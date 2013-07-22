@@ -265,7 +265,7 @@ public class UpgradeManager extends ProgressDialog {
 		
 		UpgradeOnClickListener listener = new UpgradeOnClickListener();
 		dialog.setTitle("检测到新版本");
-		String tip = String.format("当前版本: %s\n更新版本: %s\n更新内容: \n%s", 
+		String tip = String.format("当前版本: %s<br />更新版本: %s<br />更新内容: <br />%s", 
 							_param.getCurrentVersionName(),
 							_param.getHighestVersionName(),
 							_param.getUpgradeDetail());
