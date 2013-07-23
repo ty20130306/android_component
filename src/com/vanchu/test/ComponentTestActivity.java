@@ -17,12 +17,17 @@ import com.vanchu.libs.upgrade.UpgradeUtil;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
 
 public class ComponentTestActivity extends Activity {
 	private static final String	LOG_TAG	= ComponentTestActivity.class.getSimpleName();
@@ -83,6 +88,59 @@ public class ComponentTestActivity extends Activity {
 		
 	}
 	
+	public void checkUpgradeUIManager(View v){
+		SwitchLogger.setPrintLog(true);
+		SwitchLogger.d(LOG_TAG, "checkUpgradeManager");
+		
+		UpgradeParam param	= new UpgradeParam(
+			UpgradeUtil.getCurrentVersionName(this), 
+			"1.0.3",
+			"1.0.7", 
+			"http://pesiwang.devel.rabbit.oa.com/component.1.0.4.apk",
+			"升级详细内容"
+		);
+
+		class MyUpgradeManager extends UpgradeManager{
+			public MyUpgradeManager(Context context, UpgradeParam param, UpgradeCallback callback){
+				super(context, param, callback);
+			}
+			
+			@Override
+			protected Dialog createDialog(){
+				Dialog	dialog	= new Dialog(getContext());
+				View view	= LayoutInflater.from(getContext()).inflate(R.layout.dialog, null);
+				Button yes	= (Button)view.findViewById(R.id.dialog_upgrade);
+				
+				yes.setOnClickListener(new android.view.View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						MyUpgradeManager.this.chooseToUpgrade();
+					}
+				});
+				
+				Button no	= (Button)view.findViewById(R.id.dialog_ignore);
+				no.setOnClickListener(new android.view.View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						MyUpgradeManager.this.choosetToSkip();
+					}
+				});
+				
+				TextView text	= (TextView)view.findViewById(R.id.dialog_text);
+				UpgradeParam param	= getParam();
+				SwitchLogger.e(LOG_TAG, text+"  xxxxxxxxxxxxxxxxxxxxxx   "+param);
+				text.setText(param.getCurrentVersionName() +","+param.getHighestVersionName()+","+param.getUpgradeDetail());
+				SwitchLogger.e(LOG_TAG, "yyyyyyyyyyyyyyyyyyyyyyyyyy");
+				dialog.setContentView(view);
+				
+				return dialog;
+			}
+		}
+		
+		new MyUpgradeManager(this, param, new UpgradeCallback(this)).check();
+
+	}
+	
 	public void checkUpgradeManager(View v){
 		SwitchLogger.setPrintLog(true);
 		SwitchLogger.d(LOG_TAG, "checkUpgradeManager");
@@ -96,6 +154,96 @@ public class ComponentTestActivity extends Activity {
 		);
 		
 		new UpgradeManager(this, param, new UpgradeCallback(this)).check();
+
+	}
+	
+	public void upgradeUIProxy(View view){
+		SwitchLogger.setPrintLog(true);
+		SwitchLogger.d(LOG_TAG, "checkUpgradeProxy");
+		
+		class MyCallback extends UpgradeCallback {
+			
+			public MyCallback(Context context){
+				super(context);
+			}
+			
+			@Override
+			public UpgradeParam onUpgradeInfoResponse(String response){
+				try {
+					JSONObject jsonResponse	= new JSONObject(response);
+					String lowest	= jsonResponse.getString("lowest");
+					String highest	= jsonResponse.getString("highest");
+					String url		= jsonResponse.getString("apkUrl");
+					String detail	= jsonResponse.getString("detail");
+					
+					SwitchLogger.d(LOG_TAG, "receive info, lowest version:" + lowest + ", highest version: " + highest);
+					SwitchLogger.d(LOG_TAG, "receive info, apkUrl: " + url + ", detail: " + detail);
+					
+					String current	= UpgradeUtil.getCurrentVersionName(getContext());
+					SwitchLogger.d(LOG_TAG, "current version: " + current);
+					
+					return new UpgradeParam(current, lowest, highest, url, detail);
+				} catch(JSONException e){
+					if(SwitchLogger.isPrintLog()){
+						SwitchLogger.e(e);
+					}
+					return null;
+				}
+			}
+		}
+		
+		class MyUpgradeManager extends UpgradeManager{
+			public MyUpgradeManager(Context context, UpgradeParam param, UpgradeCallback callback){
+				super(context, param, callback);
+			}
+			
+			@Override
+			protected Dialog createDialog(){
+				Dialog	dialog	= new Dialog(getContext());
+				View view	= LayoutInflater.from(getContext()).inflate(R.layout.dialog, null);
+				Button yes	= (Button)view.findViewById(R.id.dialog_upgrade);
+				
+				yes.setOnClickListener(new android.view.View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						MyUpgradeManager.this.chooseToUpgrade();
+					}
+				});
+				
+				Button no	= (Button)view.findViewById(R.id.dialog_ignore);
+				no.setOnClickListener(new android.view.View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						MyUpgradeManager.this.choosetToSkip();
+					}
+				});
+				
+				TextView text	= (TextView)view.findViewById(R.id.dialog_text);
+				UpgradeParam param	= getParam();
+				SwitchLogger.e(LOG_TAG, text+"  xxxxxxxxxxxxxxxxxxxxxx   "+param);
+				text.setText(param.getCurrentVersionName() +","+param.getHighestVersionName()+","+param.getUpgradeDetail());
+				SwitchLogger.e(LOG_TAG, "yyyyyyyyyyyyyyyyyyyyyyyyyy");
+				dialog.setContentView(view);
+				
+				return dialog;
+			}
+		}
+		
+		class MyUpgradeProxy extends UpgradeProxy{
+			public MyUpgradeProxy(Context context, String upgradeInfoUrl, UpgradeCallback callback){
+				super(context, upgradeInfoUrl, callback);
+			}
+			
+			@Override
+			protected UpgradeManager createUpgradeManager(Context context, UpgradeParam param, UpgradeCallback callback){
+				return new MyUpgradeManager(context, param, callback);
+			}
+		}
+		
+		new MyUpgradeProxy(
+				this,
+				"http://pesiwang.devel.rabbit.oa.com/t.php",
+				new MyCallback(this)).check();
 
 	}
 	

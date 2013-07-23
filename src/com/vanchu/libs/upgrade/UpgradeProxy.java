@@ -15,17 +15,18 @@ public class UpgradeProxy {
 	private static final int ERR_HTTP_REQUEST_FAILED		= 2;
 	private static final int ERR_HTTP_RESPONSE_ERROR		= 3;
 	
-	private Context _context;
-	private String _upgradeInfoUrl;
-	private UpgradeCallback _callback;
+	private Context				_context;
+	private String				_upgradeInfoUrl;
+	private UpgradeCallback		_callback;
 	
 	private Handler _handler = new Handler(){
 		@Override
 		public void handleMessage(Message msg){
 			switch (msg.what) {
 			case SUCC:
-				UpgradeParam param	= (UpgradeParam)msg.obj;
-				new UpgradeManager(_context, param, _callback).check();
+				UpgradeParam param		= (UpgradeParam)msg.obj;
+				UpgradeManager manager	= createUpgradeManager(_context, param, _callback);
+				manager.check();
 				break;
 			
 			case ERR_NETWORK_NOT_CONNECTED:
@@ -53,6 +54,10 @@ public class UpgradeProxy {
 		_context		= context;
 		_upgradeInfoUrl	= upgradeInfoUrl;
 		_callback		= callback;
+	}
+	
+	protected UpgradeManager createUpgradeManager(Context context, UpgradeParam param, UpgradeCallback callback){
+		return new UpgradeManager(context, param, callback);
 	}
 	
 	private void doCheck(){

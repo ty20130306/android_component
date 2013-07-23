@@ -9,7 +9,19 @@
     android:orientation="vertical"
     tools:context=".ComponentTestActivity" >
 
-    
+     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试自定义升级组件"
+        android:layout_marginBottom="10dp"
+        android:onClick="checkUpgradeUIManager" />
+     
+      <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试自定义升级代理"
+        android:layout_marginBottom="10dp"
+        android:onClick="upgradeUIProxy" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -14,6 +14,7 @@ import com.vanchu.libs.common.SwitchLogger;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,6 +61,8 @@ public class UpgradeManager extends ProgressDialog {
 	
 	private int 				_timeoutRetryCnt;
 	
+	private Dialog				_dialog;
+	
 	private Handler	_handler = new Handler(){
 		
 		@Override
@@ -105,6 +108,8 @@ public class UpgradeManager extends ProgressDialog {
 		
 		_timeoutRetryCnt		= 0;
 		
+		_dialog	= createDialog();
+		
 		initDownloadStorage(false);
 		initProgressDialog();
 	}
@@ -118,6 +123,54 @@ public class UpgradeManager extends ProgressDialog {
 		}
 		
 		upgrade();
+	}
+	
+	protected UpgradeParam getParam(){
+		return _param;
+	}
+	
+	protected Dialog createDialog(){
+		AlertDialog.Builder dialog = new AlertDialog.Builder(_context) {
+			@Override
+			public AlertDialog create() {
+				setCancelable(false);
+				return super.create();
+			}
+		};
+		
+		UpgradeOnClickListener listener = new UpgradeOnClickListener();
+		dialog.setTitle("检测到新版本");
+		String tip = String.format("当前版本: %s<br />更新版本: %s<br />更新内容: <br />%s", 
+							_param.getCurrentVersionName(),
+							_param.getHighestVersionName(),
+							_param.getUpgradeDetail());
+		Spanned span	= Html.fromHtml(tip);
+		tip	= span.toString();
+		
+		dialog.setMessage(tip);
+		dialog.setPositiveButton("立即更新", listener);
+		if (_upgradeType == UpgradeParam.UPGRADE_TYPE_OPTIONAL) {
+			dialog.setNeutralButton("以后再说", listener);
+		}
+		return dialog.create();
+	}
+	
+	public void chooseToUpgrade(){
+		SwitchLogger.d(LOG_TAG, "chooseToUpgrade");
+		
+		if(_dialog != null){
+			_dialog.dismiss();
+		}
+		
+		download();
+	}
+	
+	public void choosetToSkip(){
+		SwitchLogger.d(LOG_TAG, "choosetToSkip");
+		
+		if(_dialog != null){
+			_dialog.dismiss();
+		}
 	}
 	
 	private void install(){
@@ -255,29 +308,7 @@ public class UpgradeManager extends ProgressDialog {
 	}
 	
 	private void upgrade(){
-		AlertDialog.Builder dialog = new AlertDialog.Builder(_context) {
-			@Override
-			public AlertDialog create() {
-				setCancelable(false);
-				return super.create();
-			}
-		};
-		
-		UpgradeOnClickListener listener = new UpgradeOnClickListener();
-		dialog.setTitle("检测到新版本");
-		String tip = String.format("当前版本: %s<br />更新版本: %s<br />更新内容: <br />%s", 
-							_param.getCurrentVersionName(),
-							_param.getHighestVersionName(),
-							_param.getUpgradeDetail());
-		Spanned span	= Html.fromHtml(tip);
-		tip	= span.toString();
-		
-		dialog.setMessage(tip);
-		dialog.setPositiveButton("立即更新", listener);
-		if (_upgradeType == UpgradeParam.UPGRADE_TYPE_OPTIONAL) {
-			dialog.setNeutralButton("以后再说", listener);
-		}
-		dialog.show();
+		_dialog.show();
 	}
 	
 	private class DownloadProgress {
