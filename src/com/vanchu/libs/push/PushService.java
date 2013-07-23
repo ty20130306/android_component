@@ -16,6 +16,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -50,7 +51,7 @@ abstract public class PushService extends Service {
 	 * 根据消息类型实现推送消息的点击动作
 	 * @param msgType	消息类型
 	 */
-	abstract protected void onNotificationClick(int msgType);
+	abstract protected void onNotificationClick(int msgType, Bundle msgExtra);
 	
 	private void showNotification(PushMsg pushMsg) {
 		//SwitchLogger.d(LOG_TAG, "ticker="+pushMsg.getTicker()+",type="+pushMsg.getType()+",title="+pushMsg.getTitle()+",text="+pushMsg.getText());
@@ -59,6 +60,7 @@ abstract public class PushService extends Service {
 		intent.setClass(this, this.getClass());
 		intent.putExtra(START_TYPE, START_TYPE_NOTIFICATION);
 		intent.putExtra(MSG_TYPE, pushMsg.getType());
+		intent.putExtras(pushMsg.getExtra());
 		PendingIntent	pIntent	= PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		
 		Notification notification = new Notification();
@@ -142,6 +144,7 @@ abstract public class PushService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		SwitchLogger.d(LOG_TAG, "onStartCommand()");
+		getPushParam();
 		
 		if(intent != null){
 			int startType	= intent.getIntExtra(START_TYPE, START_TYPE_INIT);
@@ -153,7 +156,7 @@ abstract public class PushService extends Service {
 				break;
 	
 			case START_TYPE_NOTIFICATION :
-				onNotificationClick(intent.getIntExtra(MSG_TYPE, PushMsg.MSG_TYPE_NONE));
+				onNotificationClick(intent.getIntExtra(MSG_TYPE, PushMsg.MSG_TYPE_NONE), intent.getExtras());
 				break;
 				
 			default:
@@ -182,7 +185,6 @@ abstract public class PushService extends Service {
 	}
 	
 	private void initTimerTask(){
-		getPushParam();
 		startGetMsgTimer();
 		startGetCfgTimer();
 	}
@@ -195,12 +197,17 @@ abstract public class PushService extends Service {
 			return;
 		}
 		
-		String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
-		if(response == null){
-			SwitchLogger.e(LOG_TAG, "request push msg fail");
-			return ;
+		if(_pushParam.isMsgUrlValid()){
+			String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
+			if(response == null){
+				SwitchLogger.e(LOG_TAG, "request push msg fail");
+				return ;
+			}
+			
+			onPushMsgResponse(response);
+		} else {
+			SwitchLogger.d(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
 		}
-		onPushMsgResponse(response);
 	}
 	
 	private void startGetMsgTimer() {
@@ -229,12 +236,17 @@ abstract public class PushService extends Service {
 	
 	private void getPushCfg() {
 		getPushParam();
-		String response	= NetUtil.httpPostRequest(_pushParam.getCfgUrl(), _pushParam.getCfgUrlParam(), 3);
-		if(response == null){
-			SwitchLogger.e(LOG_TAG, "request push cfg fail");
-			return ;
+		
+		if(_pushParam.isCfgUrlValid()){
+			String response	= NetUtil.httpPostRequest(_pushParam.getCfgUrl(), _pushParam.getCfgUrlParam(), 3);
+			if(response == null){
+				SwitchLogger.e(LOG_TAG, "request push cfg fail");
+				return ;
+			}
+			onPushCfgResponse(response);
+		} else {
+			SwitchLogger.d(LOG_TAG, "cfg url is not valid, disable cfg request");
 		}
-		onPushCfgResponse(response);
 	}
 
 	private void startGetCfgTimer() {

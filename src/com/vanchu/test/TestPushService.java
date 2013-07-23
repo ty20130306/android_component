@@ -1,5 +1,7 @@
 package com.vanchu.test;
 
+import android.os.Bundle;
+
 import com.vanchu.libs.common.CommonUtil;
 import com.vanchu.libs.common.NetUtil;
 import com.vanchu.libs.common.SwitchLogger;
@@ -24,8 +26,12 @@ public class TestPushService extends PushService {
 	}
 
 	@Override
-	protected void onNotificationClick(int msgType) {
-		SwitchLogger.d(LOG_TAG, "onNotificationClick, msg type=" + msgType);
+	protected void onNotificationClick(int msgType, Bundle msgExtra) {
+		SwitchLogger.e(LOG_TAG, "onNotificationClick, msg type=" + msgType);
+		SwitchLogger.e(LOG_TAG, "onNotificationClick, extra string name=" + msgExtra.getString("name"));
+		int num	= Integer.parseInt(msgExtra.getString("num"));
+		SwitchLogger.e(LOG_TAG, "onNotificationClick, extra int num=" + num);
+		SwitchLogger.e(LOG_TAG, "onNotificationClick, extra string age=" + msgExtra.getString("age"));
 		
 		switch(msgType){
 		case 1:

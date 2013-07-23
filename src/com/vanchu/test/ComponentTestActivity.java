@@ -71,7 +71,7 @@ public class ComponentTestActivity extends Activity {
 		HashMap<String, String> cfgUrlParam = new HashMap<String, String>();
 		cfgUrlParam.put("age", "24");
 		
-		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam, 5000, cfgUrl, cfgUrlParam, true);
+		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam, 5000, "", cfgUrlParam, true);
 		PushRobot.run(this, TestPushService.class, pushParam);
 	}
 	

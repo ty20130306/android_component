@@ -112,6 +112,14 @@ public class PushParam {
 		return _notifyWhenRunning;
 	}
 	
+	public boolean isMsgUrlValid(){
+		return (_msgUrl != "");
+	}
+	
+	public boolean isCfgUrlValid(){
+		return (_cfgUrl != "");
+	}
+	
 	private int adjustMsgInterval(int msgInterval){
 		if(msgInterval < MIN_MSG_INTERVAL){
 			msgInterval	= MIN_MSG_INTERVAL;

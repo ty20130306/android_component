@@ -3,15 +3,12 @@ package com.vanchu.libs.push;
 import java.util.HashMap;
 
 import com.vanchu.libs.common.SharedPrefsUtil;
-import com.vanchu.libs.common.SwitchLogger;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
 public class PushRobot {
-	private static final String LOG_TAG	= PushRobot.class.getSimpleName();
-	
 	private static final String PREFS_PUSH_SERVICE		= "push_service";
 	private static final String PREFS_PUSH_SERVICE_MSG_URL_PARAM	= "push_service_msg_url_param";
 	private static final String PREFS_PUSH_SERVICE_CFG_URL_PARAM	= "push_service_cfg_url_param";
@@ -25,13 +22,6 @@ public class PushRobot {
 	}
 	
 	public static void check(Context context, Class<?> pushServiceClass){
-		PushParam pushParam	= getPushParam(context);
-		
-		if(pushParam.getMsgUrl() == "" || pushParam.getCfgUrl() == ""){
-			SwitchLogger.e(LOG_TAG, "push param not set, check service fail, please call run PushRobot.run() first");
-			return ;
-		}
-		
 		Intent intent	= new Intent(context, pushServiceClass);
 		intent.putExtra(PushService.START_TYPE, PushService.START_TYPE_INIT);
 		context.startService(intent);
