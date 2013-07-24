@@ -1,5 +1,6 @@
 package com.vanchu.libs.push;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,10 +36,7 @@ abstract public class PushService extends Service {
 	
 	private Timer 		_msgTimer		= null;
 	private TimerTask	_msgTimerTask	= null;
-	
-	private Timer		_cfgTimer		= null;
-	private TimerTask	_cfgTimerTask	= null;
-	
+
 	
 	/**
 	 * 根据消息类型返回icon id
@@ -54,7 +52,7 @@ abstract public class PushService extends Service {
 	abstract protected void onNotificationClick(int msgType, Bundle msgExtra);
 	
 	private void showNotification(PushMsg pushMsg) {
-		//SwitchLogger.d(LOG_TAG, "ticker="+pushMsg.getTicker()+",type="+pushMsg.getType()+",title="+pushMsg.getTitle()+",text="+pushMsg.getText());
+		SwitchLogger.d(LOG_TAG, "ticker="+pushMsg.getTicker()+",type="+pushMsg.getType()+",title="+pushMsg.getTitle()+",text="+pushMsg.getText());
 		
 		Intent	intent		= new Intent(Intent.ACTION_RUN);
 		intent.setClass(this, this.getClass());
@@ -83,42 +81,45 @@ abstract public class PushService extends Service {
 			if(pushMsg.isShow()){
 				showNotification(pushMsg);
 			}
+			
+			updatePushCfgIfNeed(pushMsg);
 		} catch(JSONException e){
 			SwitchLogger.e(e);
 		}
 	}
 	
-	private void onPushCfgResponse(String response) {
-		//SwitchLogger.d(LOG_TAG, response);
-		try {
-			JSONObject cfg	= new JSONObject(response);
-			int msgInterval	= cfg.getInt("msgInterval");
-			int cfgInterval	= cfg.getInt("cfgInterval");
-			SwitchLogger.d(LOG_TAG, "received msgInterval="+msgInterval+",cfgInterval="+cfgInterval);
-			resetPushInterval(msgInterval, cfgInterval);
-		} catch(JSONException e){
-			SwitchLogger.e(e);
+	private void updatePushCfgIfNeed(PushMsg pushMsg) {
+		HashMap<String, String> cfg	= pushMsg.getCfg();
+		if(cfg.containsKey("interval")){
+			int interval	= Integer.parseInt(cfg.get("interval"));
+			SwitchLogger.d(LOG_TAG, "received interval="+interval);
+			resetPushInterval(interval);
 		}
 	}
 	
-	private void resetPushInterval(int msgInterval, int cfgInterval) {
-		_pushParam.setMsgInterval(msgInterval);
-		_pushParam.setCfgInterval(cfgInterval);
-		setPushParam();
-		stopTimerTask();
-		initTimerTask();
+	private void resetPushInterval(int interval) {
+		getPushParam();
+		if(interval != _pushParam.getMsgInterval()){
+			_pushParam.setMsgInterval(interval);
+			setPushParam();
+			stopTimerTask();
+			initTimerTask();
+			return ;
+		} else {
+			SwitchLogger.d(LOG_TAG, "same interval, no need to update");
+		}
+		
 	}
 	
 	private void stopTimerTask() {
-		_msgTimerTask.cancel();
-		_msgTimer.cancel();
-		_msgTimerTask	= null;
-		_msgTimer		= null;
-		
-		_cfgTimerTask.cancel();
-		_cfgTimer.cancel();
-		_cfgTimerTask	= null;
-		_cfgTimer		= null;
+		if(_msgTimerTask != null){
+			_msgTimerTask.cancel();
+			_msgTimerTask	= null;
+		}
+		if(_msgTimer != null){
+			_msgTimer.cancel();
+			_msgTimer		= null;
+		}
 	}
 	
 	@Override
@@ -186,7 +187,6 @@ abstract public class PushService extends Service {
 	
 	private void initTimerTask(){
 		startGetMsgTimer();
-		startGetCfgTimer();
 	}
 
 	private void getPushMsg() {
@@ -229,46 +229,9 @@ abstract public class PushService extends Service {
 			};
 			
 			_msgTimer.schedule(_msgTimerTask, _pushParam.getMsgInterval(), _pushParam.getMsgInterval());
+			SwitchLogger.d(LOG_TAG, "_msgTimerTask schedule succ, interval="+_pushParam.getMsgInterval());
 		} else {
 			SwitchLogger.d(LOG_TAG, "_msgTimerTask already inited");
-		}
-	}
-	
-	private void getPushCfg() {
-		getPushParam();
-		
-		if(_pushParam.isCfgUrlValid()){
-			String response	= NetUtil.httpPostRequest(_pushParam.getCfgUrl(), _pushParam.getCfgUrlParam(), 3);
-			if(response == null){
-				SwitchLogger.e(LOG_TAG, "request push cfg fail");
-				return ;
-			}
-			onPushCfgResponse(response);
-		} else {
-			SwitchLogger.d(LOG_TAG, "cfg url is not valid, disable cfg request");
-		}
-	}
-
-	private void startGetCfgTimer() {
-		SwitchLogger.d(LOG_TAG, "startGetCfgTimer()");
-		
-		if(_cfgTimerTask == null){
-			SwitchLogger.d(LOG_TAG, "_cfgTimerTask is null");
-			if(_cfgTimer == null){
-				SwitchLogger.d(LOG_TAG, "_cfgTimer is null");
-				_cfgTimer	= new Timer(true);
-			}
-			
-			_cfgTimerTask	= new TimerTask() {
-				@Override
-				public void run() {
-					getPushCfg();
-				}
-			};
-			
-			_cfgTimer.schedule(_cfgTimerTask, _pushParam.getCfgInterval(), _pushParam.getCfgInterval());
-		} else {
-			SwitchLogger.d(LOG_TAG, "_cfgTimerTask already inited");
 		}
 	}
 	

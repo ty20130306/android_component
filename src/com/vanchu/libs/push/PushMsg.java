@@ -1,5 +1,6 @@
 package com.vanchu.libs.push;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.JSONException;
@@ -17,39 +18,24 @@ public class PushMsg {
 	private	String	_ticker;
 	private	Bundle	_extra;
 	
+	private HashMap<String, String> _cfg;
+	
 	public PushMsg(JSONObject msg){
 		_show	= true;
 		_extra	= new Bundle();
+		_cfg	= new HashMap<String, String>();
 		
 		try {
-			_type	= msg.getInt("type");
-			_title	= msg.getString("title");
-			_text	= msg.getString("text");
+			JSONObject	data	= msg.getJSONObject("data");
+			_type	= data.getInt("type");
+			_title	= data.getString("title");
+			_text	= data.getString("text");
 			
-			if(msg.has("show")){
-				int s	= msg.getInt("show");
-				if(s == 0){
-					_show	= false;
-				} else {
-					_show	= true;
-				}
-			}
+			parseShow(data);
+			parseTicker(data);
+			parseExtra(data);
 			
-			if(msg.has("ticker")){
-				_ticker	= msg.getString("ticker");
-			} else {
-				_ticker	= _text;
-			}
-			
-			if(msg.has("extra")){
-				JSONObject extra		= msg.getJSONObject("extra");
-				Iterator<?> iterator	= extra.keys();
-				while(iterator.hasNext()){
-					
-					String key	= (String)iterator.next();
-					_extra.putString(key, extra.getString(key));
-				}
-			}
+			parseCfg(msg);
 		} catch(JSONException e){
 			_show	= false;
 			_type	= MSG_TYPE_NONE;
@@ -81,5 +67,50 @@ public class PushMsg {
 	
 	public Bundle getExtra(){
 		return _extra;
+	}
+	
+	public HashMap<String, String> getCfg(){
+		return _cfg;
+	}
+	
+	private void parseExtra(JSONObject data) throws JSONException {
+		if(data.has("extra")){
+			JSONObject extra		= data.getJSONObject("extra");
+			Iterator<?> iterator	= extra.keys();
+			while(iterator.hasNext()){
+				String key	= (String)iterator.next();
+				_extra.putString(key, extra.getString(key));
+			}
+		}
+	}
+	
+	private void parseShow(JSONObject data) throws JSONException {
+		if(data.has("show")){
+			int s	= data.getInt("show");
+			if(s == 0){
+				_show	= false;
+			} else {
+				_show	= true;
+			}
+		}
+	}
+	
+	private void parseTicker(JSONObject data) throws JSONException {
+		if(data.has("ticker")){
+			_ticker	= data.getString("ticker");
+		} else {
+			_ticker	= _text;
+		}
+	}
+	
+	private void parseCfg(JSONObject msg) throws JSONException {
+		if(msg.has("cfg")){
+			JSONObject extra		= msg.getJSONObject("cfg");
+			Iterator<?> iterator	= extra.keys();
+			while(iterator.hasNext()){
+				String key	= (String)iterator.next();
+				_cfg.put(key, extra.getString(key));
+			}
+		}
 	}
 }

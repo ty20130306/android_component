@@ -66,12 +66,7 @@ public class ComponentTestActivity extends Activity {
 		HashMap<String, String> msgUrlParam = new HashMap<String, String>();
 		msgUrlParam.put("name", "wolf");
 		
-		//int cfgInterval = PushParam.DEFAULT_CFG_INTERVAL;
-		String cfgUrl = "http://pesiwang.devel.rabbit.oa.com/test_push_cfg.php";
-		HashMap<String, String> cfgUrlParam = new HashMap<String, String>();
-		cfgUrlParam.put("age", "24");
-		
-		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam, 5000, "", cfgUrlParam, true);
+		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam, true);
 		PushRobot.run(this, TestPushService.class, pushParam);
 	}
 	

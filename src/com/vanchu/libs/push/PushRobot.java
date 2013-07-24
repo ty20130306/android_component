@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 public class PushRobot {
 	private static final String PREFS_PUSH_SERVICE		= "push_service";
 	private static final String PREFS_PUSH_SERVICE_MSG_URL_PARAM	= "push_service_msg_url_param";
-	private static final String PREFS_PUSH_SERVICE_CFG_URL_PARAM	= "push_service_cfg_url_param";
 	
 	public static void run(Context context, Class<?> pushServiceClass, PushParam pushParam){
 		setPushParam(context, pushParam);
@@ -29,29 +28,23 @@ public class PushRobot {
 	
 	public static PushParam getPushParam(Context context){
 		SharedPreferences prefs		= context.getSharedPreferences(PREFS_PUSH_SERVICE, Context.MODE_PRIVATE);
-		int		cfgInterval			= prefs.getInt("cfgInterval", PushParam.DEFAULT_CFG_INTERVAL);
-		String	cfgUrl				= prefs.getString("cfgUrl", "");
 		int		msgInterval			= prefs.getInt("msgInterval", PushParam.DEFAULT_MSG_INTERVAL);
 		String	msgUrl				= prefs.getString("msgUrl", "");
 		boolean	notifyWhenRunning	= prefs.getBoolean("notifyWhenRunning", false);
 		
 		HashMap<String, String> msgUrlParam	= SharedPrefsUtil.getStringMap(context, PREFS_PUSH_SERVICE_MSG_URL_PARAM);
-		HashMap<String, String> cfgUrlParam	= SharedPrefsUtil.getStringMap(context, PREFS_PUSH_SERVICE_CFG_URL_PARAM);
 		
-		return new PushParam(msgInterval, msgUrl, msgUrlParam, cfgInterval, cfgUrl, cfgUrlParam, notifyWhenRunning);
+		return new PushParam(msgInterval, msgUrl, msgUrlParam, notifyWhenRunning);
 	}
 	
 	public static void setPushParam(Context context, PushParam pushParam){
 		SharedPreferences prefs			= context.getSharedPreferences(PREFS_PUSH_SERVICE, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor	= prefs.edit();
-		editor.putInt("cfgInterval", pushParam.getCfgInterval());
-		editor.putString("cfgUrl", pushParam.getCfgUrl());
 		editor.putInt("msgInterval", pushParam.getMsgInterval());
 		editor.putString("msgUrl", pushParam.getMsgUrl());
 		editor.putBoolean("notifyWhenRunning", pushParam.getNotifyWhenRunning());
 		editor.commit();
 		
 		SharedPrefsUtil.putStringMap(context, PREFS_PUSH_SERVICE_MSG_URL_PARAM, pushParam.getMsgUrlParam());
-		SharedPrefsUtil.putStringMap(context, PREFS_PUSH_SERVICE_CFG_URL_PARAM, pushParam.getCfgUrlParam());
 	}
 }
