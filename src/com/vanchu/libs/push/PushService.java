@@ -66,7 +66,8 @@ abstract public class PushService extends Service {
 		notification.tickerText = pushMsg.getTicker();
 		notification.flags = Notification.FLAG_AUTO_CANCEL;
 		notification.setLatestEventInfo(this, pushMsg.getTitle(), pushMsg.getText(), pIntent);
-		notification.defaults = Notification.DEFAULT_ALL;
+		getPushParam();
+		notification.defaults = _pushParam.getDefaults();
 		
 		NotificationManager	notificationManager	= (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(pushMsg.getType(), notification);
@@ -108,7 +109,7 @@ abstract public class PushService extends Service {
 		} else {
 			SwitchLogger.d(LOG_TAG, "same interval, no need to update");
 		}
-		
+
 	}
 	
 	private void stopTimerTask() {

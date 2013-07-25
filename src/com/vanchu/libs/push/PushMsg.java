@@ -21,21 +21,18 @@ public class PushMsg {
 	private HashMap<String, String> _cfg;
 	
 	public PushMsg(JSONObject msg){
-		_show	= true;
+		_show	= false;
 		_extra	= new Bundle();
 		_cfg	= new HashMap<String, String>();
 		
 		try {
-			JSONObject	data	= msg.getJSONObject("data");
-			_type	= data.getInt("type");
-			_title	= data.getString("title");
-			_text	= data.getString("text");
-			
-			parseShow(data);
-			parseTicker(data);
-			parseExtra(data);
-			
 			parseCfg(msg);
+		} catch (JSONException e){
+			// ignore the exception
+		}
+		
+		try {
+			parseData(msg);
 		} catch(JSONException e){
 			_show	= false;
 			_type	= MSG_TYPE_NONE;
@@ -43,6 +40,7 @@ public class PushMsg {
 			_text	= "";
 			_ticker	= "";
 		}
+		
 	}
 	
 	public boolean isShow(){
@@ -111,6 +109,26 @@ public class PushMsg {
 				String key	= (String)iterator.next();
 				_cfg.put(key, extra.getString(key));
 			}
+		}
+	}
+	
+	
+	private void parseData(JSONObject msg) throws JSONException {
+		if(msg.has("data")){
+			JSONObject	data	= msg.getJSONObject("data");
+			_type	= data.getInt("type");
+			_title	= data.getString("title");
+			_text	= data.getString("text");
+			
+			parseShow(data);
+			parseTicker(data);
+			parseExtra(data);
+		} else {
+			_show	= false;
+			_type	= MSG_TYPE_NONE;
+			_title	= "";
+			_text	= "";
+			_ticker	= "";
 		}
 	}
 }

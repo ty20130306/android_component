@@ -3,6 +3,8 @@ package com.vanchu.libs.push;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Notification;
+
 
 public class PushParam {
 
@@ -30,10 +32,15 @@ public class PushParam {
 	 */
 	private boolean					_notifyWhenRunning;
 	
+	
+	/**
+	 * 接受到通知时的表现
+	 */
+	private int						_defaults;
+	
 	public PushParam(int msgInterval,
 					String msgUrl, 
-					Map<String, String> msgUrlParam,
-					boolean notifyWhenRunning)
+					Map<String, String> msgUrlParam)
 	{
 		setMsgInterval(msgInterval);
 		_msgUrl			= msgUrl;
@@ -42,7 +49,8 @@ public class PushParam {
 			_msgUrlParam	= new HashMap<String, String>();
 		}
 		
-		_notifyWhenRunning	= notifyWhenRunning;
+		_notifyWhenRunning	= false;
+		_defaults			= Notification.DEFAULT_LIGHTS;
 	}
 	
 	public String getMsgUrl(){
@@ -64,6 +72,18 @@ public class PushParam {
 	
 	public boolean getNotifyWhenRunning(){
 		return _notifyWhenRunning;
+	}
+	
+	public void setNotifyWhenRunning(boolean notifyWhenRunning){
+		_notifyWhenRunning	= notifyWhenRunning;
+	}
+	
+	public int getDefaults(){
+		return _defaults;
+	}
+	
+	public void setDefaults(int defaults){
+		_defaults	= defaults;
 	}
 	
 	public boolean isMsgUrlValid(){

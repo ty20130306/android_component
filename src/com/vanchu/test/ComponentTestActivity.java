@@ -18,6 +18,7 @@ import com.vanchu.libs.upgrade.UpgradeUtil;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -66,7 +67,10 @@ public class ComponentTestActivity extends Activity {
 		HashMap<String, String> msgUrlParam = new HashMap<String, String>();
 		msgUrlParam.put("name", "wolf");
 		
-		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam, true);
+		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam);
+		pushParam.setNotifyWhenRunning(true);
+		pushParam.setDefaults(Notification.DEFAULT_LIGHTS);
+		
 		PushRobot.run(this, TestPushService.class, pushParam);
 	}
 	

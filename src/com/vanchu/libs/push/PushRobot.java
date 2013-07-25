@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.vanchu.libs.common.SharedPrefsUtil;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,10 +32,15 @@ public class PushRobot {
 		int		msgInterval			= prefs.getInt("msgInterval", PushParam.DEFAULT_MSG_INTERVAL);
 		String	msgUrl				= prefs.getString("msgUrl", "");
 		boolean	notifyWhenRunning	= prefs.getBoolean("notifyWhenRunning", false);
+		int 	defaults			= prefs.getInt("defaults", Notification.DEFAULT_LIGHTS);
 		
 		HashMap<String, String> msgUrlParam	= SharedPrefsUtil.getStringMap(context, PREFS_PUSH_SERVICE_MSG_URL_PARAM);
 		
-		return new PushParam(msgInterval, msgUrl, msgUrlParam, notifyWhenRunning);
+		PushParam pushParam	= new PushParam(msgInterval, msgUrl, msgUrlParam);
+		pushParam.setNotifyWhenRunning(notifyWhenRunning);
+		pushParam.setDefaults(defaults);
+		
+		return pushParam;
 	}
 	
 	public static void setPushParam(Context context, PushParam pushParam){
@@ -43,6 +49,7 @@ public class PushRobot {
 		editor.putInt("msgInterval", pushParam.getMsgInterval());
 		editor.putString("msgUrl", pushParam.getMsgUrl());
 		editor.putBoolean("notifyWhenRunning", pushParam.getNotifyWhenRunning());
+		editor.putInt("defaults", pushParam.getDefaults());
 		editor.commit();
 		
 		SharedPrefsUtil.putStringMap(context, PREFS_PUSH_SERVICE_MSG_URL_PARAM, pushParam.getMsgUrlParam());
