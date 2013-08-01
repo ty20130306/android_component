@@ -1,26 +1,30 @@
-package com.vanchu.libs.common;
+package com.vanchu.libs.common.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 
-public class CommonUtil {
-	
-	public static String inputStreamToString(InputStream inputStream) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream), 8192);
-		StringBuffer buffer = new StringBuffer();
-		String line = "";
-		while ((line = in.readLine()) != null) {
-			buffer.append(line);
+public class ActivityUtil {
+	public static String getCurrentVersionName(Context context) {
+		String currentVersionName = "";
+		
+		try {
+			PackageManager pm	= context.getPackageManager();
+			PackageInfo pi		= pm.getPackageInfo(context.getPackageName(), 0);
+			currentVersionName	= pi.versionName;
+			if (currentVersionName == null || currentVersionName.length() <= 0) {
+				currentVersionName	= "1.0.0";
+			}
+		} catch (Exception e) {
+			currentVersionName	= "1.0.0";
 		}
-		return buffer.toString();
+		
+		return currentVersionName;
 	}
 	
 	public static boolean isAppRuning(Context context) {

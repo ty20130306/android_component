@@ -1,4 +1,4 @@
-package com.vanchu.libs.common;
+package com.vanchu.libs.common.util;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -59,7 +59,7 @@ public class NetUtil {
 			return 0;
 		} else if(retry >= HTTP_RETRY_MAX){
 			return HTTP_RETRY_MAX;
-		} else{
+		} else {
 			return retry;
 		}
 	}
@@ -88,7 +88,7 @@ public class NetUtil {
 				httpPost.addHeader("Accept-Encoding", "gzip");
 				if(listParams != null){
 					httpPost.setEntity(new UrlEncodedFormEntity(listParams, HTTP.UTF_8));
-					SwitchLogger.d(LOG_TAG, "post " + url + "?" + CommonUtil.inputStreamToString(httpPost.getEntity().getContent()));
+					SwitchLogger.d(LOG_TAG, "post " + url + "?" + StringUtil.inputStreamToString(httpPost.getEntity().getContent()));
 				} else {
 					SwitchLogger.d(LOG_TAG, "post " + url);
 				}
@@ -102,7 +102,7 @@ public class NetUtil {
 						SwitchLogger.d(LOG_TAG, "contentEncoding==gzip");
 						inputStream = new GZIPInputStream(inputStream);
 					}
-					response = CommonUtil.inputStreamToString(inputStream);
+					response = StringUtil.inputStreamToString(inputStream);
 					inputStream.close();
 					break;
 				} else {
@@ -160,7 +160,7 @@ public class NetUtil {
 						SwitchLogger.d(LOG_TAG, "contentEncoding==gzip");
 						inputStream = new GZIPInputStream(inputStream);
 					}
-					response = CommonUtil.inputStreamToString(inputStream);
+					response = StringUtil.inputStreamToString(inputStream);
 					inputStream.close();
 					break;
 				} else {

@@ -1,6 +1,6 @@
 package com.vanchu.libs.upgrade;
 
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.SwitchLogger;
 
 
 public class UpgradeParam {

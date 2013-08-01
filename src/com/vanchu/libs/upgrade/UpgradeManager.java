@@ -9,7 +9,8 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.FileUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -175,8 +176,8 @@ public class UpgradeManager extends ProgressDialog {
 	
 	private void install(){
 		SwitchLogger.d(LOG_TAG, "download complete, begin to install");
-		UpgradeUtil.rename(_tmpDownloadPath, _downloadPath);
-		UpgradeUtil.chmod(_downloadPath, "777");
+		FileUtil.rename(_tmpDownloadPath, _downloadPath);
+		FileUtil.chmod(_downloadPath, "777");
 		doInstall();
 		dismiss();
 		_callback.onInstallStarted();
@@ -286,7 +287,7 @@ public class UpgradeManager extends ProgressDialog {
 	private void initDownloadStorage(boolean useDeviceMem){
 		File file	= null;
 		
-		if( ! useDeviceMem && UpgradeUtil.isSDCardReady()){
+		if( ! useDeviceMem && FileUtil.isSDCardReady()){
 			_downloadStorageType	= DOWNLOAD_STORAGE_TYPE_SDCARD;
 			file			= Environment.getExternalStorageDirectory();
 		} else {
@@ -349,7 +350,7 @@ public class UpgradeManager extends ProgressDialog {
 	}
 
 	private long getDownloadedSize(File tmpApkFile){
-		long currentSize	= UpgradeUtil.getFileSize(tmpApkFile);
+		long currentSize	= FileUtil.getFileSize(tmpApkFile);
 		if(currentSize > 0){
 			/**
 			 * 如果安装包临时文件已经存在并且已经下载完整，
@@ -386,7 +387,7 @@ public class UpgradeManager extends ProgressDialog {
 			
 			DownloadProgress downloadProgress = new DownloadProgress(currentSize + httpUrlConnection.getContentLength(), currentSize);
 			SwitchLogger.d(LOG_TAG, _tmpDownloadPath + ", total size: " + downloadProgress.total);
-			if( ! UpgradeUtil.spaceEnough(_downloadDir, downloadProgress.total)){
+			if( ! FileUtil.spaceEnough(_downloadDir, downloadProgress.total)){
 				_handler.obtainMessage(UpgradeManager.DOWNLOAD_ERR_SPACE_NOT_ENOUGH, downloadProgress).sendToTarget();
 				inputStream.close();
 				outputStream.close();

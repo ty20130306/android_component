@@ -1,4 +1,4 @@
-package com.vanchu.libs.common;
+package com.vanchu.libs.common.util;
 
 import java.util.HashMap;
 import java.util.Map;

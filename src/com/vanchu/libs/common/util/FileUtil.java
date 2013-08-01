@@ -1,37 +1,16 @@
-package com.vanchu.libs.upgrade;
+package com.vanchu.libs.common.util;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import com.vanchu.libs.common.SwitchLogger;
 
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.StatFs;
 
-public class UpgradeUtil {
-	private static final String LOG_TAG = UpgradeUtil.class.getSimpleName();
-	
-	public static String getCurrentVersionName(Context context) {
-		String currentVersionName = "";
-		
-		try {
-			PackageManager pm	= context.getPackageManager();
-			PackageInfo pi		= pm.getPackageInfo(context.getPackageName(), 0);
-			currentVersionName	= pi.versionName;
-			if (currentVersionName == null || currentVersionName.length() <= 0) {
-				currentVersionName	= "1.0.0";
-			}
-		} catch (Exception e) {
-			currentVersionName	= "1.0.0";
-		}
-		
-		return currentVersionName;
-	}
+public class FileUtil {
+	private static final String LOG_TAG = FileUtil.class.getSimpleName();
 	
 	public static boolean rename(String oldPath, String newPath){
 		File tmpApkFile		= new File(oldPath);
@@ -90,7 +69,7 @@ public class UpgradeUtil {
 	
 	public static long getFileSize(String path){
 		File file	= new File(path);
-		return UpgradeUtil.getFileSize(file);
+		return FileUtil.getFileSize(file);
 	}
 	
 	public static long getFileSize(File file){
@@ -109,15 +88,7 @@ public class UpgradeUtil {
 		
 		return size;
 	}
-	
-	public static void sleep(long millis){
-		try{
-			Thread.sleep(millis);
-		} catch (InterruptedException e){
-			SwitchLogger.e(e);
-		}
-	}
-	
+
 	public static boolean copy(String srcPath, String dstPath){
 		try{
 			FileInputStream srcFile		= new FileInputStream(srcPath);

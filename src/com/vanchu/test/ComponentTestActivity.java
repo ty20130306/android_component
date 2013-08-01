@@ -5,15 +5,15 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.vanchu.libs.common.SharedPrefsUtil;
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.SharedPrefsUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.push.PushParam;
 import com.vanchu.libs.push.PushRobot;
 import com.vanchu.libs.upgrade.UpgradeCallback;
 import com.vanchu.libs.upgrade.UpgradeManager;
 import com.vanchu.libs.upgrade.UpgradeParam;
 import com.vanchu.libs.upgrade.UpgradeProxy;
-import com.vanchu.libs.upgrade.UpgradeUtil;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -38,7 +38,7 @@ public class ComponentTestActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.component_test);
 		
-		Log.d(LOG_TAG, "current version name="+UpgradeUtil.getCurrentVersionName(this));
+		Log.d(LOG_TAG, "current version name="+ActivityUtil.getCurrentVersionName(this));
 	}
 
 	@Override
@@ -87,12 +87,17 @@ public class ComponentTestActivity extends Activity {
 		
 	}
 	
+	public void feedback(View v){
+		Intent intent	= new Intent(this, TestFeedbackActivity.class);
+		startActivity(intent);
+	}
+	
 	public void checkUpgradeUIManager(View v){
 		SwitchLogger.setPrintLog(true);
 		SwitchLogger.d(LOG_TAG, "checkUpgradeManager");
 		
 		UpgradeParam param	= new UpgradeParam(
-			UpgradeUtil.getCurrentVersionName(this), 
+			ActivityUtil.getCurrentVersionName(this), 
 			"1.0.3",
 			"1.0.7", 
 			"http://pesiwang.devel.rabbit.oa.com/component.1.0.4.apk",
@@ -145,7 +150,7 @@ public class ComponentTestActivity extends Activity {
 		SwitchLogger.d(LOG_TAG, "checkUpgradeManager");
 		
 		UpgradeParam param	= new UpgradeParam(
-			UpgradeUtil.getCurrentVersionName(this), 
+			ActivityUtil.getCurrentVersionName(this), 
 			"1.0.3",
 			"1.0.7", 
 			"http://pesiwang.devel.rabbit.oa.com/component.1.0.4.apk",
@@ -178,7 +183,7 @@ public class ComponentTestActivity extends Activity {
 					SwitchLogger.d(LOG_TAG, "receive info, lowest version:" + lowest + ", highest version: " + highest);
 					SwitchLogger.d(LOG_TAG, "receive info, apkUrl: " + url + ", detail: " + detail);
 					
-					String current	= UpgradeUtil.getCurrentVersionName(getContext());
+					String current	= ActivityUtil.getCurrentVersionName(getContext());
 					SwitchLogger.d(LOG_TAG, "current version: " + current);
 					
 					return new UpgradeParam(current, lowest, highest, url, detail);
@@ -269,7 +274,7 @@ public class ComponentTestActivity extends Activity {
 					SwitchLogger.d(LOG_TAG, "receive info, lowest version:" + lowest + ", highest version: " + highest);
 					SwitchLogger.d(LOG_TAG, "receive info, apkUrl: " + url + ", detail: " + detail);
 					
-					String current	= UpgradeUtil.getCurrentVersionName(getContext());
+					String current	= ActivityUtil.getCurrentVersionName(getContext());
 					SwitchLogger.d(LOG_TAG, "current version: " + current);
 					
 					return new UpgradeParam(current, lowest, highest, url, detail);

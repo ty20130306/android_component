@@ -2,7 +2,7 @@ package com.vanchu.libs.push;
 
 import java.util.HashMap;
 
-import com.vanchu.libs.common.SharedPrefsUtil;
+import com.vanchu.libs.common.util.SharedPrefsUtil;
 
 import android.app.Notification;
 import android.content.Context;

@@ -1,7 +1,7 @@
 package com.vanchu.libs.upgrade;
 
-import com.vanchu.libs.common.NetUtil;
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.NetUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.content.Context;
 import android.os.Handler;

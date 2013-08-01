@@ -1,6 +1,6 @@
 package com.vanchu.libs.push;
 
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

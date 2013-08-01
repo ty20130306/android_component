@@ -49,4 +49,11 @@
         android:text="跳               转"
         android:layout_marginBottom="10dp"
         android:onClick="goToSecond" />
+	
+	<Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="反               馈"
+        android:layout_marginBottom="10dp"
+        android:onClick="feedback" />
 </LinearLayout>

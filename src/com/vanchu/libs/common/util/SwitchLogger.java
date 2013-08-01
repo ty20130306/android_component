@@ -1,4 +1,4 @@
-package com.vanchu.libs.common;
+package com.vanchu.libs.common.util;
 
 import android.util.Log;
 

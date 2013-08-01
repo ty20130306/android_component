@@ -2,9 +2,9 @@ package com.vanchu.test;
 
 import android.os.Bundle;
 
-import com.vanchu.libs.common.CommonUtil;
-import com.vanchu.libs.common.NetUtil;
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.NetUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.push.PushService;
 
 public class TestPushService extends PushService {
@@ -35,7 +35,7 @@ public class TestPushService extends PushService {
 		
 		switch(msgType){
 		case 1:
-			CommonUtil.startApp(this, ComponentTestActivity.class);
+			ActivityUtil.startApp(this, ComponentTestActivity.class);
 			break;
 			
 		case 2:

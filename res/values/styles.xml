@@ -17,4 +17,19 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <!-- 对话框出现和消失动画 -->
+	<style name="dialogCenterAnimation" parent="@android:style/Animation">
+		<item name="android:windowEnterAnimation">@anim/dialog_announce_enter</item>
+		<item name="android:windowExitAnimation">@anim/dialog_announce_exit</item>
+	</style>
+	
+	<!-- 文本框样式（反馈） -->
+    <style name="txt_feedback" >
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">left|top</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">#ff000000</item>
+    </style>
 </resources>

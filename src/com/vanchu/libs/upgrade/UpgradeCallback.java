@@ -3,10 +3,11 @@ package com.vanchu.libs.upgrade;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.ui.Tip;
+import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.content.Context;
-import android.widget.Toast;
 
 public class UpgradeCallback {
 	private static final String LOG_TAG = UpgradeCallback.class.getSimpleName();
@@ -38,7 +39,7 @@ public class UpgradeCallback {
 			SwitchLogger.d(LOG_TAG, "receive info, lowest version:" + lowest + ", highest version: " + highest);
 			SwitchLogger.d(LOG_TAG, "receive info, apkUrl: " + url + ", detail: " + detail);
 			
-			String current	= UpgradeUtil.getCurrentVersionName(getContext());
+			String current	= ActivityUtil.getCurrentVersionName(getContext());
 			SwitchLogger.d(LOG_TAG, "current version: " + current);
 			
 			return new UpgradeParam(current, lowest, highest, url, detail);
@@ -63,26 +64,26 @@ public class UpgradeCallback {
 	}
 	
 	public void onIoError(){
-		Toast.makeText(_context, "更新失败，请检查您的SD卡", Toast.LENGTH_LONG).show();
+		Tip.show(_context, "更新失败，请检查您的SD卡");
 	}
 	
 	public void onUrlError(){
-		Toast.makeText(_context, "更新失败，服务器升级中", Toast.LENGTH_LONG).show();
+		Tip.show(_context,"更新失败，服务器升级中");
 	}
 	
 	public void onNetworkNotConnected(){
 		SwitchLogger.d(LOG_TAG, "onNetworkNotConnected called");
-		Toast.makeText(_context, "请打开您的网络连接", Toast.LENGTH_LONG).show();
+		Tip.show(_context, "请打开您的网络连接");
 	}
 	
 	public void onStorageNotEnough(long needBytes){
 		SwitchLogger.e(LOG_TAG, "space not enough to download, need " + needBytes + " bytes");
 		String tip	= String.format("更新失败，存储空间不足, 需要 %d M空间", (int)(needBytes / (1024 * 1024) + 1));
-		Toast.makeText(_context, tip, Toast.LENGTH_LONG).show();
+		Tip.show(_context, tip);
 	}
 	
 	public void onSocketTimeout(){
 		SwitchLogger.e(LOG_TAG, "socket time out");
-		Toast.makeText(_context, "更新失败，网络超时", Toast.LENGTH_LONG).show();
+		Tip.show(_context, "更新失败，网络超时");
 	}
 }

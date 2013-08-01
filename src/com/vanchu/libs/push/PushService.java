@@ -7,9 +7,9 @@ import java.util.TimerTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.vanchu.libs.common.CommonUtil;
-import com.vanchu.libs.common.NetUtil;
-import com.vanchu.libs.common.SwitchLogger;
+import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.NetUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -194,7 +194,7 @@ abstract public class PushService extends Service {
 		getPushParam();
 		
 		boolean notifyWhenRunning	= _pushParam.getNotifyWhenRunning();
-		if( ! notifyWhenRunning && CommonUtil.isAppRuning(this)){
+		if( ! notifyWhenRunning && ActivityUtil.isAppRuning(this)){
 			return;
 		}
 		

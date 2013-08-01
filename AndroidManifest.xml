@@ -10,17 +10,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
-    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
-   
-    
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
-    <uses-permission android:name="android.permission.GET_TASKS"/>
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.VIBRATE" />
-	
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -43,14 +39,20 @@
             android:name="com.vanchu.test.SecondActivity"
             android:label="@string/title_activity_second" >
         </activity>
-        
+
         <!-- 推送模块 -->
         <service android:name="com.vanchu.test.TestPushService" />
+
         <receiver android:name="com.vanchu.test.TestPushBroadcastReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="com.vanchu.test.TestFeedbackActivity"
+            android:label="@string/title_activity_test_feedback" >
+        </activity>
     </application>
 
 </manifest>

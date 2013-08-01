@@ -2,12 +2,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".SecondActivity" >
 
      <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="second测试升级组件"
+        android:text="测试升级组件"
         android:onClick="checkUpgrade" />
 
+     
+     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试loadingDialog"
+        android:onClick="testLoadingDialog" />
+      <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试loadingDialog2"
+        android:onClick="testLoadingDialog2" />
+       <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试loadingDialog3"
+        android:onClick="testLoadingDialog3" />
+       
+        <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试progress bar"
+        android:onClick="testProgressBar" />
 </LinearLayout>
