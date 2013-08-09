@@ -17,6 +17,7 @@ import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.ui.Tip;
 import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
+import com.vanchu.test.ComponentTestActivity;
 
 
 public class PluginManager {
@@ -24,6 +25,7 @@ public class PluginManager {
 	public static final int	RESULT_SKIP_UPGRADE			= 1;
 	public static final int	RESULT_LATEST_VERSION		= 2;
 	public static final int	RESULT_INSTALL_STARTED		= 3;
+	public static final int RESULT_ERR_DOWNLOAD_FAIL	= 4;
 	
 	private static final String 	LOG_TAG	= PluginManager.class.getSimpleName();
 	
@@ -45,7 +47,6 @@ public class PluginManager {
 		_detailDialog	= createDetailDialog();
 		
 		_progressDialog	= createProgressDialog();
-		
 	}
 	
 	public void start() {
@@ -72,6 +73,12 @@ public class PluginManager {
 			_detailDialog.show();
 		} else {
 			download();
+		}
+	}
+	
+	public void uninstall(){
+		if(_pluginInfo.isInstalled()) {
+			ActivityUtil.uninstallApp(_context, _pluginInfo.getPluginCfg().getPackageName());
 		}
 	}
 	
@@ -155,7 +162,7 @@ public class PluginManager {
 		_callback.onComplete(RESULT_INSTALL_STARTED);
 	}
 	
-	private ProgressDialog createProgressDialog(){
+	protected ProgressDialog createProgressDialog(){
 		ProgressDialog progressDialog	= new ProgressDialog(_context);
 		progressDialog.setCancelable(false);
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -193,20 +200,12 @@ public class PluginManager {
 		public void onError(int errCode) {
 			switch (errCode) {
 			case Downloader.DOWNLOAD_ERR_SOCKET_TIMEOUT:
-				break;
-				
 			case Downloader.DOWNLOAD_ERR_IO:
-
-				break;
-				
 			case Downloader.DOWNLOAD_ERR_SPACE_NOT_ENOUGH:
-
-				break;
-				
 			case Downloader.DOWNLOAD_ERR_URL:
-
+				_callback.onComplete(RESULT_ERR_DOWNLOAD_FAIL);
 				break;
-				
+
 			default:
 				break;
 			}

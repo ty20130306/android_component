@@ -8,15 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.vanchu.libs.common.util.SwitchLogger;
-
 import android.content.Context;
 import android.content.pm.PackageInfo;
 
 public class PluginInfoManager {
 
-	private static final String		LOG_TAG		= PluginInfoManager.class.getSimpleName();
-	
 	private static final int		NO_FLAG		= 0;
 	
 	private Context					_context;
@@ -65,18 +61,7 @@ public class PluginInfoManager {
 			
 			_pluginInfoList.add(new PluginInfo(pluginCfg, currentVersionName));
 		}
-		SwitchLogger.d(LOG_TAG, "-------------------before sort--------------------");
-		printInfoList();
 		Collections.sort(_pluginInfoList);
-		SwitchLogger.d(LOG_TAG, "-------------------after sort--------------------");
-		printInfoList();
-	}
-
-	private void printInfoList() {
-		for(int i = 0; i < _pluginInfoList.size(); ++i) {
-			PluginCfg pc	= _pluginInfoList.get(i).getPluginCfg();
-			SwitchLogger.d(LOG_TAG, "name="+pc.getName()+"priority="+pc.getPriority()+",order="+pc.getOrder());
-		}
 	}
 	
 	public Map<String, PluginCfg> getPluginCfgMap() {
@@ -112,17 +97,4 @@ public class PluginInfoManager {
 		
 		return orderList;
 	}
-	
-//	public List<String> getListByPriorityAndOrder() {
-//		
-//	}
-//	
-//	public List<String> getListByPriority() {
-//		ArrayList<String> list	= new ArrayList<String>();
-//		
-//	}
-//	
-//	public List<String> getListByOrder() {
-//		
-//	}
 }

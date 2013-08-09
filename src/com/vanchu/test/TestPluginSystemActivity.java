@@ -15,14 +15,11 @@ import com.vanchu.libs.pluginSystem.PluginManagerCallback;
 import com.vanchu.libs.pluginSystem.PluginSystem;
 import com.vanchu.libs.pluginSystem.PluginSystemCallback;
 import com.vanchu.libs.pluginSystem.PluginVersion;
-import com.vanchu.libs.upgrade.UpgradeCallback;
-import com.vanchu.libs.upgrade.UpgradeManager;
-import com.vanchu.libs.upgrade.UpgradeParam;
+
 import com.vanchu.sample.PluginSystemDbManager;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,10 +35,9 @@ import android.widget.AdapterView.OnItemClickListener;
 public class TestPluginSystemActivity extends Activity {
 	private static final String 	LOG_TAG	= TestPluginSystemActivity.class.getSimpleName();
 	
-	private List<PluginInfo> list = new ArrayList<PluginInfo>();
-	private GridView gv;
+	private List<PluginInfo> _list = new ArrayList<PluginInfo>();
+	private GridView _gv;
 	private GridViewAdapter _gvAdapater;
-	private ProgressDialog	_progressDialog;
 	private ImgUtil			_imgUtil;
 	private PluginSystem _ps;
 	
@@ -52,17 +48,17 @@ public class TestPluginSystemActivity extends Activity {
 		setContentView(R.layout.activity_test_plugin_system);
 		
 		initImgUtil();
-		gv	= (GridView) findViewById(R.id.gridView);
-		gv.setVisibility(View.GONE);
+		_gv	= (GridView) findViewById(R.id.gridView);
+		_gv.setVisibility(View.GONE);
 		
-		gv.setOnItemClickListener(new OnItemClickListener() {  
+		_gv.setOnItemClickListener(new OnItemClickListener() {  
 			 
             public void onItemClick(AdapterView<?> parent, View view, int position,  long id) {  
                 SwitchLogger.d(LOG_TAG, ((TextView) view.findViewById(R.id.textView1))  
                                 .getText().toString() + " position:" + position + ",id="+id);  
                 
                 
-                PluginManager pluginManager	= new PluginManager(TestPluginSystemActivity.this, list.get(position), new PluginManagerCallback());
+                PluginManager pluginManager	= new PluginManager(TestPluginSystemActivity.this, _list.get(position), new PluginManagerCallback());
                 if(pluginManager.getUpgradeType() == PluginVersion.UPGRADE_TYPE_NONE
                 		|| pluginManager.getUpgradeType() == PluginVersion.UPGRADE_TYPE_FORCE) 
                 {
@@ -81,60 +77,8 @@ public class TestPluginSystemActivity extends Activity {
 		_ps.run();
 	}
 	
-	private void initProgressDialog(){
-		_progressDialog	= new ProgressDialog(this);
-		_progressDialog.setCancelable(false);
-		_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		_progressDialog.setMax(100);
-		_progressDialog.setTitle("下载进度");
-		_progressDialog.setMessage("正在准备下载安装包");
-		_progressDialog.show();
-	}
-	
 	private void initImgUtil() {
 		_imgUtil	= new ImgUtil(this);
-	}
-	
-	public void downloadAndInstall(int position){
-		SwitchLogger.setPrintLog(true);
-		SwitchLogger.d(LOG_TAG, "checkUpgradeManager");
-		
-		UpgradeParam param	= new UpgradeParam(
-			list.get(position).getCurrentVersionName(),
-			list.get(position).getPluginCfg().getPluginVersion().getLowestName(),
-			list.get(position).getPluginCfg().getPluginVersion().getHighestName(),
-			list.get(position).getPluginCfg().getPluginVersion().getApkUrl(),
-			list.get(position).getPluginCfg().getPluginVersion().getUpgradeDetail()
-		);
-		
-		class MyCallback extends UpgradeCallback {
-			
-			public MyCallback(Context context){
-				super(context);
-			}
-			
-			@Override
-			public void onDownloadStarted() {
-				initProgressDialog();
-			}
-			
-			@Override
-			public void onProgress(long downloaded, long total) {
-				_progressDialog.setProgress((int)(downloaded * 100 / total));
-				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
-											(int)(downloaded / 1024), (int)(total / 1024) );
-				
-				_progressDialog.setMessage(tip);
-			}
-			
-			@Override
-			public void onComplete(int result) {
-				_progressDialog.dismiss();
-			}
-		}
-		
-		new UpgradeManager(this, param, new MyCallback(this)).check();
-
 	}
 	
 	private class GridViewAdapter extends BaseAdapter {
@@ -147,7 +91,7 @@ public class TestPluginSystemActivity extends Activity {
 
 		@Override
 		public int getCount() {
-			return list.size();
+			return _list.size();
 		}
 
 		@Override
@@ -171,8 +115,8 @@ public class TestPluginSystemActivity extends Activity {
 	                .findViewById(R.id.textView1);  
 	 
 	       
-	        String name	= list.get(position).getPluginCfg().getName();
-	        PluginInfo pi	= list.get(position);
+	        String name	= _list.get(position).getPluginCfg().getName();
+	        PluginInfo pi	= _list.get(position);
 	        
 	        //ivRef.setImageResource(R.drawable.icon);  
 	        _imgUtil.asyncSetImg(ivRef, pi.getPluginCfg().getIconUrl(), R.drawable.icon);
@@ -200,19 +144,19 @@ public class TestPluginSystemActivity extends Activity {
 		
 		@Override
 		public void onPluginInfoReady(PluginInfoManager pluginInfoManager) {
-			list	= pluginInfoManager.getPluginInfoList();
+			_list	= pluginInfoManager.getPluginInfoList();
 			
-			printInfoList(list);
+			printInfoList(_list);
 			_gvAdapater	= new GridViewAdapter(TestPluginSystemActivity.this);
-			gv.setAdapter(_gvAdapater);
-			gv.setVisibility(View.VISIBLE);
+			_gv.setAdapter(_gvAdapater);
+			_gv.setVisibility(View.VISIBLE);
 		}
 
 		@Override
 		public void onPluginInfoChange(PluginInfoManager pluginInfoManager) {
 			SwitchLogger.d(LOG_TAG, "onPluginInfoChange called");
-			list	= pluginInfoManager.getPluginInfoList();
-			printInfoList(list);
+			_list	= pluginInfoManager.getPluginInfoList();
+			printInfoList(_list);
 			_gvAdapater.notifyDataSetChanged();
 		}
 		
