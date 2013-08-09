@@ -2,6 +2,8 @@ package com.vanchu.test;
 
 import com.vanchu.libs.common.ui.LoadingDialog;
 import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.ImgUtil;
+import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.common.util.ThreadUtil;
 import com.vanchu.libs.upgrade.UpgradeCallback;
 import com.vanchu.libs.upgrade.UpgradeManager;
@@ -15,6 +17,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -52,6 +55,18 @@ public class SecondActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.second, menu);
 		return true;
+	}
+	
+	public void testAysncImgaeLoader(View v) {
+		SwitchLogger.setPrintLog(true);
+		
+		ImgUtil imgUtil	= new ImgUtil(this);
+		ImageView imageView	= (ImageView) findViewById(R.id.aysnc_img);
+		imgUtil.asyncSetImg(imageView, "http://pesiwang.devel.rabbit.oa.com/icon.png", R.drawable.icon);
+	}
+	
+	public void testMyProgressDialog(View v){
+		new MyProgressDialog(this).show();
 	}
 	
 	public void testLoadingDialog(View v){

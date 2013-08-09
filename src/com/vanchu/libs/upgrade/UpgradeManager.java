@@ -1,118 +1,54 @@
 package com.vanchu.libs.upgrade;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 
-import com.vanchu.libs.common.util.FileUtil;
+import com.vanchu.libs.common.task.Downloader;
+import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.text.Html;
 import android.text.Spanned;
 
-public class UpgradeManager extends ProgressDialog {
+public class UpgradeManager {
 	
 	private static final String LOG_TAG = UpgradeManager.class.getSimpleName();
-	
-	private static final int DOWNLOAD_BUFFER_SIZE		= 2048;
-	
-	private static final int CONNECT_TIMEOUT		= 5000; // millisecond
-	private static final int READ_TIMEOUT			= 5000; // millisecond
+
 	private static final int EXIT_DELAY_DURATION	= 2000; // millisecond
-	
-	private static final int TIMEOUT_RETRY_MAX		= 3;
-	
-	private static final int DOWNLOAD_STORAGE_TYPE_SDCARD		= 1;
-	private static final int DOWNLOAD_STORAGE_TYPE_DEVICE_MEM	= 2;
-	
-	private static final int DOWNLOAD_DONE					= 0;
-	private static final int DOWNLOAD_PROGRESS				= 1;
-	private static final int DOWNLOAD_ERR_IO				= 2;
-	private static final int DOWNLOAD_ERR_URL				= 3;
-	private static final int DOWNLOAD_ERR_SPACE_NOT_ENOUGH	= 4;
-	private static final int DOWNLOAD_ERR_SOCKET_TIMEOUT	= 5;
 	
 	private UpgradeParam		_param;
 	private UpgradeCallback		_callback;
 	private Context				_context;
 	
 	private int					_upgradeType;
-	
-	private int 				_downloadStorageType;
 	private String				_downloadPath;
-	private String				_downloadDir;
-	private String				_tmpDownloadPath;
 	
-	private int 				_timeoutRetryCnt;
-	
-	private Dialog				_dialog;
-	
-	private Handler	_handler = new Handler(){
-		
-		@Override
-		public void handleMessage(Message msg){
-
-			switch (msg.what) {
-			case DOWNLOAD_PROGRESS:
-				updateProgress(msg);
-				break;
-				
-			case DOWNLOAD_ERR_SOCKET_TIMEOUT:
-				handleSocketTimeout();
-				break;
-				
-			case DOWNLOAD_ERR_IO:
-				handleIoError();
-				break;
-				
-			case DOWNLOAD_ERR_SPACE_NOT_ENOUGH:
-				handleSpaceNotEnough(msg);
-				break;
-				
-			case DOWNLOAD_ERR_URL:
-				handleUrlError();
-				break;
-				
-			case DOWNLOAD_DONE:
-				install();
-				break;
-			}
-		}
-	};	
+	private Dialog				_detailDialog;
+	private Handler				_handler;
+	private boolean				_downloadStarted;
 	
 	public UpgradeManager (Context context, UpgradeParam param, UpgradeCallback callback){
-		super(context);
-		
 		_context	= context;
 		_param		= param;
 		_callback	= callback;
 		
 		_upgradeType			= _param.getUpgradeType();
-		_downloadStorageType	= DOWNLOAD_STORAGE_TYPE_SDCARD;
 		
-		_timeoutRetryCnt		= 0;
-		
-		_dialog	= createDialog();
-		
-		initDownloadStorage(false);
-		initProgressDialog();
+		_detailDialog		= createDetailDialog();
+		_handler			= new Handler();
+		_downloadStarted	= false;
+	}
+	
+	public Context getContext(){
+		return _context;
 	}
 	
 	public void check(){
@@ -130,7 +66,7 @@ public class UpgradeManager extends ProgressDialog {
 		return _param;
 	}
 	
-	protected Dialog createDialog(){
+	protected Dialog createDetailDialog(){
 		AlertDialog.Builder dialog = new AlertDialog.Builder(_context) {
 			@Override
 			public AlertDialog create() {
@@ -153,14 +89,15 @@ public class UpgradeManager extends ProgressDialog {
 		if (_upgradeType == UpgradeParam.UPGRADE_TYPE_OPTIONAL) {
 			dialog.setNeutralButton("以后再说", listener);
 		}
+		
 		return dialog.create();
 	}
 	
 	public void chooseToUpgrade(){
 		SwitchLogger.d(LOG_TAG, "chooseToUpgrade");
 		
-		if(_dialog != null){
-			_dialog.dismiss();
+		if(_detailDialog != null){
+			_detailDialog.dismiss();
 		}
 		
 		download();
@@ -169,17 +106,14 @@ public class UpgradeManager extends ProgressDialog {
 	public void choosetToSkip(){
 		SwitchLogger.d(LOG_TAG, "choosetToSkip");
 		
-		if(_dialog != null){
-			_dialog.dismiss();
+		if(_detailDialog != null){
+			_detailDialog.dismiss();
 		}
 	}
 	
 	private void install(){
 		SwitchLogger.d(LOG_TAG, "download complete, begin to install");
-		FileUtil.rename(_tmpDownloadPath, _downloadPath);
-		FileUtil.chmod(_downloadPath, "777");
 		doInstall();
-		dismiss();
 		_callback.onInstallStarted();
 		_callback.onComplete(UpgradeResult.RESULT_INSTALL_STARTED);
 		
@@ -188,48 +122,7 @@ public class UpgradeManager extends ProgressDialog {
 		}
 	}
 	
-	private void handleUrlError(){
-		_callback.onUrlError();
-		errorCommonHandler();
-	}
-	
-	private void handleSpaceNotEnough(Message msg){
-		if(_downloadStorageType == DOWNLOAD_STORAGE_TYPE_SDCARD){
-			SwitchLogger.d(LOG_TAG, "sdcard space not enough, try device mem");
-			initDownloadStorage(true);
-			download();
-		} else {
-			DownloadProgress progress	= (DownloadProgress)msg.obj;
-			_callback.onStorageNotEnough(progress.total);
-			errorCommonHandler();
-		}
-	}
-	
-	private void handleIoError(){
-		if(_downloadStorageType == DOWNLOAD_STORAGE_TYPE_SDCARD){
-			SwitchLogger.d(LOG_TAG, "download to sdcard fail, try device mem");
-			initDownloadStorage(true);
-			download();
-		} else {
-			_callback.onIoError();
-			errorCommonHandler();
-		}
-	}
-	
-	private void handleSocketTimeout(){
-		if(_timeoutRetryCnt < TIMEOUT_RETRY_MAX){
-			_timeoutRetryCnt++;
-			SwitchLogger.d(LOG_TAG, 
-							"socket timeout, retry it, timeout retry count now: " + _timeoutRetryCnt);
-			download();
-		} else {
-			_callback.onSocketTimeout();
-			errorCommonHandler();
-		}
-	}
-	
 	private void errorCommonHandler(){
-		dismiss();
 		if(UpgradeParam.UPGRADE_TYPE_FORCE == _param.getUpgradeType()){
 			_callback.onComplete(UpgradeResult.RESULT_ERROR_FATAL);
 			exitApp();
@@ -238,13 +131,8 @@ public class UpgradeManager extends ProgressDialog {
 		}
 	}
 	
-	private void updateProgress(Message msg){
-		DownloadProgress progress = (DownloadProgress)msg.obj;
-		setProgress((int)(progress.hasRead * 100 / progress.total));
-		String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
-									(int)(progress.hasRead / 1024), (int)(progress.total / 1024) );
-		
-		setMessage(tip);
+	private void publishProgress(long downloaded, long total){
+		_callback.onProgress(downloaded, total);
 	}
 
 	private void exitApp(){
@@ -265,7 +153,7 @@ public class UpgradeManager extends ProgressDialog {
 	}
 	
 	private void doInstall(){
-		SwitchLogger.d(LOG_TAG, "install path: "+_downloadPath);
+		SwitchLogger.d(LOG_TAG, "install path: " + _downloadPath);
 		
 		Intent intent = new Intent();
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -273,33 +161,8 @@ public class UpgradeManager extends ProgressDialog {
 		Uri uri = Uri.fromFile(new File(_downloadPath));
 		intent.setDataAndType(uri, "application/vnd.android.package-archive");
 		_context.startActivity(intent);
-		dismiss();
 	}
-	
-	private void initProgressDialog(){
-		setCancelable(false);
-		setProgressStyle(STYLE_HORIZONTAL);
-		setMax(100);
-		setTitle("下载进度");
-		setMessage("正在准备下载安装包");
-	}
-	
-	private void initDownloadStorage(boolean useDeviceMem){
-		File file	= null;
-		
-		if( ! useDeviceMem && FileUtil.isSDCardReady()){
-			_downloadStorageType	= DOWNLOAD_STORAGE_TYPE_SDCARD;
-			file			= Environment.getExternalStorageDirectory();
-		} else {
-			_downloadStorageType	= DOWNLOAD_STORAGE_TYPE_DEVICE_MEM;
-			file			= _context.getFilesDir();
-		}
-		
-		_downloadDir		= file.getAbsolutePath();
-		_downloadPath		= _downloadDir + "/" + _param.getApkFileName();
-		_tmpDownloadPath	= _downloadPath + ".tmp";
-	}
-	
+
 	private void deleteInstalledApkFile(){
 		File apkFile	= new File(_downloadPath);
 		if(apkFile.exists()){
@@ -309,118 +172,60 @@ public class UpgradeManager extends ProgressDialog {
 	}
 	
 	private void upgrade(){
-		_dialog.show();
+		_detailDialog.show();
 	}
-	
-	private class DownloadProgress {
-		public long total;
-		public long hasRead;
+
+	private class UpgradeDownloadListener implements IDownloadListener {
+
+		@Override
+		public void onStart() {
+			// do nothing
+		}
 		
-		public DownloadProgress(long total, long hasRead){
-			this.total		= total;
-			this.hasRead	= hasRead;
+		@Override
+		public void onProgress(long downloaded, long total) {
+			if( ! _downloadStarted) {
+				_downloadStarted	= true;
+				_callback.onDownloadStarted();
+			}
+			publishProgress(downloaded, total);
+		}
+
+		@Override
+		public void onSuccess(String downloadFile) {
+			_downloadPath	= downloadFile;
+			install();
+		}
+
+		@Override
+		public void onError(int errCode) {
+			switch (errCode) {
+			case Downloader.DOWNLOAD_ERR_SOCKET_TIMEOUT:
+				_callback.onSocketTimeout();
+				break;
+				
+			case Downloader.DOWNLOAD_ERR_IO:
+				_callback.onIoError();
+				break;
+				
+			case Downloader.DOWNLOAD_ERR_SPACE_NOT_ENOUGH:
+				_callback.onStorageNotEnough();
+				break;
+				
+			case Downloader.DOWNLOAD_ERR_URL:
+				_callback.onUrlError();
+				break;
+				
+			default:
+				break;
+			}
+			
+			errorCommonHandler();
 		}
 	}
 	
 	private void download(){
-		if(apkDownloaded()){
-			SwitchLogger.d(LOG_TAG, _downloadPath + " already downloaded");
-			install();
-			return;
-		}
-		
-		SwitchLogger.d(LOG_TAG, "try to download, path: " + _downloadPath);
-		setProgress(0);
-		show();
-		
-		new Thread(){
-			public void run(){
-				doDownload();
-			}
-		}.start();
-	}
-	
-	private boolean apkDownloaded() {
-		File apkFile	= new File(_downloadPath);
-		if(apkFile.exists()){
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private long getDownloadedSize(File tmpApkFile){
-		long currentSize	= FileUtil.getFileSize(tmpApkFile);
-		if(currentSize > 0){
-			/**
-			 * 如果安装包临时文件已经存在并且已经下载完整，
-			 * currentSize 会与文件大小相等，如果将Range的起始下载字节位置)设置为文件大小
-			 * 将会导致服务端返回416错误--Requested Range Not Satisfiable错误
-			 * 为了避免这种情况发生，对currentSize进行减1，保证Range的起始下载字节位置是正确的
-			 */
-			currentSize -= 1;
-		}
-
-		return currentSize;
-	}
-	
-	private void doDownload(){
-		try {
-			File tmpApkFile		= new File(_tmpDownloadPath);
-			long currentSize	= getDownloadedSize(tmpApkFile);
-
-			SwitchLogger.d(LOG_TAG, _tmpDownloadPath + ", current size: " + currentSize);
-			
-			URL	url	= new URL(_param.getUpgradeApkUrl());
-			HttpURLConnection httpUrlConnection	= (HttpURLConnection)url.openConnection();
-			httpUrlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-			httpUrlConnection.setReadTimeout(READ_TIMEOUT);
-			
-			SwitchLogger.d(LOG_TAG, "connect time out="+httpUrlConnection.getConnectTimeout()
-							+",read time out="+httpUrlConnection.getReadTimeout());
-			
-			httpUrlConnection.setRequestProperty("Range", "bytes=" + currentSize + "-");
-			
-			InputStream inputStream			= httpUrlConnection.getInputStream();
-			RandomAccessFile outputStream	= new RandomAccessFile(tmpApkFile, "rw");
-			outputStream.seek(currentSize);
-			
-			DownloadProgress downloadProgress = new DownloadProgress(currentSize + httpUrlConnection.getContentLength(), currentSize);
-			SwitchLogger.d(LOG_TAG, _tmpDownloadPath + ", total size: " + downloadProgress.total);
-			if( ! FileUtil.spaceEnough(_downloadDir, downloadProgress.total)){
-				_handler.obtainMessage(UpgradeManager.DOWNLOAD_ERR_SPACE_NOT_ENOUGH, downloadProgress).sendToTarget();
-				inputStream.close();
-				outputStream.close();
-				return;
-			}
-			
-			_handler.obtainMessage(UpgradeManager.DOWNLOAD_PROGRESS, downloadProgress).sendToTarget();
-			
-			byte[] buffer	= new byte[DOWNLOAD_BUFFER_SIZE];
-			int len = 0;
-			while((len = inputStream.read(buffer)) != -1){
-				outputStream.write(buffer, 0, len);
-				downloadProgress.hasRead	+= len;
-				_handler.obtainMessage(UpgradeManager.DOWNLOAD_PROGRESS, downloadProgress).sendToTarget();
-			}
-			
-			inputStream.close();
-			outputStream.close();
-			_handler.obtainMessage(UpgradeManager.DOWNLOAD_DONE).sendToTarget();
-			
-		} catch(MalformedURLException e){
-			SwitchLogger.e(e);
-			_handler.obtainMessage(UpgradeManager.DOWNLOAD_ERR_URL).sendToTarget();
-			
-		} catch(SocketTimeoutException e){
-			SwitchLogger.d(LOG_TAG, "receive socket timeout exception occur");
-			SwitchLogger.e(e);
-			_handler.obtainMessage(UpgradeManager.DOWNLOAD_ERR_SOCKET_TIMEOUT).sendToTarget();
-		
-		} catch(IOException e){
-			SwitchLogger.e(e);
-			_handler.obtainMessage(UpgradeManager.DOWNLOAD_ERR_IO).sendToTarget();
-		}
+		new Downloader(_context, _param.getUpgradeApkUrl(), new UpgradeDownloadListener()).run();
 	}
 	
 	private class UpgradeOnClickListener implements DialogInterface.OnClickListener {

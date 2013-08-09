@@ -5,12 +5,29 @@
     android:orientation="vertical"
     tools:context=".SecondActivity" >
 
+    <ImageView 
+        android:id="@+id/aysnc_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试异步加载图片"
+        android:onClick="testAysncImgaeLoader" />
+    
      <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="测试升级组件"
         android:onClick="checkUpgrade" />
 
+      <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试自定义progress dialog"
+        android:onClick="testMyProgressDialog" />
      
      <Button
         android:layout_width="wrap_content"

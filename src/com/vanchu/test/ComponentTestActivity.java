@@ -5,6 +5,8 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vanchu.libs.common.task.Downloader;
+import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.SharedPrefsUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
@@ -19,6 +21,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Notification;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -27,11 +30,14 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 public class ComponentTestActivity extends Activity {
+	public static final String	SONG_PACKAGE_NAME	=	"com.vanchu.apps.bangyouxi.plugins.song";
+	public static final String	SONG_INDEX_ACTIVITY	=	"com.vanchu.apps.bangyouxi.plugins.song.SongActivity";
+	
 	private static final String	LOG_TAG	= ComponentTestActivity.class.getSimpleName();
+	
+	private ProgressDialog	_progressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +53,72 @@ public class ComponentTestActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+	private void initProgressDialog(){
+		_progressDialog	= new ProgressDialog(this);
+		_progressDialog.setCancelable(false);
+		_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		_progressDialog.setMax(100);
+		_progressDialog.setTitle("下载进度");
+		_progressDialog.setMessage("正在准备下载安装包");
+		_progressDialog.show();
+	}
+	
+	public void testDownloader(View v){
+		SwitchLogger.setPrintLog(true);
+		
+		class TestDownloadListener implements IDownloadListener {
 
-	public void goToSecond(View v){
-		Toast.makeText(this, 
-				String.format("更新失败，存储空间不足, 需要 %s M空间", "545515"), 
-				Toast.LENGTH_LONG).show();
-		
-		
+			@Override
+			public void onStart() {
+				initProgressDialog();
+			}
+			
+			@Override
+			public void onProgress(long downloaded, long total) {
+				_progressDialog.setProgress((int)(downloaded * 100 / total));
+				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
+											(int)(downloaded / 1024), (int)(total / 1024) );
+				
+				_progressDialog.setMessage(tip);
+				
+				SwitchLogger.d(LOG_TAG, "downloaded " + downloaded);
+			}
+
+			@Override
+			public void onSuccess(String downloadFile) {
+				SwitchLogger.d(LOG_TAG, "download " + downloadFile + " complete");
+				_progressDialog.dismiss();
+				SwitchLogger.d(LOG_TAG, "_progressDialog.dismiss() called");
+			}
+
+			@Override
+			public void onError(int errCode) {
+				SwitchLogger.d(LOG_TAG, "download error, errCode = " + errCode);
+			}
+		}
+
+		new Downloader(this, "http://pesiwang.devel.rabbit.oa.com/song.apk", new TestDownloadListener()).run();
+	}
+	
+	public void testPluginSystem(View v){
+		SwitchLogger.setPrintLog(true);
+	
+		Intent intent	= new Intent(this, TestPluginSystemActivity.class);
+		startActivity(intent);
+	}
+	
+	public void startApp(View v){
+		SwitchLogger.setPrintLog(true);
+		ActivityUtil.startApp(this, SONG_PACKAGE_NAME);
+	}
+	
+	public void startApp2(View v){
+		SwitchLogger.setPrintLog(true);
+		ActivityUtil.startApp(this, SONG_PACKAGE_NAME, SONG_INDEX_ACTIVITY);
+	}
+	
+	public void goToSecond(View v){		
 		Intent intent	= new Intent(this, SecondActivity.class);
 		startActivity(intent);
 	}
@@ -103,6 +168,33 @@ public class ComponentTestActivity extends Activity {
 			"http://pesiwang.devel.rabbit.oa.com/component.1.0.4.apk",
 			"升级详细内容"
 		);
+		
+
+		class MyCallback extends UpgradeCallback {
+			
+			public MyCallback(Context context){
+				super(context);
+			}
+			
+			@Override
+			public void onDownloadStarted() {
+				initProgressDialog();
+			}
+			
+			@Override
+			public void onProgress(long downloaded, long total) {
+				_progressDialog.setProgress((int)(downloaded * 100 / total));
+				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
+											(int)(downloaded / 1024), (int)(total / 1024) );
+				
+				_progressDialog.setMessage(tip);
+			}
+			
+			@Override
+			public void onComplete(int result) {
+				_progressDialog.dismiss();
+			}
+		}
 
 		class MyUpgradeManager extends UpgradeManager{
 			public MyUpgradeManager(Context context, UpgradeParam param, UpgradeCallback callback){
@@ -110,7 +202,7 @@ public class ComponentTestActivity extends Activity {
 			}
 			
 			@Override
-			protected Dialog createDialog(){
+			protected Dialog createDetailDialog(){
 				Dialog	dialog	= new Dialog(getContext());
 				View view	= LayoutInflater.from(getContext()).inflate(R.layout.dialog, null);
 				Button yes	= (Button)view.findViewById(R.id.dialog_upgrade);
@@ -141,7 +233,7 @@ public class ComponentTestActivity extends Activity {
 			}
 		}
 		
-		new MyUpgradeManager(this, param, new UpgradeCallback(this)).check();
+		new MyUpgradeManager(this, param, new MyCallback(this)).check();
 
 	}
 	
@@ -157,7 +249,33 @@ public class ComponentTestActivity extends Activity {
 			"升级详细内容"
 		);
 		
-		new UpgradeManager(this, param, new UpgradeCallback(this)).check();
+		class MyCallback extends UpgradeCallback {
+			
+			public MyCallback(Context context){
+				super(context);
+			}
+			
+			@Override
+			public void onDownloadStarted() {
+				initProgressDialog();
+			}
+			
+			@Override
+			public void onProgress(long downloaded, long total) {
+				_progressDialog.setProgress((int)(downloaded * 100 / total));
+				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
+											(int)(downloaded / 1024), (int)(total / 1024) );
+				
+				_progressDialog.setMessage(tip);
+			}
+			
+			@Override
+			public void onComplete(int result) {
+				_progressDialog.dismiss();
+			}
+		}
+		
+		new UpgradeManager(this, param, new MyCallback(this)).check();
 
 	}
 	
@@ -169,6 +287,25 @@ public class ComponentTestActivity extends Activity {
 			
 			public MyCallback(Context context){
 				super(context);
+			}
+			
+			@Override
+			public void onDownloadStarted() {
+				initProgressDialog();
+			}
+			
+			@Override
+			public void onProgress(long downloaded, long total) {
+				_progressDialog.setProgress((int)(downloaded * 100 / total));
+				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
+											(int)(downloaded / 1024), (int)(total / 1024) );
+				
+				_progressDialog.setMessage(tip);
+			}
+			
+			@Override
+			public void onComplete(int result) {
+				_progressDialog.dismiss();
 			}
 			
 			@Override
@@ -202,7 +339,7 @@ public class ComponentTestActivity extends Activity {
 			}
 			
 			@Override
-			protected Dialog createDialog(){
+			protected Dialog createDetailDialog(){
 				Dialog	dialog	= new Dialog(getContext());
 				View view	= LayoutInflater.from(getContext()).inflate(R.layout.dialog, null);
 				Button yes	= (Button)view.findViewById(R.id.dialog_upgrade);
@@ -255,11 +392,30 @@ public class ComponentTestActivity extends Activity {
 
 		SwitchLogger.setPrintLog(true);
 		SwitchLogger.d(LOG_TAG, "checkUpgradeProxy");
-		
+		initProgressDialog();
 		class MyCallback extends UpgradeCallback {
 			
 			public MyCallback(Context context){
 				super(context);
+			}
+			
+			@Override
+			public void onDownloadStarted() {
+				
+			}
+			
+			@Override
+			public void onProgress(long downloaded, long total) {
+				_progressDialog.setProgress((int)(downloaded * 100 / total));
+				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
+											(int)(downloaded / 1024), (int)(total / 1024) );
+				
+				_progressDialog.setMessage(tip);
+			}
+			
+			@Override
+			public void onComplete(int result) {
+				_progressDialog.dismiss();
 			}
 			
 			@Override

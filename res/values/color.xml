@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 白色 -->
+    <color name="red">#FFFF0000</color>
+    <!-- 白色 -->
+    <color name="white">#FFFFFFFF</color>
+    <!-- 黑色 -->
+    <color name="black">#FF000000</color>
+    <!-- 基本文字样式使用的颜色 -->
+    <color name="text_base">#FF14304B</color>
+    <!-- 竞赛界面歌单名称颜色 -->
+    <color name="name_playlist_contest">#FFFF9900</color>
+    <!-- 对手列表背景颜色 -->
+    <color name="bg_list">#FFE7F4FF</color>
+    <!-- 好友列表背景颜色 -->
+    <color name="bg_list_friend">#5C60A1FB</color>
+    <!-- 猜歌名、猜歌手文字颜色 -->
+    <color name="contest_guess">#FF492416</color>
+    <!-- 主界面分享对话框背景 -->
+    <color name="share_bg">#D9000000</color>
+    <!-- 个单列表选中项 -->
+    <color name="playlist_seleted">#5C60A1FB</color>
+    <!-- 活动中心公告标题 -->
+    <color name="title_announce">#FF0D2448</color>
+    <!-- 商城道具列表详细描述 -->
+    <color name="shop_listitem_txt">#FFEF1B50</color>
+    <!-- 极限擂台赛倒计时数字 -->
+    <color name="extremely_info_time">#FFBF3A3A</color>
+    <!-- tab选中背景 -->
+    <color name="bg_tab_click">#1F000000</color>
+    <!-- 时间数字 -->
+    <color name="num_time">#FF482315</color>
+    <!-- 签到奖品字体颜色 -->
+    <color name="txt_gift">#ff0167</color>
+    <!-- 黄色 -->
+    <color name="yellow">#ffff00</color>
+    <!-- 淡蓝色 -->
+    <color name="smoke">#1BCFFC</color>
+    <!--紫红色 -->
+    <color name="amaranth">#ff0167</color>
+    <!--疯狂模式歌单颜色 -->
+    <color name="crazy_playlistName">#ff2d0f04</color>
+    <!-- 疯狂模式结果界面背景色 -->
+    <color name="crazy_bg_result">#ff404040</color>   
+    <!-- 灰色 -->
+    <drawable name="gray">#8F8F8F</drawable>
+    <!-- 白色 -->
+    <drawable name="white">#FFFFFF</drawable>
+    <color name="deep_gray">#2B2B2B</color>
+    <color name="deep_blue">#36648B</color>
+    
+
+</resources>

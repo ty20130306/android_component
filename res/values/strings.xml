@@ -8,12 +8,12 @@
     <string name="title_activity_second">SecondActivity</string>
     <string name="loading">loading</string>
     <string name="title_activity_test_feedback">TestFeedbackActivity</string>
-    
     <string name="feedback_contact_hint">选填，以便解决问题后给你答复</string>
-	<string name="feedback_msg_hint">请输入您的反馈意见（200字以内）</string>
-	<string name="feedback_msg_null">请输入反馈内容！</string>
-	<string name="feedback_contact_too_long">联系方式太长啦(50字以内)</string>
-	<string name="feedback_submit_succ">提交成功，我们会尽快处理您的反馈</string>
-	<string name="feedback_submit_fail">提交失败，请重试</string>
+    <string name="feedback_msg_hint">请输入您的反馈意见（200字以内）</string>
+    <string name="feedback_msg_null">请输入反馈内容！</string>
+    <string name="feedback_contact_too_long">联系方式太长啦(50字以内)</string>
+    <string name="feedback_submit_succ">提交成功，我们会尽快处理您的反馈</string>
+    <string name="feedback_submit_fail">提交失败，请重试</string>
+    <string name="title_activity_test_push_system">TestPushSystemActivity</string>
 
 </resources>

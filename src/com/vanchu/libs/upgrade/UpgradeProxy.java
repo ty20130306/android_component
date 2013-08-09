@@ -76,7 +76,7 @@ public class UpgradeProxy {
 		
 		UpgradeParam param	= _callback.onUpgradeInfoResponse(response);
 		if(param == null){
-			_handler.obtainMessage(ERR_HTTP_REQUEST_FAILED).sendToTarget();
+			_handler.obtainMessage(ERR_HTTP_RESPONSE_ERROR).sendToTarget();
 		} else {
 			_handler.obtainMessage(SUCC, param).sendToTarget();
 		}

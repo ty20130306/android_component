@@ -40,6 +40,16 @@
             android:label="@string/title_activity_second" >
         </activity>
 
+        <!-- 插件系统 -->
+<!--         <receiver android:name="com.vanchu.test.PackageReceiver" > -->
+<!--             <intent-filter> -->
+<!--              	<action android:name="android.intent.action.PACKAGE_ADDED" />   -->
+<!--              	<action android:name="android.intent.action.PACKAGE_REMOVED" />   -->
+<!--              	<action android:name="android.intent.action.PACKAGE_REPLACED" /> -->
+<!--              	<data android:scheme="package"></data> -->
+<!--             </intent-filter> -->
+<!--         </receiver> -->
+        
         <!-- 推送模块 -->
         <service android:name="com.vanchu.test.TestPushService" />
 
@@ -52,6 +62,10 @@
         <activity
             android:name="com.vanchu.test.TestFeedbackActivity"
             android:label="@string/title_activity_test_feedback" >
+        </activity>
+        <activity
+            android:name="com.vanchu.test.TestPluginSystemActivity"
+            android:label="@string/title_activity_test_push_system" >
         </activity>
     </application>
 

@@ -22,6 +22,14 @@ public class UpgradeCallback {
 		return _context;
 	}
 	
+	public void onDownloadStarted(){
+		SwitchLogger.d(LOG_TAG, "onStart called");
+	}
+	
+	public void onProgress(long downloaded, long total){
+		
+	}
+	
 	public void onComplete(int result){
 		SwitchLogger.d(LOG_TAG, "onComplete called, result = " + result);
 	}
@@ -76,10 +84,9 @@ public class UpgradeCallback {
 		Tip.show(_context, "请打开您的网络连接");
 	}
 	
-	public void onStorageNotEnough(long needBytes){
-		SwitchLogger.e(LOG_TAG, "space not enough to download, need " + needBytes + " bytes");
-		String tip	= String.format("更新失败，存储空间不足, 需要 %d M空间", (int)(needBytes / (1024 * 1024) + 1));
-		Tip.show(_context, tip);
+	public void onStorageNotEnough(){
+		SwitchLogger.e(LOG_TAG, "space not enough to download");
+		Tip.show(_context, "更新失败，存储空间不足");
 	}
 	
 	public void onSocketTimeout(){
