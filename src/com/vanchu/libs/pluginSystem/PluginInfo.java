@@ -2,35 +2,46 @@ package com.vanchu.libs.pluginSystem;
 
 public class PluginInfo implements Comparable<PluginInfo> {
 	
+	public static final String	NO_VERSION_NAME		= "";
+	public static final int		NO_VERSION_CODE		= 0;
+	
 	private PluginCfg	_pluginCfg;
 	private String		_currentVersionName;
 	private int			_currentVersionCode;
 	
 	private boolean		_installed;
-	private int			_upgradeType;
+	private boolean		_editing;
 	
 	public PluginInfo(PluginCfg pluginCfg, String currentVersionName) {
 		_pluginCfg			= pluginCfg;
 		
-		if(currentVersionName == PluginVersion.NO_VERSION_NAME) {
+		if(currentVersionName == NO_VERSION_NAME) {
 			_installed	= false;
-			_currentVersionName		= PluginVersion.NO_VERSION_NAME;
-			_currentVersionCode		= PluginVersion.NO_VERSION_CODE;
-			_upgradeType			= PluginVersion.UPGRADE_TYPE_NONE;
+			_currentVersionName		= NO_VERSION_NAME;
+			_currentVersionCode		= NO_VERSION_CODE;
 		} else {
 			_installed	= true;
 			_currentVersionName		= currentVersionName;
-			_currentVersionCode		= PluginVersion.versionNameToCode(_currentVersionName);
-			_upgradeType			= pluginCfg.getPluginVersion().getUpgradeType(_currentVersionCode);
+			_currentVersionCode		= versionNameToCode(_currentVersionName);
 		}
+		
+		_editing	= false;
+	}
+	
+	public static int versionNameToCode(String versionName) {
+		return Integer.parseInt(versionName.replace(".", "0"));
 	}
 	
 	public boolean isInstalled() {
 		return _installed;
 	}
 	
-	public int getUpgradeType() {
-		return _upgradeType;
+	public boolean isEditing(){
+		return _editing;
+	}
+	
+	public void setEditing(boolean editing) {
+		_editing	= editing;
 	}
 	
 	public String getCurrentVersionName() {

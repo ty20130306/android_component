@@ -163,19 +163,8 @@ public class PluginSystem {
 		int order		= pluginCfgJson.getInt("order");
 		String packageName	= pluginId;
 		String className	= pluginCfgJson.getString("className");
-		
-		PluginVersion pluginVersion		= parsePluginVersion(pluginCfgJson.getJSONObject("version"));
-		
-		return new PluginCfg(pluginId, name, iconUrl, show, priority, order, packageName, className, pluginVersion);
-	}
-	
-	private PluginVersion parsePluginVersion(JSONObject pluginVersionJson) throws JSONException {
-		String lowest	= pluginVersionJson.getString("lowest");
-		String highest	= pluginVersionJson.getString("highest");
-		String apkUrl	= pluginVersionJson.getString("apkUrl");
-		String detail	= pluginVersionJson.getString("detail");
-		
-		return new PluginVersion(lowest, highest, apkUrl, detail);
+		String apkUrl		= pluginCfgJson.getString("apkUrl");
+		return new PluginCfg(pluginId, name, iconUrl, show, priority, order, packageName, className, apkUrl);
 	}
 
 	private void getPluginCfg() {

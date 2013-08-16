@@ -2,7 +2,6 @@ package com.vanchu.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import com.vanchu.libs.common.ui.Tip;
 import com.vanchu.libs.common.util.ActivityUtil;
@@ -15,7 +14,6 @@ import com.vanchu.libs.pluginSystem.PluginManager;
 import com.vanchu.libs.pluginSystem.PluginManagerCallback;
 import com.vanchu.libs.pluginSystem.PluginSystem;
 import com.vanchu.libs.pluginSystem.PluginSystemCallback;
-import com.vanchu.libs.pluginSystem.PluginVersion;
 
 import com.vanchu.sample.PluginSystemDbManager;
 
@@ -23,8 +21,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -40,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 public class TestPluginSystemActivity extends Activity {
 	private static final String 	LOG_TAG	= TestPluginSystemActivity.class.getSimpleName();
@@ -50,6 +47,9 @@ public class TestPluginSystemActivity extends Activity {
 	private ViewPager _viewPager;
 	private List<View> _pageViewList;
 	private List<GridViewAdapter> _gridViewAdapterList;
+	private List<OnPluginClickListener> _pluginClickListenerList;
+	private List<View>	_dotList;
+	private	int _lastPagePosition;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +58,27 @@ public class TestPluginSystemActivity extends Activity {
 		
 		_pluginData	= null;
 		_viewPager	= (ViewPager)findViewById(R.id.view_pager);
+		_lastPagePosition	= 0;
 		
+		initDotList();
 		_pageViewList			= new ArrayList<View>();
 		_gridViewAdapterList	= new ArrayList<GridViewAdapter>(); 
-
+		_pluginClickListenerList	= new ArrayList<OnPluginClickListener>();
+		
 		_ps	= new PluginSystem(this, 
 				"http://pesiwang.devel.rabbit.oa.com/test_plugin_system.php", 
 				new MyPluginSystemCallback());
 		
 		_ps.run();
+	}
+	
+	private void initDotList() {
+		_dotList	= new ArrayList<View>();
+		_dotList.add(findViewById(R.id.page_dot_0));
+		_dotList.add(findViewById(R.id.page_dot_1));
+		_dotList.add(findViewById(R.id.page_dot_2));
+		_dotList.add(findViewById(R.id.page_dot_3));
+		_dotList.add(findViewById(R.id.page_dot_4));
 	}
 	
 	private void setPlguinData(List<PluginInfo> pluginInfoList) {
@@ -97,7 +109,7 @@ public class TestPluginSystemActivity extends Activity {
 			PluginCfg pc	= pi.getPluginCfg();
 			SwitchLogger.d(LOG_TAG, "id="+pc.getId()+",name="+pc.getName()+",priority="+pc.getPriority()+",order="+pc.getOrder()
 									+",show="+pc.isShow()+",installed="+pi.isInstalled()+",currentVersionName="
-									+pi.getCurrentVersionName()+",upgradeType="+pi.getUpgradeType());
+									+pi.getCurrentVersionName());
 		}
 	}
 	
@@ -132,6 +144,12 @@ public class TestPluginSystemActivity extends Activity {
 		_ps.stop();
 		super.onDestroy();
 	}
+	
+	private void showDotList() {
+		for(int i = 0; i < _pluginData.size() && i < _dotList.size(); ++i) {
+			_dotList.get(i).setVisibility(View.VISIBLE);
+		}
+	}
 
 	private class MyPluginSystemCallback extends PluginSystemCallback {
 		
@@ -142,7 +160,8 @@ public class TestPluginSystemActivity extends Activity {
 			printInfoList(pluginInfolist);
 			
 			setPlguinData(pluginInfolist);
-
+			showDotList();
+			
 			LayoutInflater inflater	= TestPluginSystemActivity.this.getLayoutInflater();
 			for(int i = 0; i < _pluginData.size(); ++i) {
 				List<PluginInfo> pagePluginInfoList	= _pluginData.get(i);
@@ -152,8 +171,11 @@ public class TestPluginSystemActivity extends Activity {
 				GridViewAdapter gvd	= new GridViewAdapter(TestPluginSystemActivity.this, pagePluginInfoList);
 				SwitchLogger.d(LOG_TAG, "gv="+gv+"gvd="+gvd);
 				gv.setAdapter(gvd);
-				gv.setOnItemClickListener(new OnPluginClickListener(pagePluginInfoList)); 
+				OnPluginClickListener listener	= new OnPluginClickListener(TestPluginSystemActivity.this, pagePluginInfoList);
+				gv.setOnItemClickListener(listener);
+				gv.setOnItemLongClickListener(new OnPluginLongClickListener());
 				
+				_pluginClickListenerList.add(listener);
 				_pageViewList.add(pageView);
 				_gridViewAdapterList.add(gvd);
 			}
@@ -171,6 +193,7 @@ public class TestPluginSystemActivity extends Activity {
 			
 			for(int i = 0; i < _gridViewAdapterList.size(); ++i) {
 				_gridViewAdapterList.get(i).setPagePluginInfoList(_pluginData.get(i));
+				_pluginClickListenerList.get(i).setPagePluginInfoList(_pluginData.get(i));
 				_gridViewAdapterList.get(i).notifyDataSetChanged();
 			}
 		}
@@ -181,34 +204,92 @@ public class TestPluginSystemActivity extends Activity {
 		}
 	}
 	
-	/**********************以下类都是可以独立出来单独成为一个文件的*****************/
+	private void changeToEditing() {
+		for(int i = 0; i < _pluginData.size(); ++i) {
+			for(int j = 0; j < _pluginData.get(i).size(); ++j) {
+				_pluginData.get(i).get(j).setEditing(true);
+			}
+		}
+	}
 	
+	private class OnPluginLongClickListener implements OnItemLongClickListener {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+			
+			SwitchLogger.d(LOG_TAG, ((TextView) view.findViewById(R.id.textView)).getText().toString() 
+					 + ", onItemLongClick, position:" + position + ",id="+id);  
+     
+			changeToEditing();
+				
+			for(int i = 0; i < _gridViewAdapterList.size(); ++i) {
+				_gridViewAdapterList.get(i).setPagePluginInfoList(_pluginData.get(i));
+				_pluginClickListenerList.get(i).setPagePluginInfoList(_pluginData.get(i));
+				_gridViewAdapterList.get(i).notifyDataSetChanged();
+			}
+			
+		    return true;
+		}
+	}
+	
+	public class MyPagerChangeListener implements OnPageChangeListener {
+
+		public void onPageScrollStateChanged(int state) {
+
+		}
+
+		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+		}
+
+		public void onPageSelected(int position) {
+			((ImageView)_dotList.get(position)).setImageResource(R.drawable.ps_page_selected);
+			((ImageView)_dotList.get(_lastPagePosition)).setImageResource(R.drawable.ps_page_unselected);
+			_lastPagePosition = position;
+			
+			Log.d("MyPagerChangeListener", "onPageSelected, position="+position);
+		}
+    }
+	
+	/**********************以下类都是可以独立出来单独成为一个文件的*****************/
+
 	public class OnPluginClickListener implements OnItemClickListener {
 		
-		
+		Context _context;
 		List<PluginInfo> _pagePluginInfoList;
 		
-		public OnPluginClickListener(List<PluginInfo> pagePluginInfoList) {
+		public OnPluginClickListener(Context context, List<PluginInfo> pagePluginInfoList) {
+			_context	= context;
 			_pagePluginInfoList	= pagePluginInfoList;
 		}
 		
+		public void setPagePluginInfoList(List<PluginInfo> pagePluginInfoList) {
+			_pagePluginInfoList		= pagePluginInfoList;
+		}
+		
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,  long id) {
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			
-			 SwitchLogger.d(LOG_TAG, ((TextView) view.findViewById(R.id.textView))  
-                     .getText().toString() + " position:" + position + ",id="+id);  
+			 SwitchLogger.d(LOG_TAG, ((TextView) view.findViewById(R.id.textView)).getText().toString() 
+					 + " onItemClick, position:" + position + ",id="+id);  
      
 			 ProgressBar	pb	= (ProgressBar)view.findViewById(R.id.progressBar);
 			 TextView		tv	= (TextView)view.findViewById(R.id.progressText);
-		     PluginManager pluginManager	= new PluginManager(TestPluginSystemActivity.this, 
+			 ImageView		installIcon	= (ImageView)view.findViewById(R.id.installIcon);
+		     PluginManager pluginManager	= new PluginManager(_context, 
 													    		_pagePluginInfoList.get(position), 
 													    		new BYXPluginManagerCallback(pb, tv));
 		     
-		     if(_pagePluginInfoList.get(position).isInstalled()) {
-		    	 pluginManager.start();
-		     } else {
-		    	 pluginManager.install();
-		     }
+		    if(_pagePluginInfoList.get(position).isInstalled()) {
+		    	if(_pagePluginInfoList.get(position).isEditing()) {
+		    		pluginManager.uninstall();
+		    	} else {
+		    		pluginManager.start();
+		    	}
+		    } else {
+		    	installIcon.setVisibility(View.GONE);
+		    	pluginManager.install();
+		    }
 		}
 	}
 	
@@ -308,7 +389,7 @@ public class TestPluginSystemActivity extends Activity {
 		}
     }
 
-	private class GridViewAdapter extends BaseAdapter {
+	public class GridViewAdapter extends BaseAdapter {
 		Context _context;
 		List<PluginInfo>	_pagePluginInfoList;
 		public GridViewAdapter(Context context, List<PluginInfo> pagePluginInfoList) {
@@ -338,56 +419,36 @@ public class TestPluginSystemActivity extends Activity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = ((Activity) _context).getLayoutInflater();  
-	        View twoEditTextLayoutRef = inflater.inflate(R.layout.grid_view_item,  
-	                null);  
-	        ImageView ivRef = (ImageView) twoEditTextLayoutRef.findViewById(R.id.imageView);  
-	        TextView tvRef = (TextView) twoEditTextLayoutRef.findViewById(R.id.textView);  
-	       
-	        String name	= _pagePluginInfoList.get(position).getPluginCfg().getName();
 	        PluginInfo pi	= _pagePluginInfoList.get(position);
+	        String name		= pi.getPluginCfg().getName();
+			
+			LayoutInflater inflater = ((Activity) _context).getLayoutInflater();
+	        View itemView = inflater.inflate(R.layout.grid_view_item, null);  
 	        
-	        //ivRef.setImageResource(R.drawable.icon);  
-	        (new ImgUtil((Activity)_context)).asyncSetImg(ivRef, pi.getPluginCfg().getIconUrl(), R.drawable.icon);
+	        ImageView iamgeView		= (ImageView) itemView.findViewById(R.id.imageView);  
+	        TextView textView		= (TextView) itemView.findViewById(R.id.textView);
+	        textView.setText(name);
+	        ImageView installIcon	= (ImageView) itemView.findViewById(R.id.installIcon);
+	        ImageView uninstallIcon	= (ImageView) itemView.findViewById(R.id.uninstallIcon);
 	        
-	        if(pi.isInstalled()) {
-	        	name += "(已安装";
-//		        if(pi.getUpgradeType() == PluginVersion.UPGRADE_TYPE_LATEST) {
-//		        	name += "，最新)";
-//		        } else if(pi.getUpgradeType() == PluginVersion.UPGRADE_TYPE_FORCE) {
-//		        	name += "，需强升)";
-//		        } else {
-//		        	name += "，可升)";
-//		        }
+	        (new ImgUtil((Activity)_context)).asyncSetImg(iamgeView, pi.getPluginCfg().getIconUrl(), R.drawable.icon);
+	        
+	        if( ! pi.isInstalled()) {
+	        	uninstallIcon.setVisibility(View.GONE);
+	        	installIcon.setVisibility(View.VISIBLE);
 	        } else {
-	        	name += "(未安装)";
+	        	if(pi.isEditing()) {
+	        		uninstallIcon.setVisibility(View.VISIBLE);
+	        		installIcon.setVisibility(View.GONE);
+	        	} else {
+	        		uninstallIcon.setVisibility(View.GONE);
+	        		installIcon.setVisibility(View.GONE);
+	        	}
 	        }
-	        
-	        tvRef.setText(name);
-	        return twoEditTextLayoutRef; 
+	       
+	        return itemView; 
 		}
 	}
-	
-	public class MyPagerChangeListener implements OnPageChangeListener {
-
-		public void onPageScrollStateChanged(int arg0) {
-			// TODO Auto-generated method stub
-//			Log.d("MyPagerChangeListener", "onPageScrollStateChanged");
-		}
-
-		public void onPageScrolled(int arg0, float arg1, int arg2) {
-			// TODO Auto-generated method stub
-//			Log.d("MyPagerChangeListener", "onPageScrolled");
-		}
-
-		public void onPageSelected(int position) {
-//			((View)listDots.get(position)).setBackgroundResource(R.drawable.dot_focused);
-//			((View)listDots.get(oldPosition)).setBackgroundResource(R.drawable.dot_normal);
-//			oldPosition = position;
-			
-			Log.d("MyPagerChangeListener", "onPageSelected");
-		}
-    }
 	
 	/************************可以独立出来的类结束 ********************************/
 }

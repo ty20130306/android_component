@@ -10,12 +10,10 @@ public class PluginCfg {
 	private int		_order;
 	private String	_packageName;
 	private String	_className;
-	
-	private PluginVersion	_pluginVersion;
+	private String	_apkUrl;
 	
 	public PluginCfg(String id, String name, String iconUrl, boolean show, 
-					int priority, int order, String packageName, String className,
-					PluginVersion pluginVersion) 
+					int priority, int order, String packageName, String className, String apkUrl) 
 	{
 		_id			= id;
 		_name		= name;
@@ -25,8 +23,7 @@ public class PluginCfg {
 		_order		= order;
 		_packageName	= packageName;
 		_className		= className;
-		
-		_pluginVersion	= pluginVersion;
+		_apkUrl			= apkUrl;
 	}
 	
 	public String getId() {
@@ -61,8 +58,8 @@ public class PluginCfg {
 		return _className;
 	}
 	
-	public PluginVersion getPluginVersion() {
-		return _pluginVersion;
+	public String getApkUrl() {
+		return _apkUrl;
 	}
 }
 

@@ -10,24 +10,25 @@
         android:src="@drawable/plugin_joke">
     </ImageView> 
     
-    <ImageButton 
-        android:id="@+id/uninstall_btn"
+    <ImageView 
+        android:id="@+id/installIcon"
         android:src="@drawable/ps_install_icon"
         android:background="@android:color/transparent"
         android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
 		android:layout_marginTop="18dp"
 		android:layout_alignRight="@id/imageView"
-		android:visibility="invisible"
+		android:visibility="gone"
         />
-     <ImageButton 
-        android:id="@+id/install_btn"
+     <ImageView 
+        android:id="@+id/uninstallIcon"
         android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
 		android:background="@android:color/transparent"
 		android:src="@drawable/ps_uninstall_icon"
 		android:layout_marginTop="18dp"
 		android:layout_alignRight="@id/imageView"
+		android:visibility="gone"
         />
     <ProgressBar
         android:id="@+id/progressBar"
@@ -54,6 +55,7 @@
         android:textColor="#ffffffff"
         android:layout_marginTop="10dp"
         android:layout_below="@id/progressBar"
+        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content" 
         android:layout_height="wrap_content">
     </TextView>

@@ -2,24 +2,16 @@ package com.vanchu.libs.pluginSystem;
 
 import java.io.File;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.text.Html;
-import android.text.Spanned;
-import android.widget.ProgressBar;
 
 import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.ui.Tip;
 import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
-import com.vanchu.test.ComponentTestActivity;
-
 
 public class PluginManager {
 	
@@ -36,41 +28,21 @@ public class PluginManager {
 	private PluginInfo	_pluginInfo;
 	private PluginCfg	_pluginCfg;
 	
-	private Dialog			_detailDialog;
-	
 	public PluginManager(Context context, PluginInfo pluginInfo, PluginManagerCallback callback) {
 		_context		= context;
 		_pluginInfo		= pluginInfo;
 		_pluginCfg		= _pluginInfo.getPluginCfg();
 		
 		_callback		= callback;
-		_detailDialog	= createDetailDialog();
 	}
 	
 	public void start() {
 		SwitchLogger.d(LOG_TAG, "onClick");
 		
 		if(_pluginInfo.isInstalled()) {
-			if(_pluginInfo.getUpgradeType() == PluginVersion.UPGRADE_TYPE_FORCE) {
-				Tip.show(_context, "请先更新" + _pluginCfg.getName()+"插件");
-			} else {
-				ActivityUtil.startApp(_context, _pluginCfg.getPackageName(), _pluginCfg.getClassName());
-			}
+			ActivityUtil.startApp(_context, _pluginCfg.getPackageName(), _pluginCfg.getClassName());
 		} else {
 			Tip.show(_context, "请先安装" + _pluginCfg.getName()+"插件");
-		}
-	}
-	
-	public void upgrade() {
-		if(_pluginInfo.getUpgradeType() == PluginVersion.UPGRADE_TYPE_LATEST) {
-			_callback.onComplete(RESULT_LATEST_VERSION);
-			return ;
-		}
-		
-		if(_pluginInfo.isInstalled()) {
-			_detailDialog.show();
-		} else {
-			download();
 		}
 	}
 	
@@ -89,71 +61,8 @@ public class PluginManager {
 		}
 	}
 	
-	public int getUpgradeType() {
-		return _pluginInfo.getUpgradeType();
-	}
-	
 	private void download() {
-		new Downloader(_context, _pluginCfg.getPluginVersion().getApkUrl(), new PluginDownloadListener()).run();
-	}
-	
-	protected Dialog createDetailDialog(){
-		AlertDialog.Builder dialog = new AlertDialog.Builder(_context) {
-			@Override
-			public AlertDialog create() {
-				setCancelable(false);
-				return super.create();
-			}
-		};
-		
-		PluginOnClickListener listener = new PluginOnClickListener();
-		dialog.setTitle("检测到新版本");
-		String tip = String.format("当前版本: %s<br />更新版本: %s<br />更新内容: <br />%s", 
-							_pluginInfo.getCurrentVersionName(),
-							_pluginInfo.getPluginCfg().getPluginVersion().getHighestName(),
-							_pluginInfo.getPluginCfg().getPluginVersion().getUpgradeDetail());
-		
-		Spanned span	= Html.fromHtml(tip);
-		tip	= span.toString();
-		
-		dialog.setMessage(tip);
-		dialog.setPositiveButton("立即更新", listener);
-		if (_pluginInfo.getUpgradeType() == PluginVersion.UPGRADE_TYPE_OPTIONAL) {
-			dialog.setNeutralButton("以后再说", listener);
-		}
-		
-		return dialog.create();
-	}
-	
-	private class PluginOnClickListener implements DialogInterface.OnClickListener {
-		
-		public void onClick(DialogInterface dialog, int which){
-			dialog.dismiss();
-			
-			switch (_pluginInfo.getUpgradeType()) {
-				case PluginVersion.UPGRADE_TYPE_FORCE:
-					SwitchLogger.d(LOG_TAG, "force to upgrade");
-					download();
-					break;
-					
-				case PluginVersion.UPGRADE_TYPE_OPTIONAL:
-					switch(which){
-						case DialogInterface.BUTTON_POSITIVE:
-							SwitchLogger.d(LOG_TAG, "optional to upgrade, choose to upgrade");
-							download();
-							break;
-							
-						case DialogInterface.BUTTON_NEUTRAL:
-							SwitchLogger.d(LOG_TAG, "optional to upgrade, choose to ignore");
-							_callback.onComplete(PluginManager.RESULT_SKIP_UPGRADE);
-							break;
-					}
-					break;
-					
-				default:
-					break;
-			}
-		}
+		new Downloader(_context, _pluginCfg.getApkUrl(), new PluginDownloadListener()).run();
 	}
 	
 	private void install(String downloadFile){
