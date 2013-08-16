@@ -138,7 +138,11 @@ public class AsyncImageLoader {
 			FileOutputStream fos = new FileOutputStream(imgFile);
 			BitmapDrawable bd = (BitmapDrawable) drawable;
 			Bitmap bm = bd.getBitmap();
-			bm.compress(CompressFormat.JPEG, 50, fos);
+			if (imgName.endsWith(".jpg")) {
+				bm.compress(CompressFormat.JPEG, 50, fos);
+			} else {
+				bm.compress(CompressFormat.PNG, 50, fos);
+			}
 			fos.flush();
 			fos.close();
 		} catch (Exception e) {

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.Html;
 import android.text.Spanned;
+import android.widget.ProgressBar;
 
 import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.task.Downloader.IDownloadListener;
@@ -35,8 +36,7 @@ public class PluginManager {
 	private PluginInfo	_pluginInfo;
 	private PluginCfg	_pluginCfg;
 	
-	private Dialog		_detailDialog;
-	private ProgressDialog	_progressDialog;
+	private Dialog			_detailDialog;
 	
 	public PluginManager(Context context, PluginInfo pluginInfo, PluginManagerCallback callback) {
 		_context		= context;
@@ -45,8 +45,6 @@ public class PluginManager {
 		
 		_callback		= callback;
 		_detailDialog	= createDetailDialog();
-		
-		_progressDialog	= createProgressDialog();
 	}
 	
 	public void start() {
@@ -74,6 +72,15 @@ public class PluginManager {
 		} else {
 			download();
 		}
+	}
+	
+	public void install() {
+		if(_pluginInfo.isInstalled()) {
+			Tip.show(_context, "已安装" + _pluginCfg.getName()+"插件");
+			return ;
+		}
+		
+		download();
 	}
 	
 	public void uninstall(){
@@ -162,36 +169,21 @@ public class PluginManager {
 		_callback.onComplete(RESULT_INSTALL_STARTED);
 	}
 	
-	protected ProgressDialog createProgressDialog(){
-		ProgressDialog progressDialog	= new ProgressDialog(_context);
-		progressDialog.setCancelable(false);
-		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		progressDialog.setMax(100);
-		progressDialog.setTitle("下载进度");
-		progressDialog.setMessage("正在准备下载安装包");
-		
-		return progressDialog;
-	}
-	
 	private class PluginDownloadListener implements IDownloadListener {
 		
 		@Override
 		public void onStart() {
-			_progressDialog.show();
+			_callback.onDownloadStart();
 		}
 		
 		@Override
 		public void onProgress(long downloaded, long total) {
-			_progressDialog.setProgress((int)(downloaded * 100 / total));
-			String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
-										(int)(downloaded / 1024), (int)(total / 1024) );
-			
-			_progressDialog.setMessage(tip);
+			_callback.onDownloadProgress(downloaded, total);
 		}
 
 		@Override
 		public void onSuccess(String downloadFile) {
-			_progressDialog.hide();
+			_callback.onDownloadEnd();
 			SwitchLogger.d(LOG_TAG, downloadFile + " downloaded");
 			install(downloadFile);
 		}
