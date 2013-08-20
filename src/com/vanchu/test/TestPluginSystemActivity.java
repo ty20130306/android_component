@@ -15,7 +15,7 @@ import com.vanchu.libs.pluginSystem.PluginManagerCallback;
 import com.vanchu.libs.pluginSystem.PluginSystem;
 import com.vanchu.libs.pluginSystem.PluginSystemCallback;
 
-import com.vanchu.sample.PluginSystemDbManager;
+import com.vanchu.sample.DbManager;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -36,7 +36,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 
 public class TestPluginSystemActivity extends Activity {
 	private static final String 	LOG_TAG	= TestPluginSystemActivity.class.getSimpleName();
@@ -44,12 +43,11 @@ public class TestPluginSystemActivity extends Activity {
 	private List<List<PluginInfo>>	_pluginData;
 	private PluginSystem	_ps;
 	
-	private ViewPager _viewPager;
-	private List<View> _pageViewList;
-	private List<GridViewAdapter> _gridViewAdapterList;
-	private List<OnPluginClickListener> _pluginClickListenerList;
+	private ViewPager	_viewPager;
+	private List<View>	_pageViewList;
+	private List<GridViewAdapter>	_gridViewAdapterList;
 	private List<View>	_dotList;
-	private	int _lastPagePosition;
+	private	int	_lastPagePosition;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +61,6 @@ public class TestPluginSystemActivity extends Activity {
 		initDotList();
 		_pageViewList			= new ArrayList<View>();
 		_gridViewAdapterList	= new ArrayList<GridViewAdapter>(); 
-		_pluginClickListenerList	= new ArrayList<OnPluginClickListener>();
 		
 		_ps	= new PluginSystem(this, 
 				"http://pesiwang.devel.rabbit.oa.com/test_plugin_system.php", 
@@ -76,9 +73,9 @@ public class TestPluginSystemActivity extends Activity {
 		_dotList	= new ArrayList<View>();
 		_dotList.add(findViewById(R.id.page_dot_0));
 		_dotList.add(findViewById(R.id.page_dot_1));
-		_dotList.add(findViewById(R.id.page_dot_2));
-		_dotList.add(findViewById(R.id.page_dot_3));
-		_dotList.add(findViewById(R.id.page_dot_4));
+//		_dotList.add(findViewById(R.id.page_dot_2));
+//		_dotList.add(findViewById(R.id.page_dot_3));
+//		_dotList.add(findViewById(R.id.page_dot_4));
 	}
 	
 	private void setPlguinData(List<PluginInfo> pluginInfoList) {
@@ -117,7 +114,7 @@ public class TestPluginSystemActivity extends Activity {
 		SwitchLogger.setPrintLog(true);
 		SwitchLogger.d(LOG_TAG, "test sqlite");
 		
-		PluginSystemDbManager	_dbMananger	= new PluginSystemDbManager(this);
+		DbManager	_dbMananger	= new DbManager(this);
 		_dbMananger.setPluginVersion("test", "1.0.4");
 		_dbMananger.setPluginVersion("song", "1.0.3");
 		SwitchLogger.d(LOG_TAG, "get test version =" + _dbMananger.getPluginVersion("test"));
@@ -168,14 +165,10 @@ public class TestPluginSystemActivity extends Activity {
 
 				View pageView	= inflater.inflate(R.layout.page_view_layout, null);
 				GridView gv		= (GridView)pageView.findViewById(R.id.page_grid_view);
-				GridViewAdapter gvd	= new GridViewAdapter(TestPluginSystemActivity.this, pagePluginInfoList);
+				GridViewAdapter gvd	= new GridViewAdapter(TestPluginSystemActivity.this, pagePluginInfoList, i);
 				SwitchLogger.d(LOG_TAG, "gv="+gv+"gvd="+gvd);
 				gv.setAdapter(gvd);
-				OnPluginClickListener listener	= new OnPluginClickListener(TestPluginSystemActivity.this, pagePluginInfoList);
-				gv.setOnItemClickListener(listener);
-				gv.setOnItemLongClickListener(new OnPluginLongClickListener());
 				
-				_pluginClickListenerList.add(listener);
 				_pageViewList.add(pageView);
 				_gridViewAdapterList.add(gvd);
 			}
@@ -193,7 +186,6 @@ public class TestPluginSystemActivity extends Activity {
 			
 			for(int i = 0; i < _gridViewAdapterList.size(); ++i) {
 				_gridViewAdapterList.get(i).setPagePluginInfoList(_pluginData.get(i));
-				_pluginClickListenerList.get(i).setPagePluginInfoList(_pluginData.get(i));
 				_gridViewAdapterList.get(i).notifyDataSetChanged();
 			}
 		}
@@ -212,23 +204,39 @@ public class TestPluginSystemActivity extends Activity {
 		}
 	}
 	
-	private class OnPluginLongClickListener implements OnItemLongClickListener {
+	private void changeToNormal() {
+		for(int i = 0; i < _pluginData.size(); ++i) {
+			for(int j = 0; j < _pluginData.get(i).size(); ++j) {
+				_pluginData.get(i).get(j).setEditing(false);
+			}
+		}
+	}
 
+	private class GridItemLongClickListener implements View.OnLongClickListener {
+		
 		@Override
-		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-			
-			SwitchLogger.d(LOG_TAG, ((TextView) view.findViewById(R.id.textView)).getText().toString() 
-					 + ", onItemLongClick, position:" + position + ",id="+id);  
-     
+		public boolean onLongClick(View v) {
+			SwitchLogger.d(LOG_TAG, "OnGridItemLongClickListener");
 			changeToEditing();
+			View bg	= TestPluginSystemActivity.this.findViewById(R.id.plugin_system_bg);
+			bg.setOnClickListener(new View.OnClickListener() {
 				
+				@Override
+				public void onClick(View v) {
+					changeToNormal();
+					for(int i = 0; i < _gridViewAdapterList.size(); ++i) {
+						_gridViewAdapterList.get(i).setPagePluginInfoList(_pluginData.get(i));
+						_gridViewAdapterList.get(i).notifyDataSetChanged();
+					}
+				}
+			});
+			
 			for(int i = 0; i < _gridViewAdapterList.size(); ++i) {
 				_gridViewAdapterList.get(i).setPagePluginInfoList(_pluginData.get(i));
-				_pluginClickListenerList.get(i).setPagePluginInfoList(_pluginData.get(i));
 				_gridViewAdapterList.get(i).notifyDataSetChanged();
 			}
 			
-		    return true;
+			return true;
 		}
 	}
 	
@@ -243,53 +251,50 @@ public class TestPluginSystemActivity extends Activity {
 		}
 
 		public void onPageSelected(int position) {
-			((ImageView)_dotList.get(position)).setImageResource(R.drawable.ps_page_selected);
-			((ImageView)_dotList.get(_lastPagePosition)).setImageResource(R.drawable.ps_page_unselected);
-			_lastPagePosition = position;
+			if(position < _dotList.size()) {
+				((ImageView)_dotList.get(position)).setImageResource(R.drawable.ps_page_selected);
+				((ImageView)_dotList.get(_lastPagePosition)).setImageResource(R.drawable.ps_page_unselected);
+				_lastPagePosition = position;
+			}
 			
 			Log.d("MyPagerChangeListener", "onPageSelected, position="+position);
 		}
     }
-	
-	/**********************以下类都是可以独立出来单独成为一个文件的*****************/
 
-	public class OnPluginClickListener implements OnItemClickListener {
+	/**********************以下类都是可以独立出来单独成为一个文件的*****************/
+	
+	public class GridItemClickListener	implements View.OnClickListener {
 		
 		Context _context;
-		List<PluginInfo> _pagePluginInfoList;
+		int		_pageIndex;
+		int		_itemIndex;
 		
-		public OnPluginClickListener(Context context, List<PluginInfo> pagePluginInfoList) {
+		public GridItemClickListener(Context context, int pageIndex, int itemIndex) {
 			_context	= context;
-			_pagePluginInfoList	= pagePluginInfoList;
-		}
-		
-		public void setPagePluginInfoList(List<PluginInfo> pagePluginInfoList) {
-			_pagePluginInfoList		= pagePluginInfoList;
+			_pageIndex	= pageIndex;
+			_itemIndex	= itemIndex;
 		}
 		
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		public void onClick(View v) {
+			SwitchLogger.d(LOG_TAG, "onItemClick, page index:" + _pageIndex + ",item index="+_itemIndex);  
+
+			ProgressBar	pb	= (ProgressBar)v.findViewById(R.id.progressBar);
+			TextView	tv	= (TextView)v.findViewById(R.id.progressText);
+			ImageView	installIcon	= (ImageView)v.findViewById(R.id.installIcon);
+			PluginInfo	pi	= _pluginData.get(_pageIndex).get(_itemIndex);
+			PluginManager pluginManager	= new PluginManager(_context, pi, new BYXPluginManagerCallback(pb, tv));
 			
-			 SwitchLogger.d(LOG_TAG, ((TextView) view.findViewById(R.id.textView)).getText().toString() 
-					 + " onItemClick, position:" + position + ",id="+id);  
-     
-			 ProgressBar	pb	= (ProgressBar)view.findViewById(R.id.progressBar);
-			 TextView		tv	= (TextView)view.findViewById(R.id.progressText);
-			 ImageView		installIcon	= (ImageView)view.findViewById(R.id.installIcon);
-		     PluginManager pluginManager	= new PluginManager(_context, 
-													    		_pagePluginInfoList.get(position), 
-													    		new BYXPluginManagerCallback(pb, tv));
-		     
-		    if(_pagePluginInfoList.get(position).isInstalled()) {
-		    	if(_pagePluginInfoList.get(position).isEditing()) {
-		    		pluginManager.uninstall();
-		    	} else {
-		    		pluginManager.start();
-		    	}
-		    } else {
-		    	installIcon.setVisibility(View.GONE);
-		    	pluginManager.install();
-		    }
+			if(pi.isInstalled()) {
+				if(pi.isEditing()) {
+					pluginManager.uninstall();
+				} else {
+					pluginManager.start();
+				}
+			} else {
+				installIcon.setVisibility(View.GONE);
+				pluginManager.install();
+			}
 		}
 	}
 	
@@ -339,7 +344,7 @@ public class TestPluginSystemActivity extends Activity {
 		public void destroyItem(View view, int index, Object arg2) {
 			// TODO Auto-generated method stub
 			((ViewPager)view).removeView(list.get(index));
-			
+			view	= null;
 			Log.d("MyPagerAdapter", "destroyItem");
 		}
 
@@ -391,11 +396,14 @@ public class TestPluginSystemActivity extends Activity {
 
 	public class GridViewAdapter extends BaseAdapter {
 		Context _context;
+		int		_pageIndex;
 		List<PluginInfo>	_pagePluginInfoList;
-		public GridViewAdapter(Context context, List<PluginInfo> pagePluginInfoList) {
+		
+		public GridViewAdapter(Context context, List<PluginInfo> pagePluginInfoList, int pageIndex) {
 			super();
 			_context			= context;
 			_pagePluginInfoList	= pagePluginInfoList;
+			_pageIndex			= pageIndex;
 		}
 
 		@Override
@@ -446,9 +454,12 @@ public class TestPluginSystemActivity extends Activity {
 	        	}
 	        }
 	       
+	        itemView.setOnClickListener(new GridItemClickListener(_context, _pageIndex, position));
+	        itemView.setOnLongClickListener(new GridItemLongClickListener());
 	        return itemView; 
 		}
 	}
 	
 	/************************可以独立出来的类结束 ********************************/
+
 }

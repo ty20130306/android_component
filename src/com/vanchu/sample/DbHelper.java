@@ -7,22 +7,22 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 
-public class PluginSystemDbHelper extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper {
 	
 	public static final String	TABLE_PLUGIN_VERSION				= "plugin_version";
 	public static final String	TABLE_PLUGIN_VERSION_COLUMN_ID		= "id";
 	public static final String	TABLE_PLUGIN_VERSION_COLUMN_VERSION	= "version";
 	
-	private static final String	LOG_TAG		= PluginSystemDbHelper.class.getSimpleName();
+	private static final String	LOG_TAG		= DbHelper.class.getSimpleName();
 	
 	private static final int	DB_VERSION			= 1;
 	private static final String	DB_NAME				= "db_plugin_system";	
 	
-	public PluginSystemDbHelper(Context context, String name, CursorFactory factory, int version) {
+	public DbHelper(Context context, String name, CursorFactory factory, int version) {
 		super(context, name, factory, version);
 	}
 	
-	public PluginSystemDbHelper(Context context) {
+	public DbHelper(Context context) {
 		this(context, DB_NAME, null, DB_VERSION);
 	}
 	
