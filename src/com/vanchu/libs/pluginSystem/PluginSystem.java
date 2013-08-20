@@ -161,10 +161,11 @@ public class PluginSystem {
 		boolean show	= intToBoolean(pluginCfgJson.getInt("show"));
 		int priority	= pluginCfgJson.getInt("priority");
 		int order		= pluginCfgJson.getInt("order");
+		boolean sticky	= intToBoolean(pluginCfgJson.getInt("sticky"));
 		String packageName	= pluginId;
 		String className	= pluginCfgJson.getString("className");
 		String apkUrl		= pluginCfgJson.getString("apkUrl");
-		return new PluginCfg(pluginId, name, iconUrl, show, priority, order, packageName, className, apkUrl);
+		return new PluginCfg(pluginId, name, iconUrl, show, priority, order, sticky, packageName, className, apkUrl);
 	}
 
 	private void getPluginCfg() {

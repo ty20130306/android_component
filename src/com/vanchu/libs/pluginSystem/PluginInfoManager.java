@@ -54,6 +54,10 @@ public class PluginInfoManager {
 			Entry<String, PluginCfg> entry	= iter.next();
 			String pluginId			= entry.getKey();
 			PluginCfg pluginCfg		= entry.getValue();
+			if( ! pluginCfg.isShow()) {
+				continue;
+			}
+			
 			String currentVersionName	= PluginInfo.NO_VERSION_NAME;
 			if(_currentVersionMap.containsKey(pluginId)) {
 				currentVersionName	= _currentVersionMap.get(pluginId);

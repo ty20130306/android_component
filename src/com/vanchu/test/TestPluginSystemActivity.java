@@ -1,6 +1,8 @@
 package com.vanchu.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.vanchu.libs.common.ui.Tip;
@@ -73,9 +75,9 @@ public class TestPluginSystemActivity extends Activity {
 		_dotList	= new ArrayList<View>();
 		_dotList.add(findViewById(R.id.page_dot_0));
 		_dotList.add(findViewById(R.id.page_dot_1));
-//		_dotList.add(findViewById(R.id.page_dot_2));
-//		_dotList.add(findViewById(R.id.page_dot_3));
-//		_dotList.add(findViewById(R.id.page_dot_4));
+		_dotList.add(findViewById(R.id.page_dot_2));
+		_dotList.add(findViewById(R.id.page_dot_3));
+		_dotList.add(findViewById(R.id.page_dot_4));
 	}
 	
 	private void setPlguinData(List<PluginInfo> pluginInfoList) {
@@ -199,7 +201,9 @@ public class TestPluginSystemActivity extends Activity {
 	private void changeToEditing() {
 		for(int i = 0; i < _pluginData.size(); ++i) {
 			for(int j = 0; j < _pluginData.get(i).size(); ++j) {
-				_pluginData.get(i).get(j).setEditing(true);
+				if( ! _pluginData.get(i).get(j).getPluginCfg().isSticky()){
+					_pluginData.get(i).get(j).setEditing(true);
+				}
 			}
 		}
 	}

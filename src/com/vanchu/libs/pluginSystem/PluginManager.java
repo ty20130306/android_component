@@ -56,6 +56,7 @@ public class PluginManager {
 	}
 	
 	public void uninstall(){
+		
 		if(_pluginInfo.isInstalled()) {
 			ActivityUtil.uninstallApp(_context, _pluginInfo.getPluginCfg().getPackageName());
 		}
