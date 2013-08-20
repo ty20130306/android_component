@@ -296,7 +296,6 @@ public class TestPluginSystemActivity extends Activity {
 					pluginManager.start();
 				}
 			} else {
-				installIcon.setVisibility(View.GONE);
 				pluginManager.install();
 			}
 		}
