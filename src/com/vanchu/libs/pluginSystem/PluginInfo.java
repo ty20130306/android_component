@@ -56,8 +56,7 @@ public class PluginInfo implements Comparable<PluginInfo> {
 		return _pluginCfg;
 	}
 	
-	@Override
-	public int compareTo(PluginInfo other) {
+	private int sortByPriorityAndOrder(PluginInfo other) {
 		if(_pluginCfg.getPriority() > other.getPluginCfg().getPriority()) {
 			return -1;
 		} else if(_pluginCfg.getPriority() < other.getPluginCfg().getPriority()) {
@@ -71,6 +70,16 @@ public class PluginInfo implements Comparable<PluginInfo> {
 				return 0;
 			}
 		}
-		
+	}
+	
+	@Override
+	public int compareTo(PluginInfo other) {
+		if((_installed && other.isInstalled()) || (! _installed && ! other.isInstalled())) {	
+			return sortByPriorityAndOrder(other);
+		} else if (_installed && ! other.isInstalled()) {
+			return -1;
+		} else { // ! _installed && other.isInstalled()
+			return 1;
+		}
 	}
 }
