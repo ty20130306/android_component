@@ -325,9 +325,8 @@ public class ComponentTestActivity extends Activity {
 					
 					return new UpgradeParam(current, lowest, highest, url, detail);
 				} catch(JSONException e){
-					if(SwitchLogger.isPrintLog()){
-						SwitchLogger.e(e);
-					}
+					SwitchLogger.e(e);
+
 					return null;
 				}
 			}

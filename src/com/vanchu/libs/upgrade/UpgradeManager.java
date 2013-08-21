@@ -40,7 +40,7 @@ public class UpgradeManager {
 		_param		= param;
 		_callback	= callback;
 		
-		_upgradeType			= _param.getUpgradeType();
+		_upgradeType		= _param.getUpgradeType();
 		
 		_detailDialog		= createDetailDialog();
 		_handler			= new Handler();
@@ -53,7 +53,6 @@ public class UpgradeManager {
 	
 	public void check(){
 		if(UpgradeParam.UPGRADE_TYPE_LATEST == _upgradeType){
-			deleteInstalledApkFile();
 			_callback.onLatestVersion();
 			_callback.onComplete(UpgradeResult.RESULT_LATEST_VERSION);
 			return ;
@@ -161,14 +160,6 @@ public class UpgradeManager {
 		Uri uri = Uri.fromFile(new File(_downloadPath));
 		intent.setDataAndType(uri, "application/vnd.android.package-archive");
 		_context.startActivity(intent);
-	}
-
-	private void deleteInstalledApkFile(){
-		File apkFile	= new File(_downloadPath);
-		if(apkFile.exists()){
-			SwitchLogger.d(LOG_TAG, "delete installed apk file: " + _downloadPath);
-			apkFile.delete();
-		}
 	}
 	
 	private void upgrade(){
