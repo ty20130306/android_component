@@ -4,8 +4,8 @@
     android:layout_height="wrap_content" > 
     <ImageView 
         android:id="@+id/imageView" 
-        android:layout_height="wrap_content" 
-        android:layout_width="wrap_content"
+        android:layout_height="40dp" 
+        android:layout_width="40dp"
         android:layout_centerInParent="true"
         android:src="@drawable/plugin_joke">
     </ImageView> 
@@ -14,16 +14,16 @@
         android:id="@+id/installIcon"
         android:src="@drawable/ps_install_icon"
         android:background="@android:color/transparent"
-        android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"
+        android:layout_width="16dp" 
+		android:layout_height="16dp"
 		android:layout_marginTop="18dp"
 		android:layout_alignRight="@id/imageView"
 		android:visibility="gone"
         />
      <ImageView 
         android:id="@+id/uninstallIcon"
-        android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"
+        android:layout_width="16dp" 
+		android:layout_height="16dp"
 		android:background="@android:color/transparent"
 		android:src="@drawable/ps_uninstall_icon"
 		android:layout_marginTop="18dp"

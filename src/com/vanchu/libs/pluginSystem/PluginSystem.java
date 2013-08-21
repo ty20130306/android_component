@@ -128,23 +128,28 @@ public class PluginSystem {
 		}
 	}
 	
-	private Map<String, PluginCfg> parseCfgResponse(String response) {
+	protected Map<String, PluginCfg> createPluginMap(JSONObject responseJson) throws JSONException {
 		Map<String, PluginCfg> pluginCfgMap	= new HashMap<String, PluginCfg>();
 		
-		try {
-			JSONObject	responseJson	= new JSONObject(response);
-			Iterator<?> iterator		= responseJson.keys();
-			while(iterator.hasNext()) {
-				String		pluginId		= (String)iterator.next();
-				JSONObject	pluginCfgJson	= responseJson.getJSONObject(pluginId);
-				PluginCfg	pluginCfg		= parsePluginCfg(pluginId, pluginCfgJson);
-				pluginCfgMap.put(pluginId, pluginCfg);
-			}
-		} catch (JSONException e) {
-			return null;
+		Iterator<?> iterator		= responseJson.keys();
+		while(iterator.hasNext()) {
+			String		pluginId		= (String)iterator.next();
+			JSONObject	pluginCfgJson	= responseJson.getJSONObject(pluginId);
+			PluginCfg	pluginCfg		= parsePluginCfg(pluginId, pluginCfgJson);
+			pluginCfgMap.put(pluginId, pluginCfg);
 		}
 		
 		return pluginCfgMap;
+	}
+	
+	protected Map<String, PluginCfg> parseCfgResponse(String response) {
+		try {
+			JSONObject	responseJson	= new JSONObject(response);
+			return createPluginMap(responseJson);
+		} catch (JSONException e) {
+			SwitchLogger.e(e);
+			return null;
+		}
 	}
 	
 	private boolean intToBoolean(int value){
@@ -155,7 +160,7 @@ public class PluginSystem {
 		}
 	}
 
-	private PluginCfg parsePluginCfg(String pluginId, JSONObject pluginCfgJson) throws JSONException {
+	protected PluginCfg parsePluginCfg(String pluginId, JSONObject pluginCfgJson) throws JSONException {
 		String name		= pluginCfgJson.getString("name");
 		String iconUrl	= pluginCfgJson.getString("icon");
 		boolean show	= intToBoolean(pluginCfgJson.getInt("show"));

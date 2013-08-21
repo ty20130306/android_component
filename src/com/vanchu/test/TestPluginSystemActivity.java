@@ -284,10 +284,12 @@ public class TestPluginSystemActivity extends Activity {
 			SwitchLogger.d(LOG_TAG, "onItemClick, page index:" + _pageIndex + ",item index="+_itemIndex);  
 
 			ProgressBar	pb	= (ProgressBar)v.findViewById(R.id.progressBar);
-			TextView	tv	= (TextView)v.findViewById(R.id.progressText);
+			TextView	pt	= (TextView)v.findViewById(R.id.progressText);
+			TextView	nt	= (TextView)v.findViewById(R.id.textView);
 			ImageView	installIcon	= (ImageView)v.findViewById(R.id.installIcon);
 			PluginInfo	pi	= _pluginData.get(_pageIndex).get(_itemIndex);
-			PluginManager pluginManager	= new PluginManager(_context, pi, new BYXPluginManagerCallback(pb, tv));
+			PluginManager pluginManager	= new PluginManager(_context, pi, new BYXPluginManagerCallback(pb, pt, nt, 
+																					installIcon, pi.getPluginCfg().getName()));
 			
 			if(pi.isInstalled()) {
 				if(pi.isEditing()) {
@@ -305,21 +307,31 @@ public class TestPluginSystemActivity extends Activity {
 		
 		private ProgressBar	_progressBar;
 		private TextView	_progressText;
-
-		public BYXPluginManagerCallback(ProgressBar progressBar, TextView progressText) {
+		private TextView	_pluginNameText;
+		private ImageView	_installIcon;
+		private String		_pluginName;
+		
+		public BYXPluginManagerCallback(ProgressBar progressBar, TextView progressText, 
+										TextView pluginNameText, ImageView installIcon, String pluginName) {
 			_progressBar	= progressBar;
 			_progressText	= progressText;
+			_pluginNameText	= pluginNameText;
+			_installIcon	= installIcon;
+			_pluginName		= pluginName;
 		}
 		
 		@Override
 		public void onComplete(int result) {
 			_progressBar.setVisibility(View.INVISIBLE);
+			_pluginNameText.setText(_pluginName);
 		}
 
 		@Override
 		public void onDownloadStart() {
 			_progressBar.setVisibility(View.VISIBLE);
 			_progressText.setVisibility(View.VISIBLE);
+			_pluginNameText.setText("下载中");
+			_installIcon.setVisibility(View.GONE);
 		}
 
 		@Override
@@ -332,6 +344,8 @@ public class TestPluginSystemActivity extends Activity {
 		public void onDownloadEnd() {
 			_progressBar.setVisibility(View.GONE);
 			_progressText.setVisibility(View.GONE);
+			_pluginNameText.setText(_pluginName);
+			_installIcon.setVisibility(View.VISIBLE);
 		}
 	}
 	
