@@ -1,16 +1,21 @@
 package com.vanchu.libs.common.util;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Bundle;
 
 /**
  * @author wolf
@@ -143,6 +148,38 @@ public class ActivityUtil {
 	}
 	
 	/**
+	 * 用于启动隐藏icon或启动指定activity的app
+	 * @param context
+	 * @param packageName
+	 * @param className
+	 * @param intent data
+	 * @return succ: true, fail: false
+	 */
+	public static boolean startApp(Context context, String packageName, String className, Map<String, String> data){
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_VIEW);
+		intent.setClassName(packageName, className);
+		
+		if(data != null) {
+			Iterator<Entry<String, String>> iter	= data.entrySet().iterator();
+			while(iter.hasNext()) {
+				Entry<String, String> entry	= iter.next();
+				intent.putExtra(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		try {
+			context.startActivity(intent);
+		} catch (ActivityNotFoundException e) {
+			SwitchLogger.e(e);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	
+	/**
 	 * 启动正常的app
 	 * @param context
 	 * @param packageName
@@ -166,4 +203,39 @@ public class ActivityUtil {
 		
 		return true;
 	}
+	
+	public static void restartSelf() {
+		android.os.Process.killProcess(android.os.Process.myPid());
+	}
+	
+	public static Object getMetaValue(Context context, String metaKey) {
+		Bundle metaData		= null;
+        Object metaValue	= null;
+        if (context == null || metaKey == null) {
+        	SwitchLogger.e(LOG_TAG, "context or metaKey is null");
+            return null;
+        }
+        
+        try {
+            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(
+                    				context.getPackageName(), PackageManager.GET_META_DATA);
+            
+            if (null == ai) {
+            	SwitchLogger.e(LOG_TAG, "ai is null");
+            	return null;
+            }
+            metaData = ai.metaData;
+            
+            if (null == metaData) {
+            	SwitchLogger.e(LOG_TAG, "ai.metaData is null");
+            	return null;
+            }
+            
+            metaValue = metaData.get(metaKey);
+        } catch (NameNotFoundException e) {
+        	SwitchLogger.e(e);
+        }
+        
+        return metaValue;
+    }
 }

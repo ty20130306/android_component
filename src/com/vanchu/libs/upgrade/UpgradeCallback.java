@@ -3,13 +3,12 @@ package com.vanchu.libs.upgrade;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.vanchu.libs.common.ui.Tip;
 import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.content.Context;
 
-public class UpgradeCallback {
+abstract public class UpgradeCallback {
 	private static final String LOG_TAG = UpgradeCallback.class.getSimpleName();
 	
 	private Context _context;
@@ -26,14 +25,10 @@ public class UpgradeCallback {
 		SwitchLogger.d(LOG_TAG, "onStart called");
 	}
 	
-	public void onProgress(long downloaded, long total){
+	public void onDownloadProgress(long downloaded, long total){
 		
 	}
-	
-	public void onComplete(int result){
-		SwitchLogger.d(LOG_TAG, "onComplete called, result = " + result);
-	}
-	
+
 	public UpgradeParam onUpgradeInfoResponse(String response){
 		SwitchLogger.d(LOG_TAG, "onUpgradeInfoResponse called");
 		
@@ -72,25 +67,28 @@ public class UpgradeCallback {
 	}
 	
 	public void onIoError(){
-		Tip.show(_context, "更新失败，请检查您的SD卡");
+		SwitchLogger.e(LOG_TAG, "onIoError called");
 	}
 	
 	public void onUrlError(){
-		Tip.show(_context,"更新失败，服务器升级中");
+		SwitchLogger.e(LOG_TAG, "onUrlError called");
 	}
 	
 	public void onNetworkNotConnected(){
-		SwitchLogger.d(LOG_TAG, "onNetworkNotConnected called");
-		Tip.show(_context, "请打开您的网络连接");
+		SwitchLogger.e(LOG_TAG, "onNetworkNotConnected called");
 	}
 	
 	public void onStorageNotEnough(){
-		SwitchLogger.e(LOG_TAG, "space not enough to download");
-		Tip.show(_context, "更新失败，存储空间不足");
+		SwitchLogger.e(LOG_TAG, "onStorageNotEnough called");
 	}
 	
 	public void onSocketTimeout(){
-		SwitchLogger.e(LOG_TAG, "socket time out");
-		Tip.show(_context, "更新失败，网络超时");
+		SwitchLogger.e(LOG_TAG, "onSocketTimeout called");
 	}
+	
+	public void exitApp(){
+		ActivityUtil.restartSelf();
+	}
+	
+	abstract public void onComplete(int result);
 }

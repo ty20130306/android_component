@@ -27,6 +27,8 @@ public class Downloader {
 	public static final int DOWNLOAD_ERR_SPACE_NOT_ENOUGH	= 4;
 	public static final int DOWNLOAD_ERR_SOCKET_TIMEOUT		= 5;
 	
+	private static final String DOWNLOAD_DIR_NAME	= "vanchu_download";
+	
 	private static final String LOG_TAG	= Downloader.class.getSimpleName();
 	
 	private static final int DOWNLOAD_STORAGE_TYPE_SDCARD		= 1;
@@ -167,7 +169,13 @@ public class Downloader {
 			file			= _context.getFilesDir();
 		}
 		
-		_downloadDir		= file.getAbsolutePath();
+		_downloadDir	= file.getAbsolutePath() + "/" + DOWNLOAD_DIR_NAME;
+		File dir		= new File(_downloadDir);
+		if( ! dir.exists()) {
+			dir.mkdir();
+		}
+		FileUtil.chmod(_downloadDir, "777");
+		
 		_downloadPath		= _downloadDir + "/" + _downloadFileName;
 		_tmpDownloadPath	= _downloadPath + ".tmp";
 		

@@ -2,6 +2,7 @@ package com.vanchu.test;
 
 import com.vanchu.libs.common.ui.LoadingDialog;
 import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.IdUtil;
 import com.vanchu.libs.common.util.ImgUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.common.util.ThreadUtil;
@@ -13,6 +14,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +29,7 @@ public class SecondActivity extends Activity {
 
 	private static final String LOG_TAG	= SecondActivity.class.getSimpleName();
 	private ProgressBar _pBar;
+	private ProgressDialog	_progressDialog;
 	
 	private Handler _handler	= new Handler(){
 		public void handleMessage(android.os.Message msg) {
@@ -47,7 +52,14 @@ public class SecondActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_second);
 		
+		SwitchLogger.setPrintLog(true);
 		Log.d(LOG_TAG, "current version name="+ActivityUtil.getCurrentVersionName(this));
+		
+		String deviceId	= IdUtil.getDeviceId(this);
+		String uuid		= IdUtil.getUUID();
+		String uniqueId	= IdUtil.getUniqueId(this);
+		
+		SwitchLogger.d(LOG_TAG, "device id="+deviceId+",uuid="+uuid+",uniqueId="+uniqueId);
 	}
 
 	@Override
@@ -58,7 +70,7 @@ public class SecondActivity extends Activity {
 	}
 	
 	public void testAysncImgaeLoader(View v) {
-		SwitchLogger.setPrintLog(true);
+		
 		
 		ImgUtil imgUtil	= new ImgUtil(this);
 		ImageView imageView	= (ImageView) findViewById(R.id.aysnc_img);
@@ -67,6 +79,15 @@ public class SecondActivity extends Activity {
 	
 	public void testMyProgressDialog(View v){
 		new MyProgressDialog(this).show();
+	}
+	
+	public void goToThree(View v){
+		Intent intent	= new Intent(this, ThreeActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testExitApp(View v) {
+		android.os.Process.killProcess(android.os.Process.myPid());
 	}
 	
 	public void testLoadingDialog(View v){
@@ -127,6 +148,15 @@ public class SecondActivity extends Activity {
 		}.start();
 	}
 	
+	private void initProgressDialog(){
+		_progressDialog	= new ProgressDialog(this);
+		_progressDialog.setCancelable(false);
+		_progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		_progressDialog.setMax(100);
+		_progressDialog.setTitle("下载进度");
+		_progressDialog.setMessage("正在准备下载安装包");
+	}
+	
 	public void checkUpgrade(View v){
 		UpgradeParam param	= new UpgradeParam(
 			"1.0.3",
@@ -135,11 +165,42 @@ public class SecondActivity extends Activity {
 			"http://pesiwang.devel.rabbit.oa.com/component.apk",
 			"升级详细内容"
 		);
+		initProgressDialog();
+		
+		class MyCallback extends UpgradeCallback {
+			
+			public MyCallback(Context context){
+				super(context);
+			}
+			
+			@Override
+			public void onDownloadStarted() {
+				_progressDialog.show();
+			}
+			
+			@Override
+			public void onDownloadProgress(long downloaded, long total) {
+				_progressDialog.setProgress((int)(downloaded * 100 / total));
+				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
+											(int)(downloaded / 1024), (int)(total / 1024) );
+				
+				_progressDialog.setMessage(tip);
+			}
+			
+			public void onComplete(int result) {
+				_progressDialog.dismiss();
+			}
+			
+			public void exitApp() {
+				android.os.Process.killProcess(android.os.Process.myPid());
+				SwitchLogger.d(LOG_TAG, "implement exitApp");
+			}
+		}
 		
 		new UpgradeManager(
 			this, 
 			param,
-			new UpgradeCallback(this)).check();
+			new MyCallback(this)).check();
 
 	}
 }

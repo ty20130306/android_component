@@ -17,6 +17,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -34,8 +35,15 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	private int	_maxMsgLen		= DEFAULT_MAX_MSG_LEN;
 	private int	_maxContactLen	= DEFAULT_MAX_CONTACT_LEN;
 	
-	private ImageButton _cancelBtn		= null;
-	private ImageButton _submitBtn		= null;
+	private ImageButton _cancelImageBtn		= null;
+	private ImageButton _submitImageBtn		= null;
+	
+	private Button		_cancelBtn		= null;
+	private Button		_submitBtn		= null;
+	
+	private boolean		_isCancelImageBtn	= true;
+	private boolean		_isSubmitImageBtn	= true;
+	
 	private EditText	_contactText	= null;
 	private EditText	_msgText		= null;
 	
@@ -76,6 +84,7 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	}
 
 	private void sumbitSucc() {
+		afterSendRequest();
 		onSubmitSucc();
 		quit();
 	}
@@ -96,13 +105,24 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	}
 
 	private void initView(){
-		_cancelBtn	= (ImageButton)findViewById(_cancelBtnResId);
-		_submitBtn	= (ImageButton)findViewById(_submitBtnResId);
+		if(_isCancelImageBtn) {
+			_cancelImageBtn	= (ImageButton)findViewById(_cancelBtnResId);
+			_cancelImageBtn.setOnClickListener(this);
+		} else {
+			_cancelBtn		= (Button)findViewById(_cancelBtnResId);
+			_cancelBtn.setOnClickListener(this);
+		}
+		
+		if(_isSubmitImageBtn) {
+			_submitImageBtn	= (ImageButton)findViewById(_submitBtnResId);
+			_submitImageBtn.setOnClickListener(this);
+		} else {
+			_submitBtn		= (Button)findViewById(_submitBtnResId);
+			_submitBtn.setOnClickListener(this);
+		}
+		
 		_contactText	= (EditText)findViewById(_contactTextResId);
 		_msgText		= (EditText)findViewById(_msgTextResId);
-		
-		_cancelBtn.setOnClickListener(this);
-		_submitBtn.setOnClickListener(this);
 		
 		_msgText.addTextChangedListener(new MsgTextWatcher());
 		_contactText.addTextChangedListener(new ContactTextWatcher());
@@ -250,6 +270,14 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 			SwitchLogger.e(e);
 			return false;
 		}
+	}
+	
+	protected void setIsCancleImageBtn(boolean isCancelImageBtn) {
+		_isCancelImageBtn	= isCancelImageBtn;
+	}
+	
+	protected void setIsSubmitImageBtn(boolean isSubmitImageBtn) {
+		_isSubmitImageBtn	= isSubmitImageBtn;
 	}
 	
 	/**

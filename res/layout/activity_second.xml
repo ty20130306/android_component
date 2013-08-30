@@ -11,6 +11,19 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_launcher"
         />
+    
+    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="跳               转"
+	        android:onClick="goToThree" />
+    
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="测试退出app"
+        android:onClick="testExitApp" />
+    
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

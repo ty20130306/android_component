@@ -6,23 +6,18 @@ import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.util.SwitchLogger;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
 import android.text.Html;
 import android.text.Spanned;
 
 public class UpgradeManager {
 	
 	private static final String LOG_TAG = UpgradeManager.class.getSimpleName();
-
-	private static final int EXIT_DELAY_DURATION	= 2000; // millisecond
 	
 	private UpgradeParam		_param;
 	private UpgradeCallback		_callback;
@@ -32,7 +27,6 @@ public class UpgradeManager {
 	private String				_downloadPath;
 	
 	private Dialog				_detailDialog;
-	private Handler				_handler;
 	private boolean				_downloadStarted;
 	
 	public UpgradeManager (Context context, UpgradeParam param, UpgradeCallback callback){
@@ -43,7 +37,6 @@ public class UpgradeManager {
 		_upgradeType		= _param.getUpgradeType();
 		
 		_detailDialog		= createDetailDialog();
-		_handler			= new Handler();
 		_downloadStarted	= false;
 	}
 	
@@ -117,38 +110,21 @@ public class UpgradeManager {
 		_callback.onComplete(UpgradeResult.RESULT_INSTALL_STARTED);
 		
 		if(UpgradeParam.UPGRADE_TYPE_FORCE == _param.getUpgradeType()){
-			exitApp();
+			_callback.exitApp();
 		}
 	}
 	
 	private void errorCommonHandler(){
 		if(UpgradeParam.UPGRADE_TYPE_FORCE == _param.getUpgradeType()){
 			_callback.onComplete(UpgradeResult.RESULT_ERROR_FATAL);
-			exitApp();
+			_callback.exitApp();
 		} else {
 			_callback.onComplete(UpgradeResult.RESULT_ERROR_SKIPPABLE);
 		}
 	}
 	
-	private void publishProgress(long downloaded, long total){
-		_callback.onProgress(downloaded, total);
-	}
-
-	private void exitApp(){
-		_handler.postDelayed(new Runnable() {
-			
-			@Override
-			public void run() {
-				((Activity)_context).finish();
-				
-				SwitchLogger.d(LOG_TAG, "exiting app " + _context.getPackageName());
-				ActivityManager activityManager	= (ActivityManager)_context.getSystemService(Context.ACTIVITY_SERVICE);
-				activityManager.restartPackage(_context.getPackageName());
-				
-				System.exit(0);
-			}
-		}, EXIT_DELAY_DURATION);
-		
+	private void publishDownloadProgress(long downloaded, long total){
+		_callback.onDownloadProgress(downloaded, total);
 	}
 	
 	private void doInstall(){
@@ -179,7 +155,7 @@ public class UpgradeManager {
 				_downloadStarted	= true;
 				_callback.onDownloadStarted();
 			}
-			publishProgress(downloaded, total);
+			publishDownloadProgress(downloaded, total);
 		}
 
 		@Override

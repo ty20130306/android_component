@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.task.Downloader.IDownloadListener;
+import com.vanchu.libs.common.ui.Tip;
 import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.SharedPrefsUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
@@ -25,8 +26,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -38,6 +41,8 @@ public class ComponentTestActivity extends Activity {
 	private static final String	LOG_TAG	= ComponentTestActivity.class.getSimpleName();
 	
 	private ProgressDialog	_progressDialog;
+	
+	private long lastBackKeyPressedTime;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,42 @@ public class ComponentTestActivity extends Activity {
 		return true;
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		switch (item.getItemId()) {
+		case R.id.menu_exit:
+			finish();
+			break;
+
+		default:
+			break;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_BACK:
+			
+			long currTime	= System.currentTimeMillis();
+			if(currTime - lastBackKeyPressedTime > 2000 ) {
+				Tip.show(this, "再次按返回键退出游戏");
+				lastBackKeyPressedTime	= currTime;
+			} else {
+				finish();
+			}
+			return true;
+
+		default:
+			break;
+		}
+		
+		return super.onKeyDown(keyCode, event);
+	}
+	
 	private void initProgressDialog(){
 		_progressDialog	= new ProgressDialog(this);
 		_progressDialog.setCancelable(false);
@@ -61,7 +102,6 @@ public class ComponentTestActivity extends Activity {
 		_progressDialog.setMax(100);
 		_progressDialog.setTitle("下载进度");
 		_progressDialog.setMessage("正在准备下载安装包");
-		_progressDialog.show();
 	}
 	
 	public void testDownloader(View v){
@@ -182,7 +222,7 @@ public class ComponentTestActivity extends Activity {
 			}
 			
 			@Override
-			public void onProgress(long downloaded, long total) {
+			public void onDownloadProgress(long downloaded, long total) {
 				_progressDialog.setProgress((int)(downloaded * 100 / total));
 				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
 											(int)(downloaded / 1024), (int)(total / 1024) );
@@ -193,6 +233,10 @@ public class ComponentTestActivity extends Activity {
 			@Override
 			public void onComplete(int result) {
 				_progressDialog.dismiss();
+			}
+			
+			public void exitApp() {
+				SwitchLogger.d(LOG_TAG, "implement exitApp");
 			}
 		}
 
@@ -249,6 +293,8 @@ public class ComponentTestActivity extends Activity {
 			"升级详细内容"
 		);
 		
+		initProgressDialog();
+		
 		class MyCallback extends UpgradeCallback {
 			
 			public MyCallback(Context context){
@@ -257,11 +303,11 @@ public class ComponentTestActivity extends Activity {
 			
 			@Override
 			public void onDownloadStarted() {
-				initProgressDialog();
+				_progressDialog.show();
 			}
 			
 			@Override
-			public void onProgress(long downloaded, long total) {
+			public void onDownloadProgress(long downloaded, long total) {
 				_progressDialog.setProgress((int)(downloaded * 100 / total));
 				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
 											(int)(downloaded / 1024), (int)(total / 1024) );
@@ -272,6 +318,10 @@ public class ComponentTestActivity extends Activity {
 			@Override
 			public void onComplete(int result) {
 				_progressDialog.dismiss();
+			}
+			
+			public void exitApp() {
+				SwitchLogger.d(LOG_TAG, "implement exitApp");
 			}
 		}
 		
@@ -295,7 +345,7 @@ public class ComponentTestActivity extends Activity {
 			}
 			
 			@Override
-			public void onProgress(long downloaded, long total) {
+			public void onDownloadProgress(long downloaded, long total) {
 				_progressDialog.setProgress((int)(downloaded * 100 / total));
 				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
 											(int)(downloaded / 1024), (int)(total / 1024) );
@@ -306,6 +356,10 @@ public class ComponentTestActivity extends Activity {
 			@Override
 			public void onComplete(int result) {
 				_progressDialog.dismiss();
+			}
+			
+			public void exitApp() {
+				SwitchLogger.d(LOG_TAG, "implement exitApp");
 			}
 			
 			@Override
@@ -400,11 +454,16 @@ public class ComponentTestActivity extends Activity {
 			
 			@Override
 			public void onDownloadStarted() {
-				
+				_progressDialog.show();
+			}
+			
+			public void onLatestVersion(){
+				super.onLatestVersion();
+				Tip.show(getContext(), "当前已经是最新版本");
 			}
 			
 			@Override
-			public void onProgress(long downloaded, long total) {
+			public void onDownloadProgress(long downloaded, long total) {
 				_progressDialog.setProgress((int)(downloaded * 100 / total));
 				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
 											(int)(downloaded / 1024), (int)(total / 1024) );
@@ -415,6 +474,11 @@ public class ComponentTestActivity extends Activity {
 			@Override
 			public void onComplete(int result) {
 				_progressDialog.dismiss();
+			}
+			
+			public void exitApp() {
+				SwitchLogger.d(LOG_TAG, "implement exitApp");
+				((Activity)getContext()).finish();
 			}
 			
 			@Override
