@@ -57,7 +57,7 @@ public class SecondActivity extends Activity {
 		
 		String deviceId	= IdUtil.getDeviceId(this);
 		String uuid		= IdUtil.getUUID();
-		String uniqueId	= IdUtil.getUniqueId(this);
+		String uniqueId	= IdUtil.getDeviceUniqueId(this);
 		
 		SwitchLogger.d(LOG_TAG, "device id="+deviceId+",uuid="+uuid+",uniqueId="+uniqueId);
 	}

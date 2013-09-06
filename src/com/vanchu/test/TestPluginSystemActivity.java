@@ -1,8 +1,6 @@
 package com.vanchu.test;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.vanchu.libs.common.ui.Tip;
@@ -31,13 +29,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
+
 
 public class TestPluginSystemActivity extends Activity {
 	private static final String 	LOG_TAG	= TestPluginSystemActivity.class.getSimpleName();
@@ -50,6 +47,8 @@ public class TestPluginSystemActivity extends Activity {
 	private List<GridViewAdapter>	_gridViewAdapterList;
 	private List<View>	_dotList;
 	private	int	_lastPagePosition;
+	
+	private MyPagerAdapter	_pageViewAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +122,21 @@ public class TestPluginSystemActivity extends Activity {
 		_dbMananger.getAllPluginVersion();
 	}
 	
+	public void testAddPageView(View v){
+		for(int i = 0; i < _pluginData.size(); ++i) {
+			List<PluginInfo> pagePluginInfoList	= _pluginData.get(i);
+
+			GridViewAdapter gvd	= new GridViewAdapter(TestPluginSystemActivity.this, pagePluginInfoList, i);
+			View pageView	= createPageView(gvd);
+			
+			_pageViewList.add(pageView);
+			_gridViewAdapterList.add(gvd);
+		}
+		
+		_pageViewAdapter.setList(_pageViewList);
+		_pageViewAdapter.notifyDataSetChanged();
+	}
+	
 	public void testInstall(View v){
 		SwitchLogger.setPrintLog(true);
 		if(ActivityUtil.isAppInstalled(this, ComponentTestActivity.SONG_PACKAGE_NAME)){
@@ -149,6 +163,16 @@ public class TestPluginSystemActivity extends Activity {
 			_dotList.get(i).setVisibility(View.VISIBLE);
 		}
 	}
+	
+	private View createPageView(GridViewAdapter gvd) {
+		LayoutInflater inflater	= getLayoutInflater();
+		View pageView	= inflater.inflate(R.layout.page_view_layout, null);
+		GridView gv		= (GridView)pageView.findViewById(R.id.page_grid_view);
+		SwitchLogger.d(LOG_TAG, "gv="+gv+"gvd="+gvd);
+		gv.setAdapter(gvd);
+		
+		return pageView;
+	}
 
 	private class MyPluginSystemCallback extends PluginSystemCallback {
 		
@@ -164,18 +188,22 @@ public class TestPluginSystemActivity extends Activity {
 			LayoutInflater inflater	= TestPluginSystemActivity.this.getLayoutInflater();
 			for(int i = 0; i < _pluginData.size(); ++i) {
 				List<PluginInfo> pagePluginInfoList	= _pluginData.get(i);
-
-				View pageView	= inflater.inflate(R.layout.page_view_layout, null);
-				GridView gv		= (GridView)pageView.findViewById(R.id.page_grid_view);
+				
+//				View pageView	= inflater.inflate(R.layout.page_view_layout, null);
+//				GridView gv		= (GridView)pageView.findViewById(R.id.page_grid_view);
+//				GridViewAdapter gvd	= new GridViewAdapter(TestPluginSystemActivity.this, pagePluginInfoList, i);
+//				SwitchLogger.d(LOG_TAG, "gv="+gv+"gvd="+gvd);
+//				gv.setAdapter(gvd);
+				
 				GridViewAdapter gvd	= new GridViewAdapter(TestPluginSystemActivity.this, pagePluginInfoList, i);
-				SwitchLogger.d(LOG_TAG, "gv="+gv+"gvd="+gvd);
-				gv.setAdapter(gvd);
+				View pageView	= createPageView(gvd);
 				
 				_pageViewList.add(pageView);
 				_gridViewAdapterList.add(gvd);
 			}
 			
-			_viewPager.setAdapter(new MyPagerAdapter(_pageViewList));
+			_pageViewAdapter	= new MyPagerAdapter(_pageViewList);
+			_viewPager.setAdapter(_pageViewAdapter);
 			_viewPager.setOnPageChangeListener(new MyPagerChangeListener());
 		}
 
@@ -356,6 +384,10 @@ public class TestPluginSystemActivity extends Activity {
     	public MyPagerAdapter(List<View> list) {
     		this.list = list;
 		}
+    	
+    	public void setList(List<View> list) {
+    		this.list	= list;
+    	}
     	
 		@Override
 		public void destroyItem(View view, int index, Object arg2) {

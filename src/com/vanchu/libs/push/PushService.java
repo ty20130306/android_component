@@ -1,6 +1,8 @@
 package com.vanchu.libs.push;
 
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,7 +25,10 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
 abstract public class PushService extends Service {
-	private static final String LOG_TAG	= PushService.class.getSimpleName();
+	private static final String LOG_TAG				= PushService.class.getSimpleName();
+	
+	private static final int NO_EXIT_TIME			= -1;
+	private static final int NO_POP_UP_TIME			= -1;
 	
 	public static String START_TYPE		= "START_TYPE";
 	public static String MSG_TYPE		= "MSG_TYPE";
@@ -37,6 +42,8 @@ abstract public class PushService extends Service {
 	private Timer 		_msgTimer		= null;
 	private TimerTask	_msgTimerTask	= null;
 
+	private long 		_lastExitTime	= NO_EXIT_TIME;
+	private long		_lastPopUpTime	= NO_POP_UP_TIME;
 	
 	/**
 	 * 根据消息类型返回icon id
@@ -48,8 +55,17 @@ abstract public class PushService extends Service {
 	/**
 	 * 根据消息类型实现推送消息的点击动作
 	 * @param msgType	消息类型
+	 * @param msgExtra	消息的extra数据
 	 */
 	abstract protected void onNotificationClick(int msgType, Bundle msgExtra);
+	
+	protected void putMsgUrlParam(String key, String value) {
+		Map<String, String> msgUrlParam	= _pushParam.getMsgUrlParam();
+		msgUrlParam.put(key, value);
+		
+		_pushParam.setMsgUrlParam(msgUrlParam);
+		setPushParam();
+	}
 	
 	private void showNotification(PushMsg pushMsg) {
 		SwitchLogger.d(LOG_TAG, "ticker="+pushMsg.getTicker()+",type="+pushMsg.getType()+",title="+pushMsg.getTitle()+",text="+pushMsg.getText());
@@ -73,13 +89,19 @@ abstract public class PushService extends Service {
 		notificationManager.notify(pushMsg.getType(), notification);
 	}
 	
+	protected JSONObject parseMsgResponse(String response) throws JSONException {
+		JSONObject msg	= new JSONObject(response);
+		
+		return msg;
+	}
+	
 	private void onPushMsgResponse(String response){
 		//SwitchLogger.d(LOG_TAG, response);
 		
 		try {
-			JSONObject msg	= new JSONObject(response);
+			JSONObject msg	= parseMsgResponse(response);
 			PushMsg pushMsg	= new PushMsg(msg);
-			if(pushMsg.isShow()){
+			if(needPopUp(pushMsg)){
 				showNotification(pushMsg);
 			}
 			
@@ -89,27 +111,98 @@ abstract public class PushService extends Service {
 		}
 	}
 	
+	private boolean needPopUp(PushMsg pushMsg) {
+		// update should come first
+		updateExitTimeIfNeed();
+		
+		// check whehter should pop up
+		long currTime	= System.currentTimeMillis();
+		if(currTime - _lastExitTime < _pushParam.getDelay()) {
+			SwitchLogger.d(LOG_TAG, "do not reach delay, delay = " + _pushParam.getDelay() + ", passed = " + (currTime - _lastExitTime));
+			return false;
+		}
+		
+		int currHourAndMinute	= getCurrHourAndMinute();
+		if(currHourAndMinute < _pushParam.getAvaiStartTime() || currHourAndMinute > _pushParam.getAvaiEndTime()) {
+			SwitchLogger.d(LOG_TAG, "not in available duration, start = " + _pushParam.getAvaiStartTime() 
+									+ ", end = " + _pushParam.getAvaiEndTime() + ", now = " + currHourAndMinute);
+			
+			return false;
+		}
+		
+		boolean notifyWhenRunning	= _pushParam.getNotifyWhenRunning();
+		if( ! notifyWhenRunning && ActivityUtil.isAppRuning(this)){
+			SwitchLogger.d(LOG_TAG, "do not notify when running");
+			return false;
+		}
+		
+		if( ! pushMsg.isShow()){
+			SwitchLogger.d(LOG_TAG, "push msg show field is false");
+			return false;
+		}
+		
+		if(currTime - _lastPopUpTime < _pushParam.getAfter()) {
+			SwitchLogger.d(LOG_TAG, "do not reach after, after = " + _pushParam.getAfter() + ", passed = " + (currTime - _lastPopUpTime));
+			return false;
+		}
+		
+		_lastPopUpTime	= currTime;
+		
+		return true;
+	}
+
 	private void updatePushCfgIfNeed(PushMsg pushMsg) {
+		boolean		needRestartTimerTask	= false;
+		boolean		needSetPushParam		= false;
+		
 		HashMap<String, String> cfg	= pushMsg.getCfg();
+		getPushParam();
+		
 		if(cfg.containsKey("interval")){
 			int interval	= Integer.parseInt(cfg.get("interval"));
 			SwitchLogger.d(LOG_TAG, "received interval="+interval);
-			resetPushInterval(interval);
+			if(interval != _pushParam.getMsgInterval()){
+				_pushParam.setMsgInterval(interval);
+				needSetPushParam		= true;
+				needRestartTimerTask	= true;
+			}
 		}
-	}
-	
-	private void resetPushInterval(int interval) {
-		getPushParam();
-		if(interval != _pushParam.getMsgInterval()){
-			_pushParam.setMsgInterval(interval);
+		
+		if(cfg.containsKey("delay")) {
+			int delay	= Integer.parseInt(cfg.get("delay"));
+			SwitchLogger.d(LOG_TAG, "received delay="+delay);
+			if(delay != _pushParam.getDelay()){
+				_pushParam.setDelay(delay);
+				needSetPushParam	= true;
+			}
+		}
+		
+		if(cfg.containsKey("avaiStartTime") && cfg.containsKey("avaiEndTime")) {
+			int avaiStartTime	= Integer.parseInt(cfg.get("avaiStartTime"));
+			int avaiEndTime		= Integer.parseInt(cfg.get("avaiEndTime"));
+			SwitchLogger.d(LOG_TAG, "received avaiStartTime=" + avaiStartTime + ",avaiEndTime=" + avaiEndTime);
+			
+			_pushParam.setAvaiTime(avaiStartTime, avaiEndTime);
+			needSetPushParam	= true;
+		}
+		
+		if(cfg.containsKey("after")) {
+			int after	= Integer.parseInt(cfg.get("after"));
+			SwitchLogger.d(LOG_TAG, "received after="+after);
+			if(after != _pushParam.getAfter()){
+				_pushParam.setAfter(after);
+				needSetPushParam	= true;
+			}
+		}
+		
+		if(needSetPushParam) {
 			setPushParam();
+		}
+		
+		if(needRestartTimerTask) {
 			stopTimerTask();
 			initTimerTask();
-			return ;
-		} else {
-			SwitchLogger.d(LOG_TAG, "same interval, no need to update");
 		}
-
 	}
 	
 	private void stopTimerTask() {
@@ -189,14 +282,27 @@ abstract public class PushService extends Service {
 	private void initTimerTask(){
 		startGetMsgTimer();
 	}
-
+	
+	private void updateExitTimeIfNeed() {
+		if(ActivityUtil.isAppRuning(this)) {
+			_lastExitTime	= NO_EXIT_TIME;
+		} else {
+			if(_lastExitTime == NO_EXIT_TIME) {
+				_lastExitTime	= System.currentTimeMillis();
+			}
+		}
+	}
+	
+	private int getCurrHourAndMinute() {
+		Calendar calendar	= Calendar.getInstance();
+		int hour	= calendar.get(Calendar.HOUR_OF_DAY);
+		int minute	= calendar.get(Calendar.MINUTE);
+		
+		return hour * 100 + minute;
+	}
+	
 	private void getPushMsg() {
 		getPushParam();
-		
-		boolean notifyWhenRunning	= _pushParam.getNotifyWhenRunning();
-		if( ! notifyWhenRunning && ActivityUtil.isAppRuning(this)){
-			return;
-		}
 		
 		if(_pushParam.isMsgUrlValid()){
 			String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
@@ -204,13 +310,13 @@ abstract public class PushService extends Service {
 				SwitchLogger.e(LOG_TAG, "request push msg fail");
 				return ;
 			}
-			
+			SwitchLogger.d(LOG_TAG, "response = " + response);
 			onPushMsgResponse(response);
 		} else {
-			SwitchLogger.d(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
+			SwitchLogger.e(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
 		}
 	}
-	
+
 	private void startGetMsgTimer() {
 		SwitchLogger.d(LOG_TAG, "startGetMsgTimer()");
 		

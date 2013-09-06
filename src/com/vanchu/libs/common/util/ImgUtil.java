@@ -16,12 +16,13 @@ public class ImgUtil {
 	private static String LOADED_IMG_DIR	= "loaded_img";
 	private AsyncImageLoader _asyncImageLoader;
 	private Activity _activity;
-
+	private String 	_path;
+	
 	public ImgUtil(Activity activity) {
 		_activity = activity;
 		
-		String path = _activity.getDir(LOADED_IMG_DIR, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) + "/";
-		_asyncImageLoader = new AsyncImageLoader(path);
+		_path = _activity.getDir(LOADED_IMG_DIR, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) + "/";
+		_asyncImageLoader = new AsyncImageLoader(_path);
 	}
 
 	/**
@@ -29,8 +30,10 @@ public class ImgUtil {
 	 * 
 	 * @param imageView
 	 * @param url
+	 * 
+	 * @return 返回本地存储的图片位置
 	 */
-	public void asyncSetRoundImg(final ImageView imageView, String url, int defaultDrawable) {
+	public String asyncSetRoundImg(final ImageView imageView, String url, int defaultDrawable) {
 		Drawable cachedImage = _asyncImageLoader.loadDrawable(url, new ImageCallback() {
 			@Override
 			public void imageLoaded(Drawable imageDrawable, String imageUrl) {
@@ -45,6 +48,8 @@ public class ImgUtil {
 		} else {
 			imageView.setImageDrawable(BitmapUtil.toRoundCorner(_activity, defaultDrawable, 5));
 		}
+		
+		return _path + _asyncImageLoader.getImgName(url);
 	}
 
 	/**
@@ -52,22 +57,26 @@ public class ImgUtil {
 	 * 
 	 * @param imageView
 	 * @param url
+	 * 
+	 * @return 返回本地存储的图片位置
 	 */
-	public void asyncSetImg(final ImageView imageView, String url, int defaultDrawable) {
+	public String asyncSetImg(final ImageView imageView, String url, int defaultDrawable) {
 		Drawable cachedImage = _asyncImageLoader.loadDrawable(url, new ImageCallback() {
 			@Override
 			public void imageLoaded(Drawable imageDrawable, String imageUrl) {
 				if (imageDrawable != null) {
 					imageView.setImageDrawable(imageDrawable);
 				}
-
 			}
 		});
+		
 		if (cachedImage != null) {
 			imageView.setImageDrawable(cachedImage);
 		} else {
 			imageView.setImageResource(defaultDrawable);
 		}
+		
+		return _path + _asyncImageLoader.getImgName(url);
 	}
 
 	/**
@@ -75,8 +84,10 @@ public class ImgUtil {
 	 * 
 	 * @param imageView
 	 * @param url
+	 * 
+	 * @return 返回本地存储的图片位置
 	 */
-	public void asyncSetImg(final ImageView imageView, String url) {
+	public String asyncSetImg(final ImageView imageView, String url) {
 		Drawable cachedImage = _asyncImageLoader.loadDrawable(url, new ImageCallback() {
 			@Override
 			public void imageLoaded(Drawable imageDrawable, String imageUrl) {
@@ -85,8 +96,11 @@ public class ImgUtil {
 				}
 			}
 		});
+		
 		if (cachedImage != null) {
 			imageView.setImageDrawable(cachedImage);
 		}
+		
+		return _path + _asyncImageLoader.getImgName(url);
 	}
 }

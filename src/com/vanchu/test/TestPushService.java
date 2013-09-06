@@ -1,8 +1,10 @@
 package com.vanchu.test;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.os.Bundle;
 
-import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.push.PushService;
@@ -24,6 +26,13 @@ public class TestPushService extends PushService {
 			return R.drawable.ic_launcher;
 		}
 	}
+	
+	@Override
+	protected JSONObject parseMsgResponse(String response) throws JSONException {
+		JSONObject msg	= new JSONObject(response);
+		
+		return msg.getJSONObject("notification");
+	}
 
 	@Override
 	protected void onNotificationClick(int msgType, Bundle msgExtra) {
@@ -35,7 +44,9 @@ public class TestPushService extends PushService {
 		
 		switch(msgType){
 		case 1:
-			ActivityUtil.startApp(this, ComponentTestActivity.class);
+			//ActivityUtil.startApp(this, ComponentTestActivity.class);
+			putMsgUrlParam("name", msgExtra.getString("name") + ", from client");
+			SwitchLogger.d(LOG_TAG, "receive msg type = " + msgType);
 			break;
 			
 		case 2:

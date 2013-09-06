@@ -135,6 +135,7 @@ public class ActivityUtil {
 	public static boolean startApp(Context context, String packageName, String className){
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setClassName(packageName, className);
 		
 		try {
@@ -158,6 +159,7 @@ public class ActivityUtil {
 	public static boolean startApp(Context context, String packageName, String className, Map<String, String> data){
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setClassName(packageName, className);
 		
 		if(data != null) {

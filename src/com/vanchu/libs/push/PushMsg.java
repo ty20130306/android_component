@@ -6,9 +6,11 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import android.os.Bundle;
 
 public class PushMsg {
+	
 	public static final int MSG_TYPE_NONE		= 0;
 	
 	private boolean	_show;
@@ -84,7 +86,7 @@ public class PushMsg {
 	
 	private void parseShow(JSONObject data) throws JSONException {
 		if(data.has("show")){
-			int s	= data.getInt("show");
+			int s	= Integer.parseInt(data.getString("show"));
 			if(s == 0){
 				_show	= false;
 			} else {
@@ -112,11 +114,10 @@ public class PushMsg {
 		}
 	}
 	
-	
 	private void parseData(JSONObject msg) throws JSONException {
 		if(msg.has("data")){
 			JSONObject	data	= msg.getJSONObject("data");
-			_type	= data.getInt("type");
+			_type	= Integer.parseInt(data.getString("type"));
 			_title	= data.getString("title");
 			_text	= data.getString("text");
 			

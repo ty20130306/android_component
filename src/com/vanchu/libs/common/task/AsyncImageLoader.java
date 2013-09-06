@@ -4,11 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 
+import com.vanchu.libs.common.util.StringUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.graphics.Bitmap;
@@ -28,11 +27,8 @@ public class AsyncImageLoader {
 	
 	private String _path; // 本地缓存路径
 
-	private HashMap<String, SoftReference<Drawable>> _imageCachePool; // 内存对象缓存池
-
 	public AsyncImageLoader(String path) {
 		_path = path;
-		_imageCachePool = new HashMap<String, SoftReference<Drawable>>();
 	}
 
 	/**
@@ -47,27 +43,16 @@ public class AsyncImageLoader {
 			return null;
 		}
 		
-		// 1、从内存加载图片
-		if (_imageCachePool.containsKey(imageUrl)) {
-			SoftReference<Drawable> softReference = _imageCachePool.get(imageUrl);
-			Drawable drawable = softReference.get();
-			if (drawable != null) {
-				SwitchLogger.d(LOG_TAG, "get from cache pool");
-				return drawable;
-			}
-		}
-		
-		// 2、从本地加载图片，并存入内存
+		// 1、从本地加载图片
 		String imgName = getImgName(imageUrl);
 		Bitmap bitmap = BitmapFactory.decodeFile(_path + imgName);
 		if (bitmap != null) {
 			Drawable drawable = new BitmapDrawable(bitmap);
-			_imageCachePool.put(imageUrl, new SoftReference<Drawable>(drawable)); // 图片存入内存缓存
 			SwitchLogger.d(LOG_TAG, "get from storage");
 			return drawable;
 		}
 		
-		// 3、从网络下载
+		// 2、从网络下载
 		final Handler handler = new Handler() {
 			public void handleMessage(Message message) {
 				imageCallback.imageLoaded((Drawable) message.obj, imageUrl);
@@ -80,7 +65,6 @@ public class AsyncImageLoader {
 				Drawable drawable = loadImageFromUrl(imageUrl); // 网络加载图片
 				Message message = handler.obtainMessage(0, drawable);
 				handler.sendMessage(message);
-				_imageCachePool.put(imageUrl, new SoftReference<Drawable>(drawable)); // 图片存入内存缓存
 				String imgName = getImgName(imageUrl);
 				saveImgFile(drawable, _path, imgName);// 图片存入本地
 			}
@@ -151,35 +135,14 @@ public class AsyncImageLoader {
 	}
 
 	/**
-	 * 获得文件名，以倒数第二个“/”截取
+	 * 获得文件名
 	 * 
 	 * @param url
 	 *            链接
 	 * @return
 	 */
-	private String getImgName(String url) {
-		if (url == null || "".equals(url)) {// 网址为空
-			return "pic" + System.currentTimeMillis() + ".jpg";// 直接返回时间字符串
-		}
+	public String getImgName(String url) {
 		
-		if (url.charAt(url.length() - 1) == '/') {// 若最后一位是“/”，去掉
-			url = url.substring(0, url.length() - 1);
-		}
-		
-		String imgName = "";
-		String fileName = url.substring(url.lastIndexOf("/") + 1);// 取“/”最后一位
-		if (url.lastIndexOf("/") == -1) {// 只有一个“/”
-			imgName	= fileName;
-		} else {
-			url = url.substring(0, url.lastIndexOf("/"));
-			String lastDirName = url.substring(url.lastIndexOf("/") + 1);// 取“/”倒数第二位
-			imgName = lastDirName + "_" + fileName;
-		}
-		
-		if (imgName.indexOf(".jpg") == -1 && imgName.indexOf(".png") == -1) {
-			imgName += ".jpg";
-		}
-		
-		return imgName;
+		return StringUtil.md5sum(url);
 	}
 }

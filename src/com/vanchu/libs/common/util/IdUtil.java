@@ -20,7 +20,7 @@ public class IdUtil {
 		return UUID.randomUUID().toString();
 	}
 	
-	public static String getUniqueId(Context context) {
+	public static String getDeviceUniqueId(Context context) {
 		SharedPreferences pref	= context.getSharedPreferences(PREF_NAME_UNIQUE_ID, Context.MODE_PRIVATE);
 		String uniqueId	= pref.getString(PREF_KEY_ID, "");
 		if(uniqueId == "") {

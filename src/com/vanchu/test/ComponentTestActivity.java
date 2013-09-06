@@ -1,10 +1,15 @@
 package com.vanchu.test;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vanchu.libs.common.container.SolidQueue;
+import com.vanchu.libs.common.container.SolidQueue.SolidQueueCallback;
 import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.ui.Tip;
@@ -48,7 +53,7 @@ public class ComponentTestActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.component_test);
-		
+		SwitchLogger.setPrintLog(true);
 		Log.d(LOG_TAG, "current version name="+ActivityUtil.getCurrentVersionName(this));
 	}
 
@@ -95,6 +100,11 @@ public class ComponentTestActivity extends Activity {
 		return super.onKeyDown(keyCode, event);
 	}
 	
+	public void testScaleCrop(View v) {
+		Intent intent	= new Intent(this, CropActivity.class);
+		startActivity(intent);
+	}
+	
 	private void initProgressDialog(){
 		_progressDialog	= new ProgressDialog(this);
 		_progressDialog.setCancelable(false);
@@ -102,6 +112,105 @@ public class ComponentTestActivity extends Activity {
 		_progressDialog.setMax(100);
 		_progressDialog.setTitle("下载进度");
 		_progressDialog.setMessage("正在准备下载安装包");
+	}
+	
+	private void printsq(LinkedList<String> sq) {
+		for(int i = 0; i < sq.size(); ++i) {
+			SwitchLogger.d(LOG_TAG, "sq["+i+"]="+sq.get(i));
+		}
+	}
+	
+//	private void testStringSolidQueue() {
+//		SolidQueue<String> sq	= new SolidQueue<String>(this, "test", 10);
+//		
+//		SwitchLogger.d(LOG_TAG, "1 from file --------------------------");
+//		printsq(sq.getQueue());
+//		new Thread(){
+//			public void run() {
+//				SolidQueue<String> sq2	= new SolidQueue<String>(ComponentTestActivity.this, "test", 10);
+//				sq2.enqueue("aa");
+//				sq2.enqueue("bb");
+//				sq2.enqueue("cc");
+//				sq2.enqueue("dd");
+//				sq2.enqueue("ee");
+//				sq2.enqueue("ff");
+//			}
+//		}.start();
+//		
+//		sq.enqueue("a");
+//		sq.enqueue("b");
+//		sq.enqueue("c");
+//		sq.enqueue("e");
+//		sq.enqueue("d");
+//		sq.enqueue("f");
+//		
+//		SwitchLogger.d(LOG_TAG, "2 from memory --------------------------");
+//		printsq(sq.getQueue());
+//		
+//		sq	= new SolidQueue<String>(this, "test", 10);
+//		SwitchLogger.d(LOG_TAG, "3 from file --------------------------");
+//		printsq(sq.getQueue());
+//	}
+//	
+	
+	
+	private void printMysq(LinkedList<MyItem> sq) {
+		if(sq.size() == 0) {
+			SwitchLogger.d(LOG_TAG, "sq is empty");
+			return;
+		}
+		
+		for(int i = 0; i < sq.size(); ++i) {
+			MyItem item	= sq.get(i);
+			SwitchLogger.d(LOG_TAG, "sq["+i+"]:"+item.get_id()+","+item.get_name()+","+item.get_url());
+		}
+	}
+	
+	private void testMySolidQueue() {
+		SolidQueueCallback<MyItem> callback	= new SolidQueueCallback<MyItem> (){
+			public void onAdd(MyItem element) {
+				SwitchLogger.e(LOG_TAG, "onAdd, id="+element.get_id());
+			}
+			
+			public void onRemove(MyItem element) {
+				SwitchLogger.e(LOG_TAG, "onRemove, id="+element.get_id());
+			}
+		};
+		
+		SolidQueue<MyItem> sq	= new SolidQueue<MyItem>(this, "my_queue", 10, callback);
+		
+		SwitchLogger.d(LOG_TAG, "1 from file --------------------------");
+		printMysq(sq.getQueue());
+		
+//		new Thread(){
+//			public void run() {
+//				SolidQueue<MyItem> sq2	= new SolidQueue<MyItem>(ComponentTestActivity.this, "test", 10);
+//				sq2.enqueue("aa");
+//				sq2.enqueue("bb");
+//				sq2.enqueue("cc");
+//				sq2.enqueue("dd");
+//				sq2.enqueue("ee");
+//				sq2.enqueue("ff");
+//				sq2.solidify();
+//			}
+//		}.start();
+		
+
+		sq.enqueue(new MyItem("http://", "a", "pesi"));
+		sq.enqueue(new MyItem("http://", "b", "pesi"));
+		sq.enqueue(new MyItem("http://", "c", "pesi"));
+		
+		SwitchLogger.d(LOG_TAG, "2 from memory --------------------------");
+		printMysq(sq.getQueue());
+		
+		sq	= new SolidQueue<MyItem>(this, "my_queue", 10, callback);
+		SwitchLogger.d(LOG_TAG, "3 from file --------------------------");
+		printMysq(sq.getQueue());
+	}
+	
+	public void testSolidQueue(View v){
+		// testStringSolidQueue();
+		testMySolidQueue();
 	}
 	
 	public void testDownloader(View v){
@@ -161,6 +270,13 @@ public class ComponentTestActivity extends Activity {
 	public void goToSecond(View v){		
 		Intent intent	= new Intent(this, SecondActivity.class);
 		startActivity(intent);
+		
+		Map<String, String> param	= new HashMap<String, String>();
+		param.put("a", "b");
+		param.put("a", "c");
+		param.put("a", "d");
+		
+		SwitchLogger.d(LOG_TAG, "result:" + (String)param.get("a"));
 	}
 
 	public void testPushService(View v){
@@ -173,8 +289,10 @@ public class ComponentTestActivity extends Activity {
 		msgUrlParam.put("name", "wolf");
 		
 		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam);
+		pushParam.setIgnoreIntervalLimit(true);
+		pushParam.setMsgInterval(3000);
 		pushParam.setNotifyWhenRunning(true);
-		pushParam.setDefaults(Notification.DEFAULT_LIGHTS);
+		pushParam.setDefaults(Notification.DEFAULT_ALL);
 		
 		PushRobot.run(this, TestPushService.class, pushParam);
 	}

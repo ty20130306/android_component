@@ -13,6 +13,20 @@
 	    android:paddingTop="@dimen/activity_vertical_margin"
 	    android:orientation="vertical" >
 
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试比例切图"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testScaleCrop" />
+	    
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试SolidQueue"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testSolidQueue" />
+	     
 	      <Button
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"

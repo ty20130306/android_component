@@ -31,8 +31,18 @@ eg：
 
 三：代码实现
 1：继承PushService，根据具体业务实现下边抽象函数
-	abstract protected int getNotificationIcon(int msgType);	// 根据消息类型返回icon id
-	abstract protected void onNotificationClick(int msgType);	// 根据消息类型处理推送点击动作
+	/**
+	 * 根据消息类型返回icon id
+	 * @param msgType	消息类型
+	 * @return
+	 */
+	abstract protected int getNotificationIcon(int msgType);
+	
+	/**
+	 * 根据消息类型实现推送消息的点击动作
+	 * @param msgType	消息类型
+	 */
+	abstract protected void onNotificationClick(int msgType, Bundle msgExtra);
 
 2：继承PushBroadcastReceiver，根据具体业务实现下边抽象函数
 	abstract protected Class<?> getServiceClass();	// 返回具体实现的service的类
