@@ -1,6 +1,4 @@
-package com.vanchu.libs.WebCache;
-
-import android.util.Log;
+package com.vanchu.libs.webCache;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -9,12 +7,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 
+import com.vanchu.libs.common.util.SwitchLogger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.zip.GZIPInputStream;
 
-public class CacheNetwork {
+public class Network {
     private int _timeout = 60000;
 
     public void setup(int timeout){
@@ -42,10 +42,10 @@ public class CacheNetwork {
             return inputStream;
         }
         catch (IOException e){
-            Log.e("Hello", e.getMessage());
+        	SwitchLogger.e(e);
         }
         catch (Exception e){
-            Log.e("Hello", e.getMessage());
+        	SwitchLogger.e(e);
         }
         return null;
     }

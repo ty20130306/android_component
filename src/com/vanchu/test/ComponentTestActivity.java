@@ -8,6 +8,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vanchu.libs.webCache.WebCache;
 import com.vanchu.libs.common.container.SolidQueue;
 import com.vanchu.libs.common.container.SolidQueue.SolidQueueCallback;
 import com.vanchu.libs.common.task.Downloader;
@@ -254,6 +255,11 @@ public class ComponentTestActivity extends Activity {
 		SwitchLogger.setPrintLog(true);
 	
 		Intent intent	= new Intent(this, TestPluginSystemActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testWebCache(View v){
+		Intent intent	= new Intent(this, WebCacheActivity.class);
 		startActivity(intent);
 	}
 	

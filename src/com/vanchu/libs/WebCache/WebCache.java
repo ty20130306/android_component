@@ -1,4 +1,5 @@
-package com.vanchu.libs.WebCache;
+package com.vanchu.libs.webCache;
+
 
 import android.content.Context;
 import android.os.Handler;
@@ -15,12 +16,12 @@ import java.util.TreeMap;
 public class WebCache {
     static public class Settings{
         public int capacity = 100; /* items to hold */
-        public int timeout = 6000; /* timeout in milliseconds */
+        public int timeout = 10000; /* timeout in milliseconds */
     }
 
     public interface GetCallback{
-        public void onDone(String url, File file);
-        public void onFail(String url, int reason);
+        public void onDone(String url, File file, Object param);
+        public void onFail(String url, int reason, Object param);
     }
 
     public static final int SUCC = 0x00;
@@ -29,11 +30,11 @@ public class WebCache {
 
     private static Map<String, WebCache> _instances = new TreeMap<String, WebCache>();
     private Storage _storage;
-    private CacheNetwork _network;
+    private Network _network;
 
     private WebCache(Context ctx, String type){
         this._storage = new Storage(ctx, type);
-        this._network = new CacheNetwork();
+        this._network = new Network();
     }
 
     public void setup(Settings settings){
@@ -52,35 +53,38 @@ public class WebCache {
         }
     }
 
-    public void get(final String url, final GetCallback getCallback){
-        //step 1. check storage in sync
-        File file = this._storage.get(url);
-        if(file != null){
-            getCallback.onDone(url, file);
-            return;
-        }
-
-        //step 2. setup handler
+    public void get(final String url, final GetCallback getCallback, final Object param, final boolean skipCache){
+        //step 1. setup handler
         final Handler handler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
             switch (msg.what){
                 case REASON_NETWORK_FAILED:
-                    getCallback.onFail(url, REASON_NETWORK_FAILED);
+                    getCallback.onFail(url, REASON_NETWORK_FAILED, param);
                     break;
                 case REASON_STORAGE_FAILED:
-                    getCallback.onFail(url, REASON_NETWORK_FAILED);
+                    getCallback.onFail(url, REASON_NETWORK_FAILED, param);
                     break;
                 case SUCC:
-                    getCallback.onDone(url, (File)(msg.obj));
+                    getCallback.onDone(url, (File)(msg.obj), param);
                     break;
                 }
             }
         };
 
-        //step 3. invoke a thread
-        Thread thread = new Thread(){
+        //step 2. invoke a thread
+        new Thread(){
             public void run(){
+                //check storage first
+            	if(!skipCache){
+            		File file = WebCache.this._storage.get(url);
+            		if(file != null){
+            			handler.obtainMessage(SUCC, file).sendToTarget();
+            			return;
+            		}
+            	}
+                
+                // try network
                 InputStream inputStream = WebCache.this._network.get(url);
                 if(inputStream == null){
                     handler.sendEmptyMessage(REASON_NETWORK_FAILED);
@@ -93,7 +97,6 @@ public class WebCache {
                 }
                 handler.obtainMessage(SUCC, file).sendToTarget();
             }
-        };
-        thread.start();
+        }.start();
     }
 }

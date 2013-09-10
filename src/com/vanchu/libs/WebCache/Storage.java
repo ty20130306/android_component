@@ -1,13 +1,12 @@
-package com.vanchu.libs.WebCache;
+package com.vanchu.libs.webCache;
+
 
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -21,6 +20,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import com.vanchu.libs.common.util.SwitchLogger;
 
 /**
  * Created by ray on 9/5/13.
@@ -158,9 +159,8 @@ public class Storage {
     private void _loadEntries(){
         this._entries = new TreeMap<String, ItemMeta>();
 
-        RandomAccessFile file = null;
         try{
-            file = new RandomAccessFile(this._internal + "/" + FILE_ENTRIES, "r");
+        	RandomAccessFile file = new RandomAccessFile(this._internal + "/" + FILE_ENTRIES, "r");
             int total = file.readInt();
             for(int i = 0; i < total; ++i){
                 ItemMeta meta = new ItemMeta();
@@ -182,20 +182,8 @@ public class Storage {
                 
                 file.close();
             }
-        }
-        catch (FileNotFoundException e){
-        }
-        catch (IOException e){
-            this._entries.clear();
-        }
-        catch (Exception e){
-            this._entries.clear();
-        }
-        
-        try{
-            if(file != null) file.close();
-        }
-        catch (Exception e){
+        } catch (Exception e){
+            SwitchLogger.e(e);
         }
     }
 

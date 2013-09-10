@@ -60,6 +60,11 @@
             </intent-filter>
         </receiver>
 
+        
+         <activity
+            android:name="com.vanchu.test.WebCacheActivity"
+            android:label="@string/title_activity_test_feedback" >
+        </activity>
         <activity
             android:name="com.vanchu.test.TestFeedbackActivity"
             android:label="@string/title_activity_test_feedback" >
