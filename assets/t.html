@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> New Document </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+ </head>
+
+ <body>
+  <img id="img_show" src="" width="212px" height="424px">
+  <script>
+	document.addEventListener("DOMContentLoaded", function(){
+//		document.getElementById("img_show").src = "file:///data/data/com.vanchu.apps.shiguangbao/app_loaded_img/pic.jpg";
+		Shell.loadImg();
+	}, false);
+
+var	App = {
+	setImg: function(path) {
+		document.getElementById("img_show").src = path;
+	}
+};
+  </script>
+ </body>
+</html>

@@ -60,8 +60,7 @@
             </intent-filter>
         </receiver>
 
-        
-         <activity
+        <activity
             android:name="com.vanchu.test.WebCacheActivity"
             android:label="@string/title_activity_test_feedback" >
         </activity>
@@ -77,7 +76,12 @@
             android:name="com.vanchu.test.ThreeActivity"
             android:label="@string/title_activity_three" >
         </activity>
-        <activity android:name="com.vanchu.test.CropActivity"></activity>
+        <activity android:name="com.vanchu.test.CropActivity" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.WebViewActivity"
+            android:label="@string/title_activity_web_view" >
+        </activity>
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@
     <string name="feedback_submit_fail">提交失败，请重试</string>
     <string name="title_activity_test_push_system">TestPushSystemActivity</string>
     <string name="title_activity_three">ThreeActivity</string>
-
     <string name="exit">退出</string>
+    <string name="title_activity_web_view">WebViewActivity</string>
+
 </resources>

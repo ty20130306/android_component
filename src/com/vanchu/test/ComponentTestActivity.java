@@ -23,6 +23,7 @@ import com.vanchu.libs.upgrade.UpgradeCallback;
 import com.vanchu.libs.upgrade.UpgradeManager;
 import com.vanchu.libs.upgrade.UpgradeParam;
 import com.vanchu.libs.upgrade.UpgradeProxy;
+import com.vanchu.sample.WebViewActivity;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -56,6 +57,8 @@ public class ComponentTestActivity extends Activity {
 		setContentView(R.layout.component_test);
 		SwitchLogger.setPrintLog(true);
 		Log.d(LOG_TAG, "current version name="+ActivityUtil.getCurrentVersionName(this));
+		
+		//testWebView(null);
 	}
 
 	@Override
@@ -99,6 +102,11 @@ public class ComponentTestActivity extends Activity {
 		}
 		
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	public void testWebView(View v) {
+		Intent intent	= new Intent(this, WebViewActivity.class);
+		startActivity(intent);
 	}
 	
 	public void testScaleCrop(View v) {
@@ -248,7 +256,7 @@ public class ComponentTestActivity extends Activity {
 			}
 		}
 
-		new Downloader(this, "http://pesiwang.devel.rabbit.oa.com/song.apk", new TestDownloadListener()).run();
+		new Downloader(this, "http://pesiwang.devel.rabbit.oa.com/song.apk", "test", new TestDownloadListener()).run();
 	}
 	
 	public void testPluginSystem(View v){

@@ -88,7 +88,6 @@ public class ActivityUtil {
 		
 		return isRunning;
 	}
-
 	
 	/**
 	 * 用于启动自身app

@@ -27,7 +27,7 @@ public class Downloader {
 	public static final int DOWNLOAD_ERR_SPACE_NOT_ENOUGH	= 4;
 	public static final int DOWNLOAD_ERR_SOCKET_TIMEOUT		= 5;
 	
-	private static final String DOWNLOAD_DIR_NAME	= "vanchu_download";
+	private static final String DOWNLOAD_ROOT_DIR_NAME	= "vanchu_download";
 	
 	private static final String LOG_TAG	= Downloader.class.getSimpleName();
 	
@@ -42,6 +42,7 @@ public class Downloader {
 
 	private Context	_context;
 	private String	_downloadUrl;
+	private String	_dirName;
 	private IDownloadListener	_downloadListener;
 	
 	private String	_downloadFileName;
@@ -85,9 +86,10 @@ public class Downloader {
 		}
 	};	
 	
-	public Downloader(Context context, String downloadUrl, IDownloadListener downloadListener){
+	public Downloader(Context context, String downloadUrl, String dirName, IDownloadListener downloadListener){
 		_context			= context;
 		_downloadUrl		= downloadUrl;
+		_dirName			= dirName;
 		_downloadListener	= downloadListener;
 		
 		_timeoutRetryCnt	= 0;
@@ -169,10 +171,14 @@ public class Downloader {
 			file			= _context.getFilesDir();
 		}
 		
-		_downloadDir	= file.getAbsolutePath() + "/" + DOWNLOAD_DIR_NAME;
+		_downloadDir	= file.getAbsolutePath() + "/" + DOWNLOAD_ROOT_DIR_NAME;
+		if(_dirName != null && _dirName != "") {
+			_downloadDir	+= "/" + _dirName;
+		}
+		
 		File dir		= new File(_downloadDir);
 		if( ! dir.exists()) {
-			dir.mkdir();
+			dir.mkdirs();
 		}
 		FileUtil.chmod(_downloadDir, "777");
 		

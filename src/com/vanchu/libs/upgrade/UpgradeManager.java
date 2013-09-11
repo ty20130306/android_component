@@ -192,7 +192,7 @@ public class UpgradeManager {
 	}
 	
 	private void download(){
-		new Downloader(_context, _param.getUpgradeApkUrl(), new UpgradeDownloadListener()).run();
+		new Downloader(_context, _param.getUpgradeApkUrl(), "upgrade", new UpgradeDownloadListener()).run();
 	}
 	
 	private class UpgradeOnClickListener implements DialogInterface.OnClickListener {

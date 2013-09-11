@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".WebViewActivity" >
+
+    <ImageView 
+		android:id="@+id/pic"
+		android:layout_above="@+id/btn"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="2"
+		android:scaleType="fitCenter"
+		android:src="@drawable/beauty"
+	/>
+    <LinearLayout
+        android:id="@+id/btn"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="8"
+		android:orientation="vertical"
+         >
+	    <Button 
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="保存文件到sdcard和app目录"
+			android:onClick="saveFile"
+	        />
+	    
+	 	<Button 
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="删除sdcard和app目录的文件"
+			android:onClick="deleteFile"
+	        />
+	 	
+	 	<Button 
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="读取sdcard的文件显示到web view"
+			android:onClick="readSdcardFile"
+	        />
+	 	
+	 	<Button 
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="读取app目录的文件显示到web view"
+			android:onClick="readAppFile"
+	        />
+	</LinearLayout>
+</RelativeLayout>

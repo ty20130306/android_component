@@ -45,4 +45,11 @@
         <item name="android:padding">5dp</item>
         <item name="android:textColor">#ff000000</item>
     </style>
+    
+	<!-- dialog 样式 -->
+    <style name="customDialog" parent="android:style/Theme.Dialog">
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsFloating">true</item>
+	</style>
 </resources>

@@ -13,6 +13,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.vanchu.libs.webCache.WebCache;
+import com.vanchu.test.R;
+import com.vanchu.test.R.id;
+import com.vanchu.test.R.layout;
+import com.vanchu.test.R.menu;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

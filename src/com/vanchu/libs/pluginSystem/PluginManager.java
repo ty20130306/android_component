@@ -63,7 +63,7 @@ public class PluginManager {
 	}
 	
 	private void download() {
-		new Downloader(_context, _pluginCfg.getApkUrl(), new PluginDownloadListener()).run();
+		new Downloader(_context, _pluginCfg.getApkUrl(), "plugin", new PluginDownloadListener()).run();
 	}
 	
 	private void install(String downloadFile){
