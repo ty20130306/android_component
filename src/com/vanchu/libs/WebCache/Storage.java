@@ -95,8 +95,8 @@ public class Storage {
                 file.delete();
                 try {
                     file.createNewFile();
-                }
-                catch (Exception e){
+                } catch (Exception e){
+                	SwitchLogger.e(e);
                     file = null;
                 }
             }
@@ -107,8 +107,8 @@ public class Storage {
                 file.delete();
                 try {
                     file.createNewFile();
-                }
-                catch (Exception e){
+                } catch (Exception e){
+                	SwitchLogger.e(e);
                     file = null;
                 }
             }
@@ -128,8 +128,7 @@ public class Storage {
                 outputStream.flush();
                 outputStream.close();
                 inputStream.close();
-            }
-            catch (Exception e){
+            } catch (Exception e){
                 if(outputStream != null){
                     try{
                         outputStream.close();
@@ -154,11 +153,13 @@ public class Storage {
     }
 
     //------------------------private functions-------------------------//
-    private void _loadEntries(){
+    @SuppressWarnings("resource")
+	private void _loadEntries(){
         this._entries = new TreeMap<String, ItemMeta>();
-
+        
+        RandomAccessFile file = null;
         try{
-        	RandomAccessFile file = new RandomAccessFile(this._internal + "/" + FILE_ENTRIES, "r");
+        	file = new RandomAccessFile(this._internal + "/" + FILE_ENTRIES, "r");
             int total = file.readInt();
             for(int i = 0; i < total; ++i){
                 ItemMeta meta = new ItemMeta();
@@ -177,11 +178,17 @@ public class Storage {
                 String url = new String(bytes);
 
                 this._entries.put(url, meta);
-                
-                file.close();
             }
         } catch (Exception e){
             SwitchLogger.e(e);
+        }
+        
+        try {
+	        if(file != null) {
+	        	file.close();
+	        }
+        } catch(Exception e) {
+        	SwitchLogger.e(e);
         }
     }
 
@@ -202,14 +209,13 @@ public class Storage {
                 file.writeInt(url.length());
                 file.write(url.getBytes());
             }
-        }
-        catch (Exception e){
+        } catch (Exception e){
             Log.e("ERROR", "cannot write file");
         }
+        
         try {
             if(file != null) file.close();
-        }
-        catch (Exception e){
+        } catch (Exception e){
         }
     }
 

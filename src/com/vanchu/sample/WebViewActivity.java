@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebSettings.RenderPriority;
@@ -51,6 +52,8 @@ public class WebViewActivity extends Activity {
 	
 	private Handler	_handler = new Handler();
 	
+	private String	_fileName	= "gif.dat";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,15 +64,14 @@ public class WebViewActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				
 				showWebView();
 			}
 		});
 		_javascriptConnector	= new JavascriptConnector();
 		
 		saveFile(null);
-		readSdcardFile(null);
-		//readAppFile(null);
+		//readSdcardFile(null);
+		readAppFile(null);
 		
 	}
 	
@@ -110,9 +112,17 @@ public class WebViewActivity extends Activity {
 
 	private void showDialog() {
 		View view	= getLayoutInflater().inflate(R.layout.dialog_web_view, null);
+		final Dialog dialog	= DialogFactory.createCenterDialog(this, view, R.style.customDialog, LayoutParams.MATCH_PARENT, 1.0f, true);
 		_webView	= (WebView)view.findViewById(R.id.web_view);
+		_webView.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				dialog.cancel();
+			}
+		});
 		initWebview();
-		Dialog dialog	= DialogFactory.createCenterDialog(this, view, R.style.customDialog, LayoutParams.MATCH_PARENT, 1.0f, true);
 		dialog.show();
 	}
 
@@ -140,12 +150,12 @@ public class WebViewActivity extends Activity {
 		AssetManager am	= getAssets();
 		try {
 			writeFile(am.open("beauty.jpg"), storageDirName+"/beauty.jpg");
-			writeFile(am.open("girl.jpg"), storageDirName+"/girl.jpg");
+			writeFile(am.open(_fileName), storageDirName+"/"+_fileName);
 		} catch (Exception e) {
 			SwitchLogger.e(e);
 		}
 		
-		_sdcardFileName	= storageDirName+"/girl.jpg";
+		_sdcardFileName	= storageDirName+"/"+_fileName;
 		FileUtil.chmod(_sdcardFileName, "777");
 	}
 	
@@ -163,12 +173,12 @@ public class WebViewActivity extends Activity {
 		AssetManager am	= getAssets();
 		try {
 			writeFile(am.open("beauty.jpg"), appDirName+"/beauty.jpg");
-			writeFile(am.open("girl.jpg"), appDirName+"/girl.jpg");
+			writeFile(am.open(_fileName), appDirName+"/"+_fileName);
 		} catch (Exception e) {
 			SwitchLogger.e(e);
 		}
 		
-		_appFileName	= appDirName+"/girl.jpg";
+		_appFileName	= appDirName+"/"+_fileName;
 		FileUtil.chmod(_appFileName, "777");
 	}
 	
@@ -261,6 +271,8 @@ public class WebViewActivity extends Activity {
 	private void initWebview(){
 		_webView.setScrollBarStyle(0);
 		final WebSettings settings = _webView.getSettings();
+		
+		//settings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 		
 		settings.setRenderPriority(RenderPriority.HIGH);
 		

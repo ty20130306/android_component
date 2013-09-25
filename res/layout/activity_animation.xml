@@ -1,0 +1,80 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:orientation="vertical"
+    tools:context=".AnimationActivity" >
+	<LinearLayout 
+	    android:id="@+id/top"
+	    android:layout_weight="3"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+		android:orientation="vertical" >
+	
+	    <Button 
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="startRotate"
+	    	android:text="开始旋转动画"
+	        />
+	
+	    <Button 
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="stopRotate"
+	    	android:text="停止旋转动画"
+	        />
+	    
+	     <Button 
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="startFrame"
+	    	android:text="开始帧动画"
+	        />
+	
+	    <Button 
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="stopFrame"
+	    	android:text="停止帧动画"
+	        />
+	    
+	    <ImageView 
+	        android:id="@+id/pic"
+	        android:background="@android:color/transparent"
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:src="@drawable/music_disk_default_cover"
+	        />
+	    
+	     <ImageView 
+	        android:id="@+id/pic_2"
+	        android:background="@android:color/transparent"
+	        android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	        />
+	</LinearLayout>
+	<RelativeLayout 
+	    android:visibility="gone"
+	    android:id="@+id/bottom"
+	    android:layout_weight="7"
+        android:layout_width="wrap_content"
+    	android:layout_height="wrap_content" >
+        
+	    <Button
+	        android:id="@+id/top_btn"
+	        android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:text="测试移动动画top_btn"
+    		android:layout_alignParentTop="true"
+    		/>
+	    <Button
+	        android:id="@+id/bottom_btn"
+	        android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:text="测试移动动画bottom_btn"
+    		android:layout_alignParentBottom="true"
+    		android:visibility="gone"
+    		/>
+     </RelativeLayout>
+</LinearLayout>

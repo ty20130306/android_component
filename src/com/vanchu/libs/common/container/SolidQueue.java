@@ -85,7 +85,10 @@ public class SolidQueue <T>{
 			_callback.onAdd(element);
 			while(_maxSize != UNLIMITED_SIZE && _linkedList.size() > _maxSize) {
 				T removedElement = _linkedList.removeLast();
-				_callback.onRemove(removedElement);
+				if(-1 == _linkedList.lastIndexOf(element)){
+					// no same element in queue any more
+					_callback.onRemove(removedElement);
+				}
 			}
 			solidify();
 		}
@@ -99,7 +102,10 @@ public class SolidQueue <T>{
 		synchronized (_lock) {
 			try {
 				T element	= _linkedList.removeLast();
-				_callback.onRemove(element);
+				if(-1 == _linkedList.lastIndexOf(element)){
+					// no same element in queue any more
+					_callback.onRemove(element);
+				}
 				solidify();
 				
 				return element;
@@ -120,7 +126,10 @@ public class SolidQueue <T>{
 				ObjectOutputStream oos	= new ObjectOutputStream(fos);
 				while(_maxSize != UNLIMITED_SIZE && _linkedList.size() > _maxSize) {
 					T element	= _linkedList.removeLast();
-					_callback.onRemove(element);
+					if(-1 == _linkedList.lastIndexOf(element)){
+						// no same element in queue any more
+						_callback.onRemove(element);
+					}
 				}
 				oos.writeObject(_linkedList);
 				oos.close();

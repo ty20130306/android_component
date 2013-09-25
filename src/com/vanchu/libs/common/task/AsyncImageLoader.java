@@ -7,12 +7,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.vanchu.libs.common.util.ImgUtil;
 import com.vanchu.libs.common.util.StringUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -45,7 +45,7 @@ public class AsyncImageLoader {
 		
 		// 1、从本地加载图片
 		String imgName = getImgName(imageUrl);
-		Bitmap bitmap = BitmapFactory.decodeFile(_path + imgName);
+		Bitmap bitmap = ImgUtil.getSuitableBitmap(new File(_path + imgName));
 		if (bitmap != null) {
 			Drawable drawable = new BitmapDrawable(bitmap);
 			SwitchLogger.d(LOG_TAG, "get from storage");
@@ -80,6 +80,11 @@ public class AsyncImageLoader {
 	 * @return
 	 */
 	public static Drawable loadImageFromUrl(String spec) {
+		
+		if(null == spec || spec.equals("")){
+			return null;
+		}
+		
 		URL url;
 		InputStream input = null;
 		
@@ -91,7 +96,11 @@ public class AsyncImageLoader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
+		if(null == input) {
+			return null;
+		}
+		
 		Drawable d = Drawable.createFromStream(input, "src");
 		return d;
 	}
@@ -121,6 +130,11 @@ public class AsyncImageLoader {
 			imgFile.createNewFile();
 			FileOutputStream fos = new FileOutputStream(imgFile);
 			BitmapDrawable bd = (BitmapDrawable) drawable;
+			if(null == bd) {
+				fos.flush();
+				fos.close();
+				return ;
+			}
 			Bitmap bm = bd.getBitmap();
 			if (imgName.endsWith(".jpg")) {
 				bm.compress(CompressFormat.JPEG, 50, fos);

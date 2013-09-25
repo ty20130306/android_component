@@ -82,6 +82,23 @@
             android:name="com.vanchu.sample.WebViewActivity"
             android:label="@string/title_activity_web_view" >
         </activity>
+        <activity
+            android:name="com.vanchu.sample.AnimationActivity"
+            android:label="@string/title_activity_animation" >
+        </activity>
+        <activity
+            android:name="com.vanchu.test.MainActivity"
+            android:label="@string/title_activity_main" >
+        </activity>
+        <activity
+            android:name="com.vanchu.test.MediaPlayerActivity"
+            android:label="@string/title_activity_media_player" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.TestMusicServiceActivity"
+            android:label="@string/title_activity_test_service" >
+        </activity>
+        <service android:name="com.vanchu.sample.MusicService" />
     </application>
 
 </manifest>

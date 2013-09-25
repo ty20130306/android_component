@@ -15,9 +15,7 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="@android:style/Theme">     
         <item name="android:windowNoTitle">true</item> <!-- 设置没有标题 -->
-        <item name="android:textSize">20sp</item>   <!-- 设置文本大小 -->
-          <item name="android:textColor">#F34141</item>
-        <item name="android:background">@android:color/background_light</item>
+        <item name="android:background">@android:color/background_dark</item>
         <!-- 设置activity切换动画 -->
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>

@@ -50,3 +50,22 @@ eg：
 3：在代码启动的地方调用启动代码
 	eg：PushRobot.run(this, TestPushService.class, pushParam);
 
+四：推送消息字段解析
+数据字段：
+data	=> array(
+	type	=> 推送消息类型(整型)
+	ticker	=> 手机顶栏提示文字(字符串)
+	title	=> 消息标题(字符串)
+	text	=> 消息正文(字符串)
+	show	=> 收到推送是否提示(0/1)
+	extra	=> 消息额外需要字段 (json对象)
+)
+
+配置字段：
+cfg		=> array(
+	interval	=> 获取推送消息间隔，单位为毫秒
+	delay		=> 上次退出应用后，至少经过了多少时间才允许显示推送消息，单位为毫秒
+	after		=> 上次显示推送消息后，至少经过了多少时间才允许显示推送消息，单位为毫秒
+	avaiStartTime	=> 每日允许推送开始时间（格式为：hhmm，比如早上8点表示为 0800）
+	avaiEndTime		=> 每日允许推送开始时间（格式为：hhmm，比如晚上10点表示为 2200）
+)

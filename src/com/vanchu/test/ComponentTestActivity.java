@@ -15,6 +15,7 @@ import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.task.Downloader.IDownloadListener;
 import com.vanchu.libs.common.ui.Tip;
 import com.vanchu.libs.common.util.ActivityUtil;
+import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SharedPrefsUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.push.PushParam;
@@ -23,6 +24,9 @@ import com.vanchu.libs.upgrade.UpgradeCallback;
 import com.vanchu.libs.upgrade.UpgradeManager;
 import com.vanchu.libs.upgrade.UpgradeParam;
 import com.vanchu.libs.upgrade.UpgradeProxy;
+import com.vanchu.sample.AnimationActivity;
+import com.vanchu.sample.MusicService;
+import com.vanchu.sample.TestMusicServiceActivity;
 import com.vanchu.sample.WebViewActivity;
 
 import android.os.Bundle;
@@ -32,6 +36,7 @@ import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -59,28 +64,43 @@ public class ComponentTestActivity extends Activity {
 		Log.d(LOG_TAG, "current version name="+ActivityUtil.getCurrentVersionName(this));
 		
 		//testWebView(null);
+		//testAnimation(null);
+		//testNetwork(null);
+		//testMediaPlayer(null);
+		testMusicService(null);
 	}
 
+	public void testMusicService(View v) {
+		Intent intent	= new Intent(this, TestMusicServiceActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testNetwork(View v) {
+		if(NetUtil.isConnected(this)) {
+			SwitchLogger.d(LOG_TAG, "----------network is connected");
+		} else {
+			SwitchLogger.d(LOG_TAG, "----------network is not connected");
+		}
+		
+		if(NetUtil.isFastNetwork(this)) {
+			SwitchLogger.d(LOG_TAG, "----------network is fast");
+		} else {
+			SwitchLogger.d(LOG_TAG, "----------network is not fast");
+		}
+		
+		SwitchLogger.d(LOG_TAG, "----------network type is:" + NetUtil.getNetworkType(this));
+		
+		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		SwitchLogger.d(LOG_TAG, "----------TelephonyManager network type is:" + telephonyManager.getNetworkType());
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		
-		switch (item.getItemId()) {
-		case R.id.menu_exit:
-			finish();
-			break;
 
-		default:
-			break;
-		}
-		return true;
-	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -93,6 +113,9 @@ public class ComponentTestActivity extends Activity {
 				Tip.show(this, "再次按返回键退出游戏");
 				lastBackKeyPressedTime	= currTime;
 			} else {
+				SwitchLogger.d(LOG_TAG, "stop music service" );
+				Intent intent	= new Intent(this, MusicService.class);
+				stopService(intent);
 				finish();
 			}
 			return true;
@@ -215,6 +238,16 @@ public class ComponentTestActivity extends Activity {
 		sq	= new SolidQueue<MyItem>(this, "my_queue", 10, callback);
 		SwitchLogger.d(LOG_TAG, "3 from file --------------------------");
 		printMysq(sq.getQueue());
+	}
+	
+	public void testAnimation(View v){
+		Intent intent	= new Intent(this, AnimationActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testMediaPlayer(View v){
+		Intent intent	= new Intent(this, MediaPlayerActivity.class);
+		startActivity(intent);
 	}
 	
 	public void testSolidQueue(View v){

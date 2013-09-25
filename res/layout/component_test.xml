@@ -16,6 +16,27 @@
 	     <Button
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:text="测试MusicService"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testMusicService" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试MediaPlayer"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testMediaPlayer" />
+	    
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试动画"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testAnimation" />
+	     
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
 	        android:text="测试WebView"
 	        android:layout_marginBottom="10dp"
 	        android:onClick="testWebView" />

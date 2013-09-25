@@ -19,6 +19,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -37,6 +39,7 @@ abstract public class PushService extends Service {
 	public static final int START_TYPE_NOTIFICATION		= 2;
 	
 	private WakeLock	_wakeLock		= null;
+	private WifiLock	_wifiLock		= null;
 	private PushParam	_pushParam		= null;
 	
 	private Timer 		_msgTimer		= null;
@@ -226,6 +229,7 @@ abstract public class PushService extends Service {
 	public void onCreate(){
 		SwitchLogger.d(LOG_TAG, "onCreate()");
 		acquireWakeLock();
+		acquireWifiLock();
 		super.onCreate();
 	}
 	
@@ -268,6 +272,7 @@ abstract public class PushService extends Service {
 	public void onDestroy(){
 		SwitchLogger.d(LOG_TAG, "onDestroy()");
 		releaseWakeLock();
+		releaseWifiLock();
 		super.onDestroy();
 	}
 	
@@ -358,6 +363,20 @@ abstract public class PushService extends Service {
 		if (null != _wakeLock) {
 			_wakeLock.release();
 			_wakeLock = null;
+		}
+	}
+	
+	private void acquireWifiLock() {
+		if(null == _wifiLock) {
+			_wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "PushServiceWifiLock");
+			_wifiLock.acquire();
+		}
+	}
+	
+	private void releaseWifiLock() {
+		if(null != _wifiLock) {
+			_wifiLock.release();
+			_wifiLock	= null;
 		}
 	}
 	

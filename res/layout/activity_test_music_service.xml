@@ -1,0 +1,110 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".TestMusicServiceActivity" >
+
+    <Button 
+        android:id="@+id/start"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="startService"
+    	android:visibility="gone"
+        />
+    
+    <Button 
+        android:id="@+id/stop"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="stopService"
+    	android:visibility="gone"
+        />
+    
+    <Button 
+        android:id="@+id/bind"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="bindService"
+    	android:visibility="gone"
+        />
+    
+	<Button 
+        android:id="@+id/unbind"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="unbindService"
+    	android:visibility="gone"
+        />
+	
+	<Button 
+        android:id="@+id/communicate"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="communicate"
+    	android:visibility="gone"
+        />
+	
+	<Button 
+        android:id="@+id/playMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="播放音乐"
+    	android:onClick="playMusic"
+        />
+	
+	<Button 
+        android:id="@+id/stopMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="停止音乐"
+    	android:onClick="stopMusic"
+        />
+	
+	<Button 
+        android:id="@+id/pauseMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="暂停音乐"
+    	android:onClick="pauseMusic"
+        />
+	
+	<Button 
+        android:id="@+id/nextMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="下一首"
+    	android:onClick="nextMusic"
+        />
+	
+	<Button 
+        android:id="@+id/increaseVolume"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="增加音量"
+    	android:onClick="increaseVolume"
+        />
+	
+	<Button 
+        android:id="@+id/decreaseVolume"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="减少音量"
+    	android:onClick="decreaseVolume"
+        />
+	<TextView 
+        android:id="@+id/volume_text"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:textSize="20sp"
+        />
+	 <SeekBar 
+        android:id="@+id/seek_bar"
+        android:layout_below="@id/textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
