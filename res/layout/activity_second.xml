@@ -17,6 +17,18 @@
 	        android:layout_height="wrap_content"
 	        android:text="跳               转"
 	        android:onClick="goToThree" />
+            
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="智能播放音乐"
+        android:onClick="playMusic" />
+        
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="暂停播放音乐"
+        android:onClick="stopMusic" />
     
     <Button
         android:layout_width="wrap_content"
@@ -63,4 +75,5 @@
         android:layout_height="wrap_content"
         android:text="测试progress bar"
         android:onClick="testProgressBar" />
+
 </LinearLayout>

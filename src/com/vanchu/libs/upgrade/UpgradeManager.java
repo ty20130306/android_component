@@ -27,7 +27,6 @@ public class UpgradeManager {
 	private String				_downloadPath;
 	
 	private Dialog				_detailDialog;
-	private boolean				_downloadStarted;
 	
 	public UpgradeManager (Context context, UpgradeParam param, UpgradeCallback callback){
 		_context	= context;
@@ -37,7 +36,6 @@ public class UpgradeManager {
 		_upgradeType		= _param.getUpgradeType();
 		
 		_detailDialog		= createDetailDialog();
-		_downloadStarted	= false;
 	}
 	
 	public Context getContext(){
@@ -146,15 +144,11 @@ public class UpgradeManager {
 
 		@Override
 		public void onStart() {
-			// do nothing
+			_callback.onDownloadStarted();
 		}
 		
 		@Override
 		public void onProgress(long downloaded, long total) {
-			if( ! _downloadStarted) {
-				_downloadStarted	= true;
-				_callback.onDownloadStarted();
-			}
 			publishDownloadProgress(downloaded, total);
 		}
 

@@ -22,5 +22,6 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_media_player">MediaPlayerActivity</string>
     <string name="title_activity_test_service">TestServiceActivity</string>
+    <string name="title_activity_music_service">MusicServiceActivity</string>
 
 </resources>

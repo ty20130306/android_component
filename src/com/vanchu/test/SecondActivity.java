@@ -81,6 +81,14 @@ public class SecondActivity extends Activity {
 		new MyProgressDialog(this).show();
 	}
 	
+	public void playMusic(View v) {
+		
+	}
+	
+	public void stopMusic(View v) {
+		
+	}
+	
 	public void goToThree(View v){
 		Intent intent	= new Intent(this, ThreeActivity.class);
 		startActivity(intent);

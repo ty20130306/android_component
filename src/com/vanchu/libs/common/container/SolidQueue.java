@@ -82,12 +82,16 @@ public class SolidQueue <T>{
 	public void enqueue(T element) {
 		synchronized (_lock) {
 			_linkedList.addFirst(element);
-			_callback.onAdd(element);
+			if(null != _callback) {
+				_callback.onAdd(element);
+			}
 			while(_maxSize != UNLIMITED_SIZE && _linkedList.size() > _maxSize) {
 				T removedElement = _linkedList.removeLast();
-				if(-1 == _linkedList.lastIndexOf(element)){
+				if(-1 == _linkedList.lastIndexOf(removedElement)){
 					// no same element in queue any more
-					_callback.onRemove(removedElement);
+					if(null != _callback) {
+						_callback.onRemove(removedElement);
+					}
 				}
 			}
 			solidify();
@@ -101,14 +105,16 @@ public class SolidQueue <T>{
 	public T dequeue() {
 		synchronized (_lock) {
 			try {
-				T element	= _linkedList.removeLast();
-				if(-1 == _linkedList.lastIndexOf(element)){
+				T removedElement	= _linkedList.removeLast();
+				if(-1 == _linkedList.lastIndexOf(removedElement)){
 					// no same element in queue any more
-					_callback.onRemove(element);
+					if(null != _callback) {
+						_callback.onRemove(removedElement);
+					}
 				}
 				solidify();
 				
-				return element;
+				return removedElement;
 			} catch(NoSuchElementException e) {
 				SwitchLogger.e(e);
 				return null;
@@ -119,7 +125,7 @@ public class SolidQueue <T>{
 	/**
 	 * 固化队列
 	 */
-	private void solidify() {
+	public void solidify() {
 		synchronized (_lock) {
 			try {
 				FileOutputStream fos	= new FileOutputStream(_path);
@@ -128,7 +134,9 @@ public class SolidQueue <T>{
 					T element	= _linkedList.removeLast();
 					if(-1 == _linkedList.lastIndexOf(element)){
 						// no same element in queue any more
-						_callback.onRemove(element);
+						if(null != _callback) {
+							_callback.onRemove(element);
+						}
 					}
 				}
 				oos.writeObject(_linkedList);
@@ -137,6 +145,14 @@ public class SolidQueue <T>{
 				SwitchLogger.e(e);
 			}
 		}
+	}
+	
+	public void setMaxSize(int maxSize) {
+		_maxSize	= maxSize;
+	}
+	
+	public int size() {
+		return _linkedList.size();
 	}
 	
 	public LinkedList<T> getQueue() {

@@ -1,4 +1,4 @@
-package com.vanchu.sample;
+package com.vanchu.libs.music;
 
 import android.media.MediaPlayer;
 
@@ -23,5 +23,12 @@ public class MusicServiceCallback {
 	public void onMusicCompletion(MediaPlayer mp) {
 		SwitchLogger.d(LOG_TAG, "onMusicCompletion" );
 	}
-
+	
+	public void onPlayerModeChange(int currentPlayerMode) {
+		SwitchLogger.d(LOG_TAG, "onPlayerModeChange, current player mode = " + currentPlayerMode );
+	}
+	
+	public void onError(int errCode) {
+		SwitchLogger.e(LOG_TAG, "onError, errCode = " + errCode );
+	}
 }

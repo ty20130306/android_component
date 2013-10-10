@@ -1,11 +1,9 @@
-package com.vanchu.sample;
+package com.vanchu.libs.music;
 
 import java.io.IOException;
-import java.util.Random;
-
+import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.common.util.ThreadUtil;
-import com.vanchu.test.MediaPlayerActivity;
 
 import android.app.Service;
 import android.content.Context;
@@ -16,32 +14,44 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.view.View;
 
 public class MusicService extends Service {
 
 	private static final String LOG_TAG	= MusicService.class.getSimpleName();
 	
-	public static final int	PLAYER_STATE_STOPPED	= 1;
-	public static final int	PLAYER_STATE_PLAYING	= 2;
-	public static final int	PLAYER_STATE_PAUSED		= 3;
+	public static final int PLAY_SUCC				= 0;
+	public static final int PLAY_FAIL_NO_NETOWRK	= 1;
+	public static final int PLAY_FAIL_WRONG_PARAM	= 2;
+	
+	public static final int PLAYER_STATE_STOPPED	= 1;
+	public static final int PLAYER_STATE_PLAYING	= 2;
+	public static final int PLAYER_STATE_PAUSED		= 3;
+	public static final int PLAYER_STATE_PREPARING	= 4;
+	
+	public static final int PLAYER_MODE_NONE		= 0;
+	public static final int PLAYER_MODE_ONLINE		= 1;
+	public static final int PLAYER_MODE_OFFLINE		= 2;
+	
 	
 	private MusicBinder	_binder			= null;
 	private WakeLock	_wakeLock		= null;
 	private WifiLock	_wifiLock		= null;
 	
-	private String		_musicUrl		= null;
+	private String		_currentMusicUrl	= null;
+	private String 		_currentMusicPath	= null;
+	
+	private boolean		_positionThreadRunning	= true;
 	private MediaPlayer	_mediaPlayer	= null;
 	
 	private int			_playerState	= PLAYER_STATE_STOPPED;
-	
-	private MusicServiceCallback	_callback	= null;
-	
+	private int			_playerMode		= PLAYER_MODE_NONE;
+			
 	private boolean		_pausedByLossOfAudioFocus	= false;
 	private MusicAudioFocusChangeListener	_audioFocusChangeListener	= null;
+	
+	protected MusicServiceCallback	_callback	= null;
 	
 	@Override
 	public void onCreate() {
@@ -79,11 +89,12 @@ public class MusicService extends Service {
 	private void startPositionPublishThread() {
 		new Thread() {
 			public void run() {
-				while (true) {
-					if(null != _callback && null != _mediaPlayer
-						&& PLAYER_STATE_PLAYING == _playerState) 
-					{
-						_callback.onMusicPlaying(_mediaPlayer);
+				while (_positionThreadRunning) {
+					if(null != _mediaPlayer && _mediaPlayer.isPlaying()) {
+						onMusicPlaying(_mediaPlayer);
+						if(null != _callback) {
+							_callback.onMusicPlaying(_mediaPlayer);
+						}
 					}
 					ThreadUtil.sleep(900);
 				}
@@ -95,9 +106,11 @@ public class MusicService extends Service {
 		if(null == _mediaPlayer) {
 			SwitchLogger.d(LOG_TAG, "media player not inited, init media player");
 			_mediaPlayer	= new MediaPlayer();
+			_playerState	= PLAYER_STATE_STOPPED;
 			_mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
+					onMusicPrepared(mp);
 					if(null != _callback) {
 						_callback.onMusicPrepared(mp);
 					}
@@ -148,6 +161,7 @@ public class MusicService extends Service {
 		SwitchLogger.d(LOG_TAG, "onDestroy");
 		
 		// clean up things here
+		_positionThreadRunning	= false;
 		releaseWakeLock();
 		releaseWifiLock();
 		stopMusic();
@@ -166,6 +180,14 @@ public class MusicService extends Service {
 		_callback	= callback;
 	}
 	
+	public String getCurrentMusicUrl() {
+		return _currentMusicUrl;
+	}
+	
+	public String getCurrentMusicPath() {
+		return _currentMusicPath;
+	}
+	
 	/********************** 音频焦点监听器 *************************/
 	private class MusicAudioFocusChangeListener implements AudioManager.OnAudioFocusChangeListener {
 		@Override
@@ -177,7 +199,7 @@ public class MusicService extends Service {
 				if(PLAYER_STATE_PAUSED == _playerState && _pausedByLossOfAudioFocus) {
 					// 短暂丢失焦点后重新获得焦点，继续播放
 					_pausedByLossOfAudioFocus	= false;
-					playMusic(_musicUrl);
+					playMusic();
 				}
 				break;
 			
@@ -204,12 +226,12 @@ public class MusicService extends Service {
 		}
 	}
 	
-	
 	/********************** 音乐下载缓存监听器 *************************/
 	private class MusicBufferingUpdateListener implements MediaPlayer.OnBufferingUpdateListener {
 		@Override
 		public void onBufferingUpdate(MediaPlayer mp, int percent) {
 			//SwitchLogger.d(LOG_TAG, "buffering music " + percent + "%");
+			onMusicBuffering(mp, percent);
 			if(null != _callback) {
 				_callback.onMusicBuffering(mp, percent);
 			}
@@ -221,13 +243,33 @@ public class MusicService extends Service {
 		@Override
 		public void onCompletion(MediaPlayer mp) {
 			SwitchLogger.d(LOG_TAG, "MusicCompletionListener.onCompletion called");
+			stopMusic();
+			onMusicCompletion(mp);
 			if(null != _callback) {
 				_callback.onMusicCompletion(mp);
 			}
 		}
 	}
 	
-	/********************** 音乐播放控制相关函数 ***********************/
+	/********************** 音乐播放内部控制相关函数 ***********************/
+	
+	private int playMusic(){
+		if(PLAYER_MODE_ONLINE == _playerMode) {
+			return playOnlineMusic(_currentMusicUrl);
+		} else if(PLAYER_MODE_OFFLINE == _playerMode) {
+			return playOfflineMusic(_currentMusicPath);
+		}
+		
+		return PLAY_SUCC;
+	}
+	
+	private void prepareMusic(String source) throws IOException {
+		_playerState	= PLAYER_STATE_PREPARING;
+		_mediaPlayer.setDataSource(source);
+		_mediaPlayer.prepareAsync();
+	}
+	
+	/********************** 音乐外部播放控制相关函数 ***********************/
 	public MediaPlayer getMediaPlayer() {
 		return _mediaPlayer;
 	}
@@ -236,46 +278,118 @@ public class MusicService extends Service {
 		return _playerState;
 	}
 	
-	public void playMusic(String musicUrl) {
-		if(_playerState == PLAYER_STATE_PLAYING && musicUrl == _musicUrl) {
-			SwitchLogger.d(LOG_TAG, "media player is playing, no need to start");
-			return;
-		} else if(_playerState == PLAYER_STATE_PAUSED && musicUrl == _musicUrl) {
-			SwitchLogger.d(LOG_TAG, "media player is paused, continue to play");
-			_mediaPlayer.start();
+	public int getPlayerMode() {
+		return _playerMode;
+	}
+	
+	public int playOfflineMusic(String musicPath) {
+		if(PLAYER_MODE_OFFLINE != _playerMode) {
+			_playerMode	= PLAYER_MODE_OFFLINE;
+			stopMusic();
+			if(null != _callback) {
+				_callback.onPlayerModeChange(_playerMode);
+			}
+		}
+		
+		if(_playerState == PLAYER_STATE_PLAYING && null != musicPath && musicPath.equals(_currentMusicPath)) {
+			SwitchLogger.d(LOG_TAG, "media player is playing the offline music, no need to start");
+			return PLAY_SUCC;
+		} else if(_playerState == PLAYER_STATE_PAUSED && null != musicPath && musicPath.equals(_currentMusicPath)) {
+			SwitchLogger.d(LOG_TAG, "media player is paused, continue to play the offline music");
 			_playerState	= PLAYER_STATE_PLAYING;
+			_mediaPlayer.start();
+			return PLAY_SUCC;
 		} else {
-			SwitchLogger.d(LOG_TAG, "media player is stopped, start to play");
-			SwitchLogger.d(LOG_TAG, "old music url = " + _musicUrl);
-			SwitchLogger.d(LOG_TAG, "new music url = " + musicUrl);
-			_musicUrl	= musicUrl;
+			if(PLAYER_STATE_PREPARING == _playerState) {
+				SwitchLogger.d(LOG_TAG, "music is preparing, just wait for the offline music");
+				return PLAY_SUCC;
+			}
 			
-			if(null == _musicUrl) {
-				SwitchLogger.e(LOG_TAG, "music url is null, can not start to play");
-				return;
+			SwitchLogger.d(LOG_TAG, "media player is stopped, start to play the offline music");
+			SwitchLogger.d(LOG_TAG, "old music path = " + _currentMusicPath);
+			SwitchLogger.d(LOG_TAG, "new music path = " + musicPath);
+			_currentMusicPath	= musicPath;
+			
+			if(null == _currentMusicPath) {
+				SwitchLogger.e(LOG_TAG, "music path is null, can not start to play the offline music");
+				return PLAY_FAIL_WRONG_PARAM;
 			}
 			
 			if(_playerState == PLAYER_STATE_PLAYING || _playerState == PLAYER_STATE_PAUSED ){
-				_mediaPlayer.stop();
-				_mediaPlayer.reset();
+				stopMusic();
 			}
 			
 			try {
-				_mediaPlayer.setDataSource(_musicUrl);
-				_mediaPlayer.prepareAsync();
+				prepareMusic(_currentMusicPath);
 			} catch (IOException e) {
 				SwitchLogger.e(e);
 			}
+			
+			return PLAY_SUCC;
+		}
+	}
+	
+	public int playOnlineMusic(String musicUrl) {
+		if( ! NetUtil.isConnected(this) && PLAYER_STATE_PAUSED != _playerState) {
+			return PLAY_FAIL_NO_NETOWRK;
+		}
+		
+		if(PLAYER_MODE_ONLINE != _playerMode) {
+			_playerMode	= PLAYER_MODE_ONLINE;
+			stopMusic();
+			if(null != _callback) {
+				_callback.onPlayerModeChange(_playerMode);
+			}
+		}
+		
+		if(_playerState == PLAYER_STATE_PLAYING && null != musicUrl && musicUrl.equals(_currentMusicUrl)) {
+			SwitchLogger.d(LOG_TAG, "media player is playing the online music, no need to start");
+			return PLAY_SUCC;
+		} else if(_playerState == PLAYER_STATE_PAUSED && null != musicUrl && musicUrl.equals(_currentMusicUrl)) {
+			SwitchLogger.d(LOG_TAG, "media player is paused, continue to play the online music");
+			_playerState	= PLAYER_STATE_PLAYING;
+			_mediaPlayer.start();
+			return PLAY_SUCC;
+		} else {
+			if(PLAYER_STATE_PREPARING == _playerState) {
+				SwitchLogger.d(LOG_TAG, "music is preparing, just wait for the online music");
+				return PLAY_SUCC;
+			}
+			
+			SwitchLogger.d(LOG_TAG, "media player is stopped, start to play the online music");
+			SwitchLogger.d(LOG_TAG, "old music url = " + _currentMusicUrl);
+			SwitchLogger.d(LOG_TAG, "new music url = " + musicUrl);
+			_currentMusicUrl	= musicUrl;
+			
+			if(null == _currentMusicUrl) {
+				SwitchLogger.e(LOG_TAG, "music url is null, can not start to play the online music");
+				return PLAY_FAIL_WRONG_PARAM;
+			}
+			
+			if(_playerState == PLAYER_STATE_PLAYING || _playerState == PLAYER_STATE_PAUSED ){
+				stopMusic();
+			}
+			
+			try {
+				prepareMusic(_currentMusicUrl);
+			} catch (IOException e) {
+				SwitchLogger.e(e);
+			}
+			
+			return PLAY_SUCC;
 		}
 	}
 	
 	public void stopMusic() {
 		if(_playerState != PLAYER_STATE_STOPPED) {
-			SwitchLogger.d(LOG_TAG, "media player stop");
 			_playerState	= PLAYER_STATE_STOPPED;
 			_mediaPlayer.stop();
 			_mediaPlayer.reset();
 		}
+	}
+	
+	public void cleanUp() {
+		_callback	= null;
 	}
 	
 	public void pauseMusic() {
@@ -319,5 +433,39 @@ public class MusicService extends Service {
 			_wifiLock.release();
 			_wifiLock	= null;
 		}
+	}
+	
+	/****************供子类使用函数*****************/
+	final protected boolean continueToPlay() {
+		if(PLAYER_STATE_PAUSED == _playerState && PLAYER_MODE_NONE != _playerMode) {
+			if(PLAYER_MODE_ONLINE == _playerMode) {
+				playOnlineMusic(_currentMusicUrl);
+				return true;
+			} else if(PLAYER_MODE_OFFLINE == getPlayerMode()) {
+				playOfflineMusic(_currentMusicPath);
+				return true;
+			}
+			
+			return false;
+		}
+		
+		return false;
+	}
+	
+	/****************子类可扩展函数*****************/
+	protected void onMusicPrepared(MediaPlayer mp) {
+		//SwitchLogger.d(LOG_TAG, "onMusicPrepared" );
+	}
+	
+	protected void onMusicBuffering(MediaPlayer mp, int percent) {
+		//SwitchLogger.d(LOG_TAG, "onMusicBuffering, percent="+percent );
+	}
+	
+	protected void onMusicPlaying(MediaPlayer mp) {
+		//SwitchLogger.d(LOG_TAG, "onMusicPlaying" );
+	}
+
+	protected void onMusicCompletion(MediaPlayer mp) {
+		//SwitchLogger.d(LOG_TAG, "onMusicCompletion" );
 	}
 }

@@ -95,10 +95,17 @@
             android:label="@string/title_activity_media_player" >
         </activity>
         <activity
-            android:name="com.vanchu.sample.TestMusicServiceActivity"
+            android:name="com.vanchu.sample.TestOldMusicServiceActivity"
             android:label="@string/title_activity_test_service" >
         </activity>
-        <service android:name="com.vanchu.sample.MusicService" />
+
+        <service android:name="com.vanchu.libs.music.OldMusicService" />
+        <service android:name="com.vanchu.module.music.VanchuMusicService" />
+
+        <activity
+            android:name="com.vanchu.sample.MusicServiceActivity"
+            android:label="@string/title_activity_music_service" >
+        </activity>
     </application>
 
 </manifest>

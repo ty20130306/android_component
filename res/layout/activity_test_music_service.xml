@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".TestMusicServiceActivity" >
+    tools:context=".TestOldMusicServiceActivity" >
 
     <Button 
         android:id="@+id/start"
@@ -50,11 +50,27 @@
         />
 	
 	<Button 
-        android:id="@+id/playMusic"
+        android:id="@+id/playOnlineMusic"
         android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:text="播放音乐"
-    	android:onClick="playMusic"
+    	android:text="智能播放音乐"
+    	android:onClick="playSmartMusic"
+        />
+	
+	<Button 
+        android:id="@+id/playOnlineMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="播放在线音乐"
+    	android:onClick="playOnlineMusic"
+        />
+	
+	<Button 
+        android:id="@+id/playOfflineMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="播放离线音乐"
+    	android:onClick="playOfflineMusic"
         />
 	
 	<Button 
@@ -74,11 +90,19 @@
         />
 	
 	<Button 
-        android:id="@+id/nextMusic"
+        android:id="@+id/nextOnlineMusic"
         android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:text="下一首"
-    	android:onClick="nextMusic"
+    	android:text="下一首在线音乐"
+    	android:onClick="nextOnlineMusic"
+        />
+	
+	<Button 
+        android:id="@+id/nextOfflineMusic"
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="下一首离线音乐"
+    	android:onClick="nextOfflineMusic"
         />
 	
 	<Button 

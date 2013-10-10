@@ -6,6 +6,8 @@ import java.util.Iterator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vanchu.libs.common.util.SwitchLogger;
+
 
 import android.os.Bundle;
 
@@ -30,12 +32,14 @@ public class PushMsg {
 		try {
 			parseCfg(msg);
 		} catch (JSONException e){
-			// ignore the exception
+			SwitchLogger.e(e);
 		}
 		
 		try {
 			parseData(msg);
 		} catch(JSONException e){
+			SwitchLogger.e(e);
+			
 			_show	= false;
 			_type	= MSG_TYPE_NONE;
 			_title	= "";

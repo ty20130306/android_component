@@ -193,7 +193,7 @@ public class Downloader {
 		String[] urlElements	= _downloadUrl.split(File.separator);
 		
 		_downloadFileName	= urlElements[urlElements.length - 1];
-		
+		_downloadFileName	= _downloadFileName.replaceAll("\\?.*", "");
 		if(_downloadFileName.length() == 0){
 			String currentDateStr	= StringUtil.currentDateToString("yyyyMMDD_HHmmss");
 			_downloadFileName	= "downloader_" + currentDateStr;
@@ -201,17 +201,18 @@ public class Downloader {
 	}
 	
 	public void run(){
-		_downloadListener.onStart();
 		download();
 	}
 	
 	private void download(){
 		if(fileDownloaded()){
 			SwitchLogger.d(LOG_TAG, _downloadPath + " already downloaded");
-			downloadSucc();
+			FileUtil.chmod(_downloadPath, "777");
+			_downloadListener.onSuccess(_downloadPath);
 			return;
 		}
-
+		
+		_downloadListener.onStart();
 		new Thread(){
 			public void run(){
 				doDownload();

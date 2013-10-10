@@ -45,19 +45,31 @@ public class ImgUtil {
 			bitmap	= BitmapFactory.decodeStream(fis, null, options);
 			
 			int sum = options.outWidth * options.outHeight;
-			SwitchLogger.d(LOG_TAG, "before, width="+options.outWidth+",height="+options.outHeight);
-			if (sum > 640000) { // 图片太大
+			SwitchLogger.d(LOG_TAG, "=============before, width="+options.outWidth+",height="+options.outHeight);
+			if (sum > 640000 || options.outWidth > 2048 || options.outHeight > 2048) { // 图片太大
 				float scale = (float) Math.sqrt(sum / 500000.0f);
-				options.outWidth /= scale;
-				options.outHeight /= scale;
-				options.inSampleSize		= Math.round(scale);
+				float extScale	= 0.0f;	
+				if(options.outWidth > 2048) {
+					extScale	= (float)((float)(options.outWidth) / (float)(1024+256));
+				}
+				if(options.outHeight > 2048) {
+					float tmpScale	= (float)((float)(options.outHeight) / (float)(1024+256));
+					if(tmpScale > extScale) {
+						extScale = tmpScale;
+					}
+				}
+				float totalScale	= scale + extScale;
+				options.outWidth /= totalScale;
+				options.outHeight /= totalScale;
+				options.inSampleSize		= (int)(Math.ceil(totalScale));
 				//options.inPreferredConfig	= Bitmap.Config.ARGB_4444;
 				//options.inPreferredConfig	= Bitmap.Config.RGB_565;
 				options.inDither			= false;	//Disable Dithering mode
 				options.inPurgeable			= true;		//Tell to gc that whether it needs free memory, the Bitmap can be cleared
 				options.inInputShareable	= true;		//Which kind of reference will be used to recover the Bitmap data after being clear, when it will be used in the future
+				SwitchLogger.d(LOG_TAG, "=============scale="+scale+", extScale="+extScale+",totalScale="+totalScale+",inSampleSize="+options.inSampleSize);
 			}
-			SwitchLogger.d(LOG_TAG, "after, width="+options.outWidth+",height="+options.outHeight);
+			SwitchLogger.d(LOG_TAG, "=============after, width="+options.outWidth+",height="+options.outHeight);
 			options.inJustDecodeBounds	= false;
 
 			fis	= new FileInputStream(file);

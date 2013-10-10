@@ -24,9 +24,9 @@ import com.vanchu.libs.upgrade.UpgradeCallback;
 import com.vanchu.libs.upgrade.UpgradeManager;
 import com.vanchu.libs.upgrade.UpgradeParam;
 import com.vanchu.libs.upgrade.UpgradeProxy;
+import com.vanchu.module.music.VanchuMusicService;
 import com.vanchu.sample.AnimationActivity;
-import com.vanchu.sample.MusicService;
-import com.vanchu.sample.TestMusicServiceActivity;
+import com.vanchu.sample.MusicServiceActivity;
 import com.vanchu.sample.WebViewActivity;
 
 import android.os.Bundle;
@@ -69,9 +69,9 @@ public class ComponentTestActivity extends Activity {
 		//testMediaPlayer(null);
 		testMusicService(null);
 	}
-
+	
 	public void testMusicService(View v) {
-		Intent intent	= new Intent(this, TestMusicServiceActivity.class);
+		Intent intent	= new Intent(this, MusicServiceActivity.class);
 		startActivity(intent);
 	}
 	
@@ -114,7 +114,7 @@ public class ComponentTestActivity extends Activity {
 				lastBackKeyPressedTime	= currTime;
 			} else {
 				SwitchLogger.d(LOG_TAG, "stop music service" );
-				Intent intent	= new Intent(this, MusicService.class);
+				Intent intent	= new Intent(this, VanchuMusicService.class);
 				stopService(intent);
 				finish();
 			}

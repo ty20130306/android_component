@@ -169,6 +169,7 @@ public class NetUtil {
 					inputStream.close();
 					break;
 				} else {
+					SwitchLogger.e(LOG_TAG, "http request fail, status code = " + statusCode);
 					++retryCnt;
 				}
 			} catch(Exception e){
