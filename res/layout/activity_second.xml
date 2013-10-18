@@ -1,79 +1,83 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".SecondActivity" >
-
-    <ImageView 
-        android:id="@+id/aysnc_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
-        />
-    
-    <Button
+    android:layout_height="match_parent" >
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    tools:context=".SecondActivity" >
+	
+	    <ImageView 
+	        android:id="@+id/aysnc_img"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="跳               转"
-	        android:onClick="goToThree" />
-            
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="智能播放音乐"
-        android:onClick="playMusic" />
-        
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="暂停播放音乐"
-        android:onClick="stopMusic" />
-    
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试退出app"
-        android:onClick="testExitApp" />
-    
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试异步加载图片"
-        android:onClick="testAysncImgaeLoader" />
-    
-     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试升级组件"
-        android:onClick="checkUpgrade" />
-
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试自定义progress dialog"
-        android:onClick="testMyProgressDialog" />
-     
-     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试loadingDialog"
-        android:onClick="testLoadingDialog" />
-      <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试loadingDialog2"
-        android:onClick="testLoadingDialog2" />
-       <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试loadingDialog3"
-        android:onClick="testLoadingDialog3" />
-       
-        <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="测试progress bar"
-        android:onClick="testProgressBar" />
-
-</LinearLayout>
+	        android:src="@drawable/ic_launcher"
+	        />
+	    
+	    <Button
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="跳               转"
+		        android:onClick="goToThree" />
+	            
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="智能播放音乐"
+	        android:onClick="playMusic" />
+	        
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="暂停播放音乐"
+	        android:onClick="stopMusic" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试退出app"
+	        android:onClick="testExitApp" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试异步加载图片"
+	        android:onClick="testAysncImgaeLoader" />
+	    
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试升级组件"
+	        android:onClick="checkUpgrade" />
+	
+	      <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试自定义progress dialog"
+	        android:onClick="testMyProgressDialog" />
+	     
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试loadingDialog"
+	        android:onClick="testLoadingDialog" />
+	      <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试loadingDialog2"
+	        android:onClick="testLoadingDialog2" />
+	       <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试loadingDialog3"
+	        android:onClick="testLoadingDialog3" />
+	       
+	        <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试progress bar"
+	        android:onClick="testProgressBar" />
+	
+	</LinearLayout>
+</ScrollView>

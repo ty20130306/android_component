@@ -22,10 +22,11 @@ public class Downloader {
 	
 	public static final int DOWNLOAD_SUCC					= 0;
 	public static final int DOWNLOAD_PROGRESS				= 1;
-	public static final int DOWNLOAD_ERR_IO					= 2;
-	public static final int DOWNLOAD_ERR_URL				= 3;
-	public static final int DOWNLOAD_ERR_SPACE_NOT_ENOUGH	= 4;
-	public static final int DOWNLOAD_ERR_SOCKET_TIMEOUT		= 5;
+	public static final int DOWNLOAD_PAUSE					= 2;
+	public static final int DOWNLOAD_ERR_IO					= 3;
+	public static final int DOWNLOAD_ERR_URL				= 4;
+	public static final int DOWNLOAD_ERR_SPACE_NOT_ENOUGH	= 5;
+	public static final int DOWNLOAD_ERR_SOCKET_TIMEOUT		= 6;
 	
 	private static final String DOWNLOAD_ROOT_DIR_NAME	= "vanchu_download";
 	
@@ -40,6 +41,12 @@ public class Downloader {
 	private static final int DOWNLOAD_BUFFER_SIZE		= 2048;
 	private static final int TIMEOUT_RETRY_MAX			= 3;
 
+	private static final int DOWNLOAD_STATUS_INITED		= 1;
+	private static final int DOWNLOAD_STATUS_RUNNING	= 2;
+	private static final int DOWNLOAD_STATUS_PAUSED		= 3;
+	private static final int DOWNLOAD_STATUS_FAIL		= 4;
+	private static final int DOWNLOAD_STATUS_SUCC		= 5;
+	
 	private Context	_context;
 	private String	_downloadUrl;
 	private String	_dirName;
@@ -52,6 +59,8 @@ public class Downloader {
 	private String	_tmpDownloadPath;
 	
 	private int 	_timeoutRetryCnt;
+	
+	private int		_status;
 	
 	private Handler	_handler = new Handler(){
 		
@@ -78,6 +87,10 @@ public class Downloader {
 			case DOWNLOAD_ERR_URL:
 				handleUrlError();
 				break;
+			
+			case DOWNLOAD_PAUSE:
+				handlePause();
+				break;
 				
 			case DOWNLOAD_SUCC:
 				downloadSucc();
@@ -96,6 +109,8 @@ public class Downloader {
 		
 		splitFileNameFromUrl();
 		initDownloadStorage(false);
+		
+		_status	= DOWNLOAD_STATUS_INITED;
 	}
 	
 	public interface IDownloadListener {
@@ -104,10 +119,26 @@ public class Downloader {
 		
 		public void onProgress(long downloaded, long total);
 		
+		public void onPause();
+		
 		public void onSuccess(String downloadFile);
 		
 		public void onError(int errCode);
 		
+	}
+	
+	private void onError(int error) {
+		_status	= DOWNLOAD_STATUS_FAIL;
+		_downloadListener.onError(error);
+	}
+	
+	private void onSuccess() {
+		_status	= DOWNLOAD_STATUS_SUCC;
+		_downloadListener.onSuccess(_downloadPath);
+	}
+
+	private void handlePause() {
+		_downloadListener.onPause();
 	}
 	
 	private void publishProgress(Message msg){
@@ -121,11 +152,11 @@ public class Downloader {
 		SwitchLogger.d(LOG_TAG, "download complete, rename tmp to official");
 		FileUtil.rename(_tmpDownloadPath, _downloadPath);
 		FileUtil.chmod(_downloadPath, "777");
-		_downloadListener.onSuccess(_downloadPath);
+		onSuccess();
 	}
 	
 	private void handleUrlError(){
-		_downloadListener.onError(DOWNLOAD_ERR_URL);
+		onError(DOWNLOAD_ERR_URL);
 	}
 	
 	private void handleIoError(){
@@ -134,7 +165,7 @@ public class Downloader {
 			initDownloadStorage(true);
 			download();
 		} else {
-			_downloadListener.onError(DOWNLOAD_ERR_IO);
+			onError(DOWNLOAD_ERR_IO);
 		}
 	}
 	
@@ -144,7 +175,7 @@ public class Downloader {
 			SwitchLogger.d(LOG_TAG, "socket timeout, retry it, timeout retry count now: " + _timeoutRetryCnt);
 			download();
 		} else {
-			_downloadListener.onError(DOWNLOAD_ERR_SPACE_NOT_ENOUGH);
+			onError(DOWNLOAD_ERR_SOCKET_TIMEOUT);
 		}
 	}
 	
@@ -155,8 +186,8 @@ public class Downloader {
 			download();
 		} else {
 			DownloadProgress progress	= (DownloadProgress)msg.obj;
-			_downloadListener.onError(DOWNLOAD_ERR_SPACE_NOT_ENOUGH);
 			SwitchLogger.d(LOG_TAG, "device mem space not enough, need " + progress.total);
+			onError(DOWNLOAD_ERR_SPACE_NOT_ENOUGH);
 		}
 	}
 	
@@ -201,14 +232,29 @@ public class Downloader {
 	}
 	
 	public void run(){
+		if(DOWNLOAD_STATUS_RUNNING == _status) {
+			return ;
+		}
+		
+		_status	= DOWNLOAD_STATUS_RUNNING;
 		download();
+	}
+	
+	public boolean pause() {
+		if(DOWNLOAD_STATUS_RUNNING == _status) {
+			_status	= DOWNLOAD_STATUS_PAUSED;
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private void download(){
 		if(fileDownloaded()){
 			SwitchLogger.d(LOG_TAG, _downloadPath + " already downloaded");
 			FileUtil.chmod(_downloadPath, "777");
-			_downloadListener.onSuccess(_downloadPath);
+			onSuccess();
 			return;
 		}
 		
@@ -263,7 +309,7 @@ public class Downloader {
 			
 			byte[] buffer	= new byte[DOWNLOAD_BUFFER_SIZE];
 			int len = 0;
-			while((len = inputStream.read(buffer)) != -1){
+			while((len = inputStream.read(buffer)) != -1 && DOWNLOAD_STATUS_PAUSED != _status){
 				outputStream.write(buffer, 0, len);
 				downloadProgress.hasRead	+= len;
 				_handler.obtainMessage(DOWNLOAD_PROGRESS, downloadProgress).sendToTarget();
@@ -271,8 +317,12 @@ public class Downloader {
 			
 			inputStream.close();
 			outputStream.close();
-			_handler.obtainMessage(DOWNLOAD_SUCC).sendToTarget();
 			
+			if(DOWNLOAD_STATUS_PAUSED == _status) {
+				_handler.obtainMessage(DOWNLOAD_PAUSE).sendToTarget();
+			} else {
+				_handler.obtainMessage(DOWNLOAD_SUCC).sendToTarget();
+			}
 		} catch(MalformedURLException e){
 			SwitchLogger.e(e);
 			_handler.obtainMessage(DOWNLOAD_ERR_URL).sendToTarget();

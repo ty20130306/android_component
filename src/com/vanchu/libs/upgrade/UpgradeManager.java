@@ -183,6 +183,11 @@ public class UpgradeManager {
 			
 			errorCommonHandler();
 		}
+		
+		@Override
+		public void onPause() {
+			
+		}
 	}
 	
 	private void download(){

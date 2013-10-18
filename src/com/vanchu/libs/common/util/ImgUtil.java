@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import com.vanchu.libs.common.task.AsyncImageLoader;
 import com.vanchu.libs.common.task.AsyncImageLoader.ImageCallback;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,13 +25,13 @@ public class ImgUtil {
 	
 	private static String LOADED_IMG_DIR	= "loaded_img";
 	private AsyncImageLoader _asyncImageLoader;
-	private Activity _activity;
+	private Context _context;
 	private String 	_path;
 	
-	public ImgUtil(Activity activity) {
-		_activity = activity;
+	public ImgUtil(Context context) {
+		_context = context;
 		
-		_path = _activity.getDir(LOADED_IMG_DIR, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) + "/";
+		_path = _context.getDir(LOADED_IMG_DIR, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) + "/";
 		_asyncImageLoader = new AsyncImageLoader(_path);
 	}
 	
@@ -129,7 +128,7 @@ public class ImgUtil {
 		if (cachedImage != null) {
 			imageView.setImageDrawable(BitmapUtil.toRoundCorner(cachedImage, 5));
 		} else {
-			imageView.setImageDrawable(BitmapUtil.toRoundCorner(_activity, defaultDrawable, 5));
+			imageView.setImageDrawable(BitmapUtil.toRoundCorner(_context, defaultDrawable, 5));
 		}
 		
 		return _path + _asyncImageLoader.getImgName(url);
@@ -174,13 +173,13 @@ public class ImgUtil {
 		Drawable cachedImage = _asyncImageLoader.loadDrawable(url, new ImageCallback() {
 			@Override
 			public void imageLoaded(Drawable imageDrawable, String imageUrl) {
-				if (imageDrawable != null) {
+				if (null != imageDrawable && null != imageView) {
 					imageView.setImageDrawable(imageDrawable);
 				}
 			}
 		});
 		
-		if (cachedImage != null) {
+		if (null != cachedImage && null != imageView) {
 			imageView.setImageDrawable(cachedImage);
 		}
 		

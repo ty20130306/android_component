@@ -90,6 +90,7 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	}
 
 	private void quit() {
+		LoadingDialog.cancel();
 		finish();
 	}
 	
@@ -153,7 +154,7 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 				_submitUrlParams.put("contact", _contact);
 				_submitUrlParams.put("msg", _msg);
 				String response	= NetUtil.httpPostRequest(_submitUrl, _submitUrlParams, 3);
-				if(onSubmitResponse(response)){
+				if(null != response && onSubmitResponse(response)){
 					_handler.sendEmptyMessage(SUBMIT_SUCC);
 				} else {
 					_handler.sendEmptyMessage(SUBMIT_FAIL);

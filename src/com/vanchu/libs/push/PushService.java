@@ -3,8 +3,6 @@ package com.vanchu.libs.push;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,19 +10,15 @@ import org.json.JSONObject;
 import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
-
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 
 abstract public class PushService extends Service {
 	private static final String LOG_TAG				= PushService.class.getSimpleName();
@@ -37,14 +31,13 @@ abstract public class PushService extends Service {
 	
 	public static final int START_TYPE_INIT				= 1;
 	public static final int START_TYPE_NOTIFICATION		= 2;
+	public static final int START_TYPE_REQUEST_PUSH_MSG	= 3;
 	
-	private WakeLock	_wakeLock		= null;
-	private WifiLock	_wifiLock		= null;
 	private PushParam	_pushParam		= null;
-	
-	private Timer 		_msgTimer		= null;
-	private TimerTask	_msgTimerTask	= null;
 
+	private AlarmManager	_alarmManager	= null;
+	private PendingIntent	_alarmIntent	= null;
+	
 	private long 		_lastExitTime	= NO_EXIT_TIME;
 	private long		_lastPopUpTime	= NO_POP_UP_TIME;
 	
@@ -155,67 +148,61 @@ abstract public class PushService extends Service {
 	}
 
 	private void updatePushCfgIfNeed(PushMsg pushMsg) {
-		boolean		needRestartTimerTask	= false;
-		boolean		needSetPushParam		= false;
-		
-		HashMap<String, String> cfg	= pushMsg.getCfg();
-		getPushParam();
-		
-		if(cfg.containsKey("interval")){
-			int interval	= Integer.parseInt(cfg.get("interval"));
-			SwitchLogger.d(LOG_TAG, "received interval="+interval);
-			if(interval != _pushParam.getMsgInterval()){
-				_pushParam.setMsgInterval(interval);
-				needSetPushParam		= true;
-				needRestartTimerTask	= true;
-			}
-		}
-		
-		if(cfg.containsKey("delay")) {
-			int delay	= Integer.parseInt(cfg.get("delay"));
-			SwitchLogger.d(LOG_TAG, "received delay="+delay);
-			if(delay != _pushParam.getDelay()){
-				_pushParam.setDelay(delay);
-				needSetPushParam	= true;
-			}
-		}
-		
-		if(cfg.containsKey("avaiStartTime") && cfg.containsKey("avaiEndTime")) {
-			int avaiStartTime	= Integer.parseInt(cfg.get("avaiStartTime"));
-			int avaiEndTime		= Integer.parseInt(cfg.get("avaiEndTime"));
-			SwitchLogger.d(LOG_TAG, "received avaiStartTime=" + avaiStartTime + ",avaiEndTime=" + avaiEndTime);
+
+		synchronized (_pushParam) {
+			boolean		needRegisterAlarm	= false;
+			boolean		needSetPushParam	= false;
 			
-			_pushParam.setAvaiTime(avaiStartTime, avaiEndTime);
-			needSetPushParam	= true;
-		}
-		
-		if(cfg.containsKey("after")) {
-			int after	= Integer.parseInt(cfg.get("after"));
-			SwitchLogger.d(LOG_TAG, "received after="+after);
-			if(after != _pushParam.getAfter()){
-				_pushParam.setAfter(after);
+			HashMap<String, String> cfg	= pushMsg.getCfg();
+			getPushParam();
+			
+			if(cfg.containsKey("interval")){
+				int interval	= Integer.parseInt(cfg.get("interval"));
+				SwitchLogger.d(LOG_TAG, "received interval="+interval);
+				if(interval != _pushParam.getMsgInterval()){
+					_pushParam.setMsgInterval(interval);
+					needSetPushParam	= true;
+					needRegisterAlarm	= true;
+				}
+			}
+			
+			if(cfg.containsKey("delay")) {
+				int delay	= Integer.parseInt(cfg.get("delay"));
+				SwitchLogger.d(LOG_TAG, "received delay="+delay);
+				if(delay != _pushParam.getDelay()){
+					_pushParam.setDelay(delay);
+					needSetPushParam	= true;
+				}
+			}
+			
+			if(cfg.containsKey("avaiStartTime") && cfg.containsKey("avaiEndTime")) {
+				int avaiStartTime	= Integer.parseInt(cfg.get("avaiStartTime"));
+				int avaiEndTime		= Integer.parseInt(cfg.get("avaiEndTime"));
+				SwitchLogger.d(LOG_TAG, "received avaiStartTime=" + avaiStartTime + ",avaiEndTime=" + avaiEndTime);
+				
+				_pushParam.setAvaiTime(avaiStartTime, avaiEndTime);
 				needSetPushParam	= true;
 			}
-		}
-		
-		if(needSetPushParam) {
-			setPushParam();
-		}
-		
-		if(needRestartTimerTask) {
-			stopTimerTask();
-			initTimerTask();
-		}
-	}
-	
-	private void stopTimerTask() {
-		if(_msgTimerTask != null){
-			_msgTimerTask.cancel();
-			_msgTimerTask	= null;
-		}
-		if(_msgTimer != null){
-			_msgTimer.cancel();
-			_msgTimer		= null;
+			
+			if(cfg.containsKey("after")) {
+				int after	= Integer.parseInt(cfg.get("after"));
+				SwitchLogger.d(LOG_TAG, "received after="+after);
+				if(after != _pushParam.getAfter()){
+					_pushParam.setAfter(after);
+					needSetPushParam	= true;
+				}
+			}
+			
+			if(needSetPushParam) {
+				SwitchLogger.d(LOG_TAG, "***************cfg change, need update push param");
+				setPushParam();
+			}
+			
+			if(needRegisterAlarm) {
+				SwitchLogger.d(LOG_TAG, "***************cfg change, need register alarm");
+				cancelAlarm();
+				setAlarm();
+			}
 		}
 	}
 	
@@ -228,8 +215,6 @@ abstract public class PushService extends Service {
 	@Override
 	public void onCreate(){
 		SwitchLogger.d(LOG_TAG, "onCreate()");
-		acquireWakeLock();
-		acquireWifiLock();
 		super.onCreate();
 	}
 	
@@ -251,18 +236,22 @@ abstract public class PushService extends Service {
 			
 			switch (startType) {
 			case START_TYPE_INIT :
-				initTimerTask();
+				setAlarm();
 				break;
 	
 			case START_TYPE_NOTIFICATION :
 				onNotificationClick(intent.getIntExtra(MSG_TYPE, PushMsg.MSG_TYPE_NONE), intent.getExtras());
+				break;
+			
+			case START_TYPE_REQUEST_PUSH_MSG :
+				getPushMsg();
 				break;
 				
 			default:
 				break;
 			}
 		} else {
-			initTimerTask();
+			setAlarm();
 		}
 		
 		return START_STICKY;
@@ -271,8 +260,7 @@ abstract public class PushService extends Service {
 	@Override
 	public void onDestroy(){
 		SwitchLogger.d(LOG_TAG, "onDestroy()");
-		releaseWakeLock();
-		releaseWifiLock();
+		cancelAlarm();
 		super.onDestroy();
 	}
 	
@@ -284,8 +272,29 @@ abstract public class PushService extends Service {
 		PushRobot.setPushParam(this, _pushParam);
 	}
 	
-	private void initTimerTask(){
-		startGetMsgTimer();
+	private void setAlarm() {
+		if (null == _alarmManager) {
+			SwitchLogger.d(LOG_TAG, "_alarmManager is null, register alarm");
+			_alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+			Intent intent = new Intent(this, this.getClass());
+			intent.putExtra(START_TYPE, START_TYPE_REQUEST_PUSH_MSG);
+			_alarmIntent	= PendingIntent.getService(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			int interval	= _pushParam.getMsgInterval();
+			SwitchLogger.d(LOG_TAG, "get msg interval is " + interval);
+			_alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 
+										System.currentTimeMillis() + interval, 
+										interval, _alarmIntent);
+		} else {
+			SwitchLogger.d(LOG_TAG, "alarm has been registered");
+		}
+	}
+	
+	private void cancelAlarm() {
+		if(null != _alarmManager && null != _alarmIntent) {
+			_alarmManager.cancel(_alarmIntent);
+			_alarmManager	= null;
+			_alarmIntent	= null;
+		}
 	}
 	
 	private void updateExitTimeIfNeed() {
@@ -307,77 +316,24 @@ abstract public class PushService extends Service {
 	}
 	
 	private void getPushMsg() {
-		getPushParam();
-		
-		if(_pushParam.isMsgUrlValid()){
-			String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
-			if(response == null){
-				SwitchLogger.e(LOG_TAG, "request push msg fail");
-				return ;
-			}
-			SwitchLogger.d(LOG_TAG, "response = " + response);
-			onPushMsgResponse(response);
-		} else {
-			SwitchLogger.e(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
-		}
-	}
-
-	private void startGetMsgTimer() {
-		SwitchLogger.d(LOG_TAG, "startGetMsgTimer()");
-		
-		if(_msgTimerTask == null){
-			SwitchLogger.d(LOG_TAG, "_msgTimerTask is null");
-			if(_msgTimer == null){
-				SwitchLogger.d(LOG_TAG, "_msgTimer is null");
-				_msgTimer	= new Timer(true);
-			}
+		synchronized (_pushParam) {
+			getPushParam();
 			
-			_msgTimerTask	= new TimerTask() {
-				
-				@Override
+			new Thread() {
 				public void run() {
-					getPushMsg();
+					if(_pushParam.isMsgUrlValid()){
+						String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
+						if(response == null){
+							SwitchLogger.e(LOG_TAG, "request push msg fail");
+							return ;
+						}
+						SwitchLogger.d(LOG_TAG, "response = " + response);
+						onPushMsgResponse(response);
+					} else {
+						SwitchLogger.e(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
+					}
 				}
-			};
-			
-			_msgTimer.schedule(_msgTimerTask, _pushParam.getMsgInterval(), _pushParam.getMsgInterval());
-			SwitchLogger.d(LOG_TAG, "_msgTimerTask schedule succ, interval="+_pushParam.getMsgInterval());
-		} else {
-			SwitchLogger.d(LOG_TAG, "_msgTimerTask already inited");
+			}.start();
 		}
 	}
-	
-	// 获取电源锁，保持该服务在屏幕熄灭时仍然获取CPU时，保持运行
-	private void acquireWakeLock() {
-		if (null == _wakeLock) {
-			PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-			_wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "PushService");
-			if (null != _wakeLock) {
-				_wakeLock.acquire();
-			}
-		}
-	}
-
-	// 释放设备电源锁
-	private void releaseWakeLock() {
-		if (null != _wakeLock) {
-			_wakeLock.release();
-			_wakeLock = null;
-		}
-	}
-	
-	private void acquireWifiLock() {
-		if(null == _wifiLock) {
-			_wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "PushServiceWifiLock");
-			_wifiLock.acquire();
-		}
-	}
-	
-	private void releaseWifiLock() {
-		if(null != _wifiLock) {
-			_wifiLock.release();
-			_wifiLock	= null;
-		}
-	}
-	
 }

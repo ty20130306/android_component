@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.webCache.WebCache;
 import com.vanchu.test.R;
 import com.vanchu.test.R.id;
@@ -137,12 +138,17 @@ public class WebCacheActivity extends Activity {
             WebCache.GetCallback listener = new WebCache.GetCallback() {
                 @Override
                 public void onDone(String url, File file, Object param) {
-                    Log.d("onDone", "url="+url);
+                    Log.d("onDone", "--------------url="+url+",file="+file.getAbsolutePath());
                 }
 
                 @Override
                 public void onFail(String url, int reason, Object param) {
-                    Log.d("onFail", "url="+url);
+                    Log.d("onFail", "--------------url="+url+",reason="+reason);
+                }
+                
+                @Override
+                public void onProgress(String url, int progress, Object param) {
+                	SwitchLogger.d("onProgress", "--------------progress="+progress);
                 }
             };
             

@@ -46,7 +46,7 @@ public class MusicServiceActivity extends Activity {
 			_serviceBound	= true;
 			_service	= (VanchuMusicService)binder.getService();
 			_mediaPlayer	= _service.getMediaPlayer();
-			_service.setRequestUrl("http://kadovat.dev.time.bangyouxi.com/widgets/music.json");
+			_service.setRequestUrl("http://kadovat.dev.time.bangyouxi.com/widgets/music/list.json");
 			_service.setMusicServiceCallback(new VanchuMusicServiceCallback());
 			SwitchLogger.d(LOG_TAG, "onServiceConnected");
 		}
@@ -90,6 +90,7 @@ public class MusicServiceActivity extends Activity {
 			boolean isMusicAvailable	= _service.isMusicAvailable();
 			if(isMusicAvailable) {
 				SwitchLogger.d(LOG_TAG, "music available");
+				_service.nextSmartMusic();
 			} else {
 				SwitchLogger.d(LOG_TAG, "music not available");
 			}
@@ -102,6 +103,25 @@ public class MusicServiceActivity extends Activity {
 			} else {
 				SwitchLogger.d(LOG_TAG, "player mode change to offline" );
 			}
+		}
+		
+		@Override
+		public void onPlayerDetailModeChange(int currentPlayerDetailMode) {
+			super.onPlayerDetailModeChange(currentPlayerDetailMode);
+			switch (currentPlayerDetailMode) {
+			case MusicService.PLAYER_DETAIL_MODE_WIFI:
+				SwitchLogger.d(LOG_TAG, "player detail mode change to wifi" );
+				break;
+			case MusicService.PLAYER_DETAIL_MODE_2G3G:
+				SwitchLogger.d(LOG_TAG, "player detail mode change to 2G/3G" );
+				break;
+			case MusicService.PLAYER_DETAIL_MODE_OFFLINE:
+				SwitchLogger.d(LOG_TAG, "player detail mode change to offline" );
+				break;
+			default:
+				break;
+			}
+			
 		}
 		
 		@Override

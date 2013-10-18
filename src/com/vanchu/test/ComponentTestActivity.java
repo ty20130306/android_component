@@ -35,6 +35,7 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -44,6 +45,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class ComponentTestActivity extends Activity {
@@ -53,7 +55,7 @@ public class ComponentTestActivity extends Activity {
 	private static final String	LOG_TAG	= ComponentTestActivity.class.getSimpleName();
 	
 	private ProgressDialog	_progressDialog;
-	
+	Downloader _downloader	= null;
 	private long lastBackKeyPressedTime;
 	
 	@Override
@@ -67,7 +69,9 @@ public class ComponentTestActivity extends Activity {
 		//testAnimation(null);
 		//testNetwork(null);
 		//testMediaPlayer(null);
-		testMusicService(null);
+		//testMusicService(null);
+		//testPushService(null);
+		//testWebCache(null);
 	}
 	
 	public void testMusicService(View v) {
@@ -255,41 +259,56 @@ public class ComponentTestActivity extends Activity {
 		testMySolidQueue();
 	}
 	
-	public void testDownloader(View v){
-		SwitchLogger.setPrintLog(true);
+	class TestDownloadListener implements IDownloadListener {
 		
-		class TestDownloadListener implements IDownloadListener {
-
-			@Override
-			public void onStart() {
-				initProgressDialog();
-			}
+		@Override
+		public void onStart() {
 			
-			@Override
-			public void onProgress(long downloaded, long total) {
-				_progressDialog.setProgress((int)(downloaded * 100 / total));
-				String tip	= String.format("正在下载安装包...\n已下载: %d K\n总大小: %d K",
-											(int)(downloaded / 1024), (int)(total / 1024) );
-				
-				_progressDialog.setMessage(tip);
-				
-				SwitchLogger.d(LOG_TAG, "downloaded " + downloaded);
-			}
-
-			@Override
-			public void onSuccess(String downloadFile) {
-				SwitchLogger.d(LOG_TAG, "download " + downloadFile + " complete");
-				_progressDialog.dismiss();
-				SwitchLogger.d(LOG_TAG, "_progressDialog.dismiss() called");
-			}
-
-			@Override
-			public void onError(int errCode) {
-				SwitchLogger.d(LOG_TAG, "download error, errCode = " + errCode);
-			}
+		}
+		
+		@Override
+		public void onProgress(long downloaded, long total) {
+			ProgressBar	progressBar	= (ProgressBar)findViewById(R.id.downloader_progress_bar);
+			progressBar.setProgress((int)(downloaded * 100 / total));
+			
+			
+			SwitchLogger.d(LOG_TAG, "downloaded " + downloaded);
 		}
 
-		new Downloader(this, "http://pesiwang.devel.rabbit.oa.com/song.apk", "test", new TestDownloadListener()).run();
+		@Override
+		public void onSuccess(String downloadFile) {
+			SwitchLogger.d(LOG_TAG, "download " + downloadFile + " complete");
+			_downloader	= null;
+		}
+
+		@Override
+		public void onError(int errCode) {
+			SwitchLogger.d(LOG_TAG, "download error, errCode = " + errCode);
+			_downloader	= null;
+		}
+		
+		@Override
+		public void onPause() {
+			SwitchLogger.d(LOG_TAG, "download paused");
+		}
+	}
+	
+	public void testDownloaderRun(View v){
+		SwitchLogger.setPrintLog(true);
+		
+		if(null == _downloader) {
+			SwitchLogger.d(LOG_TAG, "------------------start to download");
+			_downloader = new Downloader(this, "http://pesiwang.devel.rabbit.oa.com/study.apk", "test", new TestDownloadListener());
+			_downloader.run();
+		} else {
+			SwitchLogger.d(LOG_TAG, "------------------continue to download");
+			_downloader.run();
+		}
+	}
+	
+	public void testDownloaderPause(View v){
+		SwitchLogger.d(LOG_TAG, "------------------testDownloaderPause");
+		_downloader.pause();
 	}
 	
 	public void testPluginSystem(View v){
@@ -327,7 +346,6 @@ public class ComponentTestActivity extends Activity {
 	}
 
 	public void testPushService(View v){
-		SwitchLogger.setPrintLog(true);
 		SwitchLogger.d(LOG_TAG, "testPushService()");
 		
 		//int msgInterval = PushParam.DEFAULT_MSG_INTERVAL;
@@ -335,9 +353,9 @@ public class ComponentTestActivity extends Activity {
 		HashMap<String, String> msgUrlParam = new HashMap<String, String>();
 		msgUrlParam.put("name", "wolf");
 		
-		PushParam pushParam	= new PushParam(3000, msgUrl, msgUrlParam);
+		PushParam pushParam	= new PushParam(10000, msgUrl, msgUrlParam);
 		pushParam.setIgnoreIntervalLimit(true);
-		pushParam.setMsgInterval(3000);
+		pushParam.setMsgInterval(10000);
 		pushParam.setNotifyWhenRunning(true);
 		pushParam.setDefaults(Notification.DEFAULT_ALL);
 		

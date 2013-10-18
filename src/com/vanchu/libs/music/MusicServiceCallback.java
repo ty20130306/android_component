@@ -28,6 +28,10 @@ public class MusicServiceCallback {
 		SwitchLogger.d(LOG_TAG, "onPlayerModeChange, current player mode = " + currentPlayerMode );
 	}
 	
+	public void onPlayerDetailModeChange(int currentPlayerDetailMode) {
+		SwitchLogger.d(LOG_TAG, "onPlayerDetailModeChange, current player detail mode = " + currentPlayerDetailMode );
+	}
+	
 	public void onError(int errCode) {
 		SwitchLogger.e(LOG_TAG, "onError, errCode = " + errCode );
 	}

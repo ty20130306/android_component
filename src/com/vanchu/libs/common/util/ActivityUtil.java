@@ -78,9 +78,7 @@ public class ActivityUtil {
 			
 		String packageName = context.getPackageName();
 		for (RunningTaskInfo info : list) {
-			if (info.topActivity.getPackageName().equals(packageName) 
-				|| info.baseActivity.getPackageName().equals(packageName)) 
-			{
+			if (info.topActivity.getPackageName().equals(packageName)) {
 				isRunning = true;
 				break;
 			}

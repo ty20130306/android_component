@@ -14,6 +14,7 @@ import java.util.TreeMap;
  * Created by ray on 9/5/13.
  */
 public class WebCache {
+
     static public class Settings{
         public int capacity = 100; /* items to hold */
         public int timeout = 10000; /* timeout in milliseconds */
@@ -22,12 +23,14 @@ public class WebCache {
     public interface GetCallback{
         public void onDone(String url, File file, Object param);
         public void onFail(String url, int reason, Object param);
+        public void onProgress(String url, int progress, Object param);
     }
 
     public static final int SUCC = 0x00;
-    public static final int REASON_STORAGE_FAILED = 0x01;
-    public static final int REASON_NETWORK_FAILED = 0x02;
-
+    public static final int REASON_STORAGE_FAILED	= 0x01;
+    public static final int REASON_NETWORK_FAILED	= 0x02;
+    public static final int DOWNLOAD_PROGRESS		= 0x03;
+    
     private static Map<String, WebCache> _instances = new TreeMap<String, WebCache>();
     private Storage _storage;
     private Network _network;
@@ -58,18 +61,25 @@ public class WebCache {
         final Handler handler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-            switch (msg.what){
-                case REASON_NETWORK_FAILED:
-                    getCallback.onFail(url, REASON_NETWORK_FAILED, param);
-                    break;
-                case REASON_STORAGE_FAILED:
-                    getCallback.onFail(url, REASON_NETWORK_FAILED, param);
-                    break;
-                case SUCC:
-                    getCallback.onDone(url, (File)(msg.obj), param);
-                    break;
-                }
-            }
+            	if(null == getCallback) {
+            		return ;
+            	}
+            	
+	            switch (msg.what){
+	                case REASON_NETWORK_FAILED:
+	                    getCallback.onFail(url, REASON_NETWORK_FAILED, param);
+	                    break;
+	                case REASON_STORAGE_FAILED:
+	                    getCallback.onFail(url, REASON_NETWORK_FAILED, param);
+	                    break;
+	                case SUCC:
+	                    getCallback.onDone(url, (File)(msg.obj), param);
+	                    break;
+	                case DOWNLOAD_PROGRESS:
+	                    getCallback.onProgress(url, msg.arg1, param);
+	                    break;
+	            }
+	        }
         };
 
         //step 2. invoke a thread
@@ -83,19 +93,25 @@ public class WebCache {
             			return;
             		}
             	}
-                
-                // try network
-                InputStream inputStream = WebCache.this._network.get(url);
-                if(inputStream == null){
-                    handler.sendEmptyMessage(REASON_NETWORK_FAILED);
-                    return;
-                }
-                File file = WebCache.this._storage.set(url, inputStream);
-                if(file == null){
-                    handler.sendEmptyMessage(REASON_STORAGE_FAILED);
-                    return;
-                }
-                handler.obtainMessage(SUCC, file).sendToTarget();
+            	
+            	WebCache.this._network.get(url, new Network.NetworkCallback() {
+            		public void onSucc(String url, InputStream fis) {
+            			File file = WebCache.this._storage.set(url, fis);
+                        if(file == null){
+                            handler.sendEmptyMessage(REASON_STORAGE_FAILED);
+                            return;
+                        }
+                        handler.obtainMessage(SUCC, file).sendToTarget();
+            		}
+            		
+            		public void onFail(String url) {
+            			 handler.sendEmptyMessage(REASON_NETWORK_FAILED);
+            		}
+            		
+            		public void onProgress(String url, int progress) {
+            			handler.obtainMessage(DOWNLOAD_PROGRESS, progress, 0).sendToTarget();
+            		}
+            	});
             }
         }.start();
     }

@@ -12,12 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Handler;
 
 import com.vanchu.libs.common.container.SolidQueue;
 import com.vanchu.libs.common.task.Downloader;
-import com.vanchu.libs.common.util.IdUtil;
 import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.music.MusicService;
@@ -28,6 +29,8 @@ public class VanchuMusicService extends MusicService {
 	public static final int	ERR_NO_OFFLINE_MUSIC		= 1;
 	public static final int	ERR_REQUEST_LIST_FAIL		= 2;
 	public static final int	ERR_REQUEST_URL_NOT_SET		= 3;
+	
+	private static final String PREFS_VANCHU_MUSIC_SERVICE		= "vanchu_music_services";
 	
 	private static final int INDEX_NONE		= -1;
 	
@@ -94,6 +97,7 @@ public class VanchuMusicService extends MusicService {
 		}
 		
 		_currentInfoIndex += 1;
+		SwitchLogger.d(LOG_TAG, "parseInfoList *********** _currentInfoIndex += 1, now=" + _currentInfoIndex);
 		if(_currentInfoIndex >= _musicInfoList.size()) {
 			if(_musicInfoList.size() <= 0) {
 				SwitchLogger.e(LOG_TAG, "no music info, play fail");
@@ -118,11 +122,7 @@ public class VanchuMusicService extends MusicService {
 		_musicDownloadingMap	= new HashMap<String, Boolean>();
 	}
 	
-	public void playSmartMusic() {
-		if(continueToPlay()) {
-			return ;
-		}
-		
+	private void doPlaySmartMusic() {
 		int networkType	= NetUtil.getNetworkType(this);
 		if(NetUtil.NETWORK_TYPE_WIFI == networkType) {
 			checkAndPlayOnlineMusic();
@@ -137,8 +137,16 @@ public class VanchuMusicService extends MusicService {
 		}
 	}
 	
+	public void playSmartMusic() {
+		if(continueToPlay()) {
+			return ;
+		}
+		
+		doPlaySmartMusic();
+	}
+	
 	public void nextSmartMusic() {
-		playSmartMusic();
+		doPlaySmartMusic();
 	}
 	
 	public void playOnlineMusic() {
@@ -165,22 +173,26 @@ public class VanchuMusicService extends MusicService {
 			}
 			
 			MusicInfo mi	= _musicInfoList.get(_currentInfoIndex);
+			String id		= mi.getId();
 			String name		= mi.getName();
+			String artist	= mi.getArtist();
 			String audioUrl	= mi.getAudio();
 			String lyricUrl	= mi.getLyric();
 			String imgUrl	= mi.getImg();
-			return new MusicData(name, playerMode, audioUrl, "", lyricUrl, "", imgUrl);
+			return new MusicData(id, name, artist, playerMode, audioUrl, "", lyricUrl, "", imgUrl);
 		} else if(PLAYER_MODE_OFFLINE == playerMode) {
 			MusicSolidQueueElement msqe	= getCurrentMusicSolidQueueElement();
 			if(null == msqe) {
 				return null;
 			}
 			
+			String id			= msqe.getId();
 			String name			= msqe.getName();
+			String artist		= msqe.getArtist();
 			String audioPath	= msqe.getAudioPath();
 			String lyricPath	= msqe.getLyricPath();
 			String imgUrl		= msqe.getImg();
-			return new MusicData(name, playerMode, "", audioPath, "", lyricPath, imgUrl);
+			return new MusicData(id, name, artist, playerMode, "", audioPath, "", lyricPath, imgUrl);
 		} else {
 			return null;
 		}
@@ -241,6 +253,14 @@ public class VanchuMusicService extends MusicService {
 		return false;
 	}
 	
+	private String getAndUpdateNewbieFlag() {
+		SharedPreferences prefs		= getSharedPreferences(PREFS_VANCHU_MUSIC_SERVICE, Context.MODE_PRIVATE);
+		String newbieFlag	= prefs.getString("music_newbie", "1");
+		prefs.edit().putString("music_newbie", "0").commit();
+		
+		return newbieFlag;
+	}
+	
 	private void updateMusicInfoList() {
 		if(null == _requestUrl) {
 			if(null != _callback) {
@@ -254,7 +274,7 @@ public class VanchuMusicService extends MusicService {
 			@Override
 			public void run() {
 				HashMap<String, String> params	= new HashMap<String, String>();
-				params.put("deviceId", IdUtil.getDeviceUniqueId(VanchuMusicService.this));
+				params.put("newbie", getAndUpdateNewbieFlag());
 				params.put("num", _eachFetchNum);
 				
 				String response	= NetUtil.httpPostRequest(_requestUrl, params, 3);
@@ -286,8 +306,14 @@ public class VanchuMusicService extends MusicService {
 			return ;
 		}
 		
+		int result	= playOnlineMusic(_musicInfoList.get(_currentInfoIndex + 1).getAudio());
+		if(VanchuMusicService.PLAY_FAIL_PREPARING == result) {
+			return ;
+		}
+		
 		_currentInfoIndex += 1;
-		playOnlineMusic(_musicInfoList.get(_currentInfoIndex).getAudio());
+		SwitchLogger.d(LOG_TAG, "checkAndPlayOnlineMusic *********** _currentInfoIndex += 1, now=" + _currentInfoIndex);
+		
 	}
 	
 	private void checkAndPlayOfflineMusic() {
@@ -392,6 +418,11 @@ public class VanchuMusicService extends MusicService {
 		public void onError(int errCode) {
 			SwitchLogger.e(LOG_TAG, "download lyric fail, errCode="+errCode);
 		}
+		
+		@Override
+		public void onPause() {
+			
+		}
 	}
 	
 	private void updateLyricPath(String id, String lyricPath) {
@@ -450,6 +481,11 @@ public class VanchuMusicService extends MusicService {
 			SwitchLogger.e(LOG_TAG, "download audio fail, errCode="+errCode);
 			_musicDownloadingMap.put(audioUrl, new Boolean(false) );
 		}
+		
+		@Override
+		public void onPause() {
+			
+		}
 	}
 	
 	private MusicInfo getMusicInfo(String id) {
@@ -499,6 +535,15 @@ public class VanchuMusicService extends MusicService {
 	
 	@Override
 	protected void onMusicCompletion(MediaPlayer mp) {
-		playSmartMusic();
+		SwitchLogger.d(LOG_TAG, "onMusicCompletion");
+		int networkType	= NetUtil.getNetworkType(this);
+		
+		if((NetUtil.NETWORK_TYPE_2G == networkType || NetUtil.NETWORK_TYPE_3G == networkType) 
+			&& MusicService.PLAYER_DETAIL_MODE_2G3G == getPlayerDetailMode()) 
+		{
+			playOnlineMusic();
+		} else {
+			playSmartMusic();
+		}
 	}
 }

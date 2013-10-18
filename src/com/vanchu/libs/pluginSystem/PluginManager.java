@@ -112,5 +112,10 @@ public class PluginManager {
 				break;
 			}
 		}
+		
+		@Override
+		public void onPause() {
+			
+		}
 	}
 }
