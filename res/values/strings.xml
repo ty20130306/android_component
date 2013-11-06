@@ -23,5 +23,9 @@
     <string name="title_activity_media_player">MediaPlayerActivity</string>
     <string name="title_activity_test_service">TestServiceActivity</string>
     <string name="title_activity_music_service">MusicServiceActivity</string>
+    <string name="title_activity_db">DbActivity</string>
+    <string name="title_activity_test_cfg_center">TestCfgCenterActivity</string>
+    <string name="title_activity_music_scene_service">MusicSceneServiceActivity</string>
+    <string name="title_activity_test_music_scene_mgr">TestMusicSceneMgrActivity</string>
 
 </resources>

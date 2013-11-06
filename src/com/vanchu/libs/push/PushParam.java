@@ -12,19 +12,19 @@ import android.app.Notification;
  */
 public class PushParam {
 
-	public static final int MIN_MSG_INTERVAL		= 300000;	// milliseconds = 5 minutes
-	public static final int DEFAULT_MSG_INTERVAL	= 3600000;	// milliseconds = 1 hour
-	public static final int MAX_MSG_INTERVAL		= 86400000;	// milliseconds = 1 day
+	public static final int MIN_MSG_INTERVAL		= 5 * 60 * 1000; // milliseconds = 5 minutes
+	public static final int DEFAULT_MSG_INTERVAL	= 60 * 60 * 1000;	// milliseconds = 1 hour
+	public static final int MAX_MSG_INTERVAL		= 24 * 60 * 60 * 1000;	// milliseconds = 1 day
 
-	public static final int DEFAULT_DELAY			= 0;	// milliseconds
+	public static final int DEFAULT_DELAY			= 4 * 60 * 60 * 1000;	// milliseconds = 4 hours
 	
-	public static final int DEFAULT_AVAI_START_TIME	= 0;
+	public static final int DEFAULT_AVAI_START_TIME	= 800;
 	public static final int DEFAULT_AVAI_END_TIME	= 2400;
 	
 	public static final int MIN_AVAI_START_TIME		= 0;
 	public static final int MAX_AVAI_END_TIME		= 2400;
 	
-	public static final int DEFAULT_AFTER			= 0;	// milliseconds
+	public static final int DEFAULT_AFTER			= 4 * 60 * 60 * 1000;	// milliseconds = 4 hours
 	
 	
 	/**
@@ -83,16 +83,10 @@ public class PushParam {
 	 */
 	private int 					_after;
 	
-	public PushParam(int msgInterval,
-					String msgUrl, 
-					Map<String, String> msgUrlParam)
-	{
-		setMsgInterval(msgInterval);
-		_msgUrl			= msgUrl;
-		_msgUrlParam	= msgUrlParam;
-		if(_msgUrlParam == null){
-			_msgUrlParam	= new HashMap<String, String>();
-		}
+	public PushParam() {
+		setMsgInterval(DEFAULT_MSG_INTERVAL);
+		_msgUrl			= "";
+		_msgUrlParam	= new HashMap<String, String>();
 		
 		_notifyWhenRunning	= false;
 		_defaults			= Notification.DEFAULT_LIGHTS;
@@ -159,6 +153,10 @@ public class PushParam {
 	
 	public boolean isIgnoreIntervalLimit() {
 		return _ignoreIntervalLimit;
+	}
+	
+	public void setMsgUrl(String msgUrl) {
+		_msgUrl	= msgUrl;
 	}
 	
 	public String getMsgUrl(){

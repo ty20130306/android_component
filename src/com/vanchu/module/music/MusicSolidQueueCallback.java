@@ -19,7 +19,7 @@ public class MusicSolidQueueCallback implements SolidQueueCallback<MusicSolidQue
 	
 	@Override
 	public void onRemove(MusicSolidQueueElement element) {
-		SwitchLogger.d(LOG_TAG, "MusicSolidQueueElement.onAdd, audio=" + element.getAudio() 
+		SwitchLogger.d(LOG_TAG, "MusicSolidQueueElement.onRemove, audio=" + element.getAudio() 
 				+ ", audio path=" + element.getAudioPath()
 				+ ", lyric=" + element.getLyric()
 				+ ", lyric path=" + element.getLyricPath());

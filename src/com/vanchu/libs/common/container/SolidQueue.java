@@ -20,7 +20,7 @@ public class SolidQueue <T>{
 	
 	private static final String QUEUE_FILE_DIR	= "solid_queue";
 	
-	public static final int		UNLIMITED_SIZE	= 0;
+	public static final int		UNLIMITED_SIZE	= -1;
 	
 	private Context	_context;
 	private String	_name;
@@ -38,8 +38,7 @@ public class SolidQueue <T>{
 		_maxSize	= maxSize;
 		_callback	= callback;
 				
-		_path		= _context.getDir(QUEUE_FILE_DIR, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) 
-							+ "/" + _name;
+		_path		= _context.getDir(QUEUE_FILE_DIR, Context.MODE_PRIVATE) + "/" + _name;
 		
 		createLock();
 		createList();

@@ -27,6 +27,13 @@ public class Downloader {
 	public static final int DOWNLOAD_ERR_URL				= 4;
 	public static final int DOWNLOAD_ERR_SPACE_NOT_ENOUGH	= 5;
 	public static final int DOWNLOAD_ERR_SOCKET_TIMEOUT		= 6;
+
+	public static final int DOWNLOAD_STATUS_INITED		= 1;
+	public static final int DOWNLOAD_STATUS_RUNNING		= 2;
+	public static final int DOWNLOAD_STATUS_PAUSED		= 3;
+	public static final int DOWNLOAD_STATUS_FAIL		= 4;
+	public static final int DOWNLOAD_STATUS_SUCC		= 5;
+	
 	
 	private static final String DOWNLOAD_ROOT_DIR_NAME	= "vanchu_download";
 	
@@ -41,16 +48,11 @@ public class Downloader {
 	private static final int DOWNLOAD_BUFFER_SIZE		= 2048;
 	private static final int TIMEOUT_RETRY_MAX			= 3;
 
-	private static final int DOWNLOAD_STATUS_INITED		= 1;
-	private static final int DOWNLOAD_STATUS_RUNNING	= 2;
-	private static final int DOWNLOAD_STATUS_PAUSED		= 3;
-	private static final int DOWNLOAD_STATUS_FAIL		= 4;
-	private static final int DOWNLOAD_STATUS_SUCC		= 5;
-	
 	private Context	_context;
 	private String	_downloadUrl;
 	private String	_dirName;
 	private IDownloadListener	_downloadListener;
+	private boolean	_needPermission;
 	
 	private String	_downloadFileName;
 	private int		_downloadStorageType;
@@ -100,10 +102,15 @@ public class Downloader {
 	};	
 	
 	public Downloader(Context context, String downloadUrl, String dirName, IDownloadListener downloadListener){
+		this(context, downloadUrl, dirName, downloadListener, false);
+	}
+	
+	public Downloader(Context context, String downloadUrl, String dirName, IDownloadListener downloadListener, boolean gainPermission){
 		_context			= context;
 		_downloadUrl		= downloadUrl;
 		_dirName			= dirName;
 		_downloadListener	= downloadListener;
+		_needPermission		= gainPermission;
 		
 		_timeoutRetryCnt	= 0;
 		
@@ -151,7 +158,9 @@ public class Downloader {
 	private void downloadSucc(){
 		SwitchLogger.d(LOG_TAG, "download complete, rename tmp to official");
 		FileUtil.rename(_tmpDownloadPath, _downloadPath);
-		FileUtil.chmod(_downloadPath, "777");
+		if(_needPermission) {
+			FileUtil.chmod(_downloadPath, "777");
+		}
 		onSuccess();
 	}
 	
@@ -193,7 +202,7 @@ public class Downloader {
 	
 	private void initDownloadStorage(boolean useDeviceMem){
 		File file	= null;
-		
+
 		if( ! useDeviceMem && FileUtil.isSDCardReady()){
 			_downloadStorageType	= DOWNLOAD_STORAGE_TYPE_SDCARD;
 			file			= Environment.getExternalStorageDirectory();
@@ -203,15 +212,20 @@ public class Downloader {
 		}
 		
 		_downloadDir	= file.getAbsolutePath() + "/" + DOWNLOAD_ROOT_DIR_NAME;
+		if(_needPermission) {
+			FileUtil.chmod(_downloadDir, "777");
+		}
+		
 		if(_dirName != null && _dirName != "") {
 			_downloadDir	+= "/" + _dirName;
 		}
-		
 		File dir		= new File(_downloadDir);
 		if( ! dir.exists()) {
 			dir.mkdirs();
 		}
-		FileUtil.chmod(_downloadDir, "777");
+		if(_needPermission) {
+			FileUtil.chmod(_downloadDir, "777");
+		}
 		
 		_downloadPath		= _downloadDir + "/" + _downloadFileName;
 		_tmpDownloadPath	= _downloadPath + ".tmp";
@@ -250,10 +264,16 @@ public class Downloader {
 		return false;
 	}
 	
+	public int getStatus() {
+		return _status;
+	}
+	
 	private void download(){
 		if(fileDownloaded()){
 			SwitchLogger.d(LOG_TAG, _downloadPath + " already downloaded");
-			FileUtil.chmod(_downloadPath, "777");
+			if(_needPermission) {
+				FileUtil.chmod(_downloadPath, "777");
+			}
 			onSuccess();
 			return;
 		}

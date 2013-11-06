@@ -16,6 +16,62 @@
 	    <Button
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:text="测试删除list元素"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testListRemove" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试父子类转换"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testExtend" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试MusicSceneMgr"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testMusicSceneMgr" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试MusicSceneService"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testMusicSceneService" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试HashMap的containsValue"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testHashMap" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试配置中心"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testCfgCenter" />
+	    
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试json序列化"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testSerializeJson" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试sqlLite"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testSqlLite" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
 	        android:text="测试MusicService"
 	        android:layout_marginBottom="10dp"
 	        android:onClick="testMusicService" />

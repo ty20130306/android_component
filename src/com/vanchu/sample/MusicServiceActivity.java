@@ -6,6 +6,9 @@ import com.vanchu.libs.music.MusicService;
 import com.vanchu.libs.music.MusicService.MusicBinder;
 import com.vanchu.libs.music.MusicServiceCallback;
 import com.vanchu.module.music.MusicData;
+import com.vanchu.module.music.MusicScene;
+import com.vanchu.module.music.MusicSceneMgr;
+import com.vanchu.module.music.MusicSceneMgrCallback;
 import com.vanchu.module.music.VanchuMusicService;
 import com.vanchu.test.R;
 import com.vanchu.test.R.layout;
@@ -72,7 +75,7 @@ public class MusicServiceActivity extends Activity {
 		public void onMusicBuffering(MediaPlayer mp, int percent) {
 			super.onMusicBuffering(mp, percent);
 			if(100 != percent) {
-				SwitchLogger.d(LOG_TAG, "VanchuMusicServiceCallback.onMusicBuffering, percent="+percent);
+				//SwitchLogger.d(LOG_TAG, "VanchuMusicServiceCallback.onMusicBuffering, percent="+percent);
 			}
 		}
 		

@@ -58,6 +58,7 @@ data	=> array(
 	title	=> 消息标题(字符串)
 	text	=> 消息正文(字符串)
 	show	=> 收到推送是否提示(0/1)
+	force	=> 是否强推(0/1)
 	extra	=> 消息额外需要字段 (json对象)
 )
 

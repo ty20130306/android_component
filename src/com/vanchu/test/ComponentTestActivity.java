@@ -1,10 +1,12 @@
 package com.vanchu.test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,8 +26,11 @@ import com.vanchu.libs.upgrade.UpgradeCallback;
 import com.vanchu.libs.upgrade.UpgradeManager;
 import com.vanchu.libs.upgrade.UpgradeParam;
 import com.vanchu.libs.upgrade.UpgradeProxy;
+import com.vanchu.module.music.MusicSolidQueueElement;
 import com.vanchu.module.music.VanchuMusicService;
 import com.vanchu.sample.AnimationActivity;
+import com.vanchu.sample.DbActivity;
+import com.vanchu.sample.MusicSceneServiceActivity;
 import com.vanchu.sample.MusicServiceActivity;
 import com.vanchu.sample.WebViewActivity;
 
@@ -70,12 +75,169 @@ public class ComponentTestActivity extends Activity {
 		//testNetwork(null);
 		//testMediaPlayer(null);
 		//testMusicService(null);
+		//testMusicSceneService(null);
 		//testPushService(null);
 		//testWebCache(null);
+		//testSqlLite(null);
+	}
+	
+	public void testListRemove(View v) {
+		ArrayList<String> list	= new ArrayList<String>();
+		list.add("a");
+		list.add("b");
+		list.add("c");
+		list.add("d");
+		list.add("e");
+		
+		String r	= list.remove(0);
+		SwitchLogger.d(LOG_TAG, r + " is be removed");
+		
+		r	= list.remove(0);
+		SwitchLogger.d(LOG_TAG, r + " is be removed");
+		
+		r	= list.remove(0);
+		SwitchLogger.d(LOG_TAG, r + " is be removed");
+	}
+
+	class Father {
+		private int type	= 1;
+		
+		public Father(int t) {
+			type	= t;
+		}
+		
+		public void setType(int t) {
+			type	= t;
+		}
+		
+		public int getType() {
+			return type;
+		}
+		
+		public void preload() {
+			SwitchLogger.d(LOG_TAG, "father.preload");
+		}
+	}
+	
+	class Son extends Father {
+		public Son(int t) {
+			super(t);
+		}
+		
+		public void preload() {
+			SwitchLogger.d(LOG_TAG, "son.preload");
+		}
+	}
+	
+	public void testExtend(View v) {
+		Father f	= new Son(2);
+		SwitchLogger.d(LOG_TAG, "f.getType="+f.getType());
+		f.preload();
+	}
+	
+	
+	class A{
+		private int _i;
+		private String _s;
+		public A(int i, String s) {
+			_i	= i;
+			_s	= s;
+		}
+		
+		public String getS() {
+			return _s;
+		}
+		
+		public int getI() {
+			return _i;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if(this == o) {
+				return true;
+			}
+			
+			if(o == null) {
+				return false;
+			}
+			
+			if(this.getClass() != o.getClass()){
+				return false;
+			}
+			
+			A another	= (A)o;
+			if(_s.equals(another.getS()) && _i == another.getI()) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
+	public void testHashMap(View v) {
+		A a		= new A(1, "a");
+		A a2	= new A(2, "aa");
+		Map<String, A> map	= new HashMap<String, ComponentTestActivity.A>();
+		map.put("a", a);
+		map.put("aa", a2);
+		A aa	= new A(2, "aa");
+		if(map.containsValue(aa)) {
+			SwitchLogger.d(LOG_TAG, "a2 == aa");
+		} else {
+			SwitchLogger.d(LOG_TAG, "a2 != aa");
+		}
+	}
+	
+	public void testMusicSceneMgr(View v) {
+		Intent intent	= new Intent(this, TestMusicSceneMgrActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testCfgCenter(View v) {
+		Intent intent	= new Intent(this, TestCfgCenterActivity.class);
+		startActivity(intent);
+	}
+	
+	private void printJsonObj(JSONObject obj) throws JSONException {
+		String query	= obj.getString("query");
+		SwitchLogger.d(LOG_TAG, "query="+query);
+		
+		JSONArray	arr	= obj.getJSONArray("locations");
+		for(int i = 0; i < arr.length(); ++i) {
+			SwitchLogger.d(LOG_TAG, "locations["+i+"]="+arr.getInt(i) );
+		}
+	}
+	
+	public void testSerializeJson(View v) {
+		try {
+			String str	= "{\"query\":\"Pizza\",\"locations\":[94043,90210]}";
+			JSONObject obj	= new JSONObject(str);
+			printJsonObj(obj);
+			
+			SwitchLogger.d(LOG_TAG, "to string-->to JSONObject" );
+			
+			String newStr = obj.toString();
+			SwitchLogger.d(LOG_TAG, "new string=" + newStr);
+			JSONObject newObj	= new JSONObject(newStr);
+			printJsonObj(newObj);
+		} catch(JSONException e) {
+			SwitchLogger.e(e);
+		}
+	}
+	
+	public void testSqlLite(View v) {
+		Intent intent	= new Intent(this, DbActivity.class);
+		startActivity(intent);
 	}
 	
 	public void testMusicService(View v) {
 		Intent intent	= new Intent(this, MusicServiceActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testMusicSceneService(View v) {
+		Intent intent	= new Intent(this, MusicSceneServiceActivity.class);
 		startActivity(intent);
 	}
 	
@@ -348,14 +510,17 @@ public class ComponentTestActivity extends Activity {
 	public void testPushService(View v){
 		SwitchLogger.d(LOG_TAG, "testPushService()");
 		
-		//int msgInterval = PushParam.DEFAULT_MSG_INTERVAL;
-		String msgUrl = "http://pesiwang.devel.rabbit.oa.com/test_push_msg.php";
-		HashMap<String, String> msgUrlParam = new HashMap<String, String>();
-		msgUrlParam.put("name", "wolf");
+		PushParam pushParam	= PushRobot.getPushParam(this);
 		
-		PushParam pushParam	= new PushParam(10000, msgUrl, msgUrlParam);
+		String msgUrl = "http://pesiwang.devel.rabbit.oa.com/test_push_msg.php";
+		pushParam.setMsgUrl(msgUrl);
+		
+		Map<String, String> msgUrlParam =	pushParam.getMsgUrlParam();
+		msgUrlParam.put("name", "wolf");
+		pushParam.setMsgUrlParam(msgUrlParam);
+		
 		pushParam.setIgnoreIntervalLimit(true);
-		pushParam.setMsgInterval(10000);
+		pushParam.setMsgInterval(3000);
 		pushParam.setNotifyWhenRunning(true);
 		pushParam.setDefaults(Notification.DEFAULT_ALL);
 		
@@ -667,7 +832,8 @@ public class ComponentTestActivity extends Activity {
 			@Override
 			public UpgradeParam onUpgradeInfoResponse(String response){
 				try {
-					JSONObject jsonResponse	= new JSONObject(response);
+					JSONObject jsonResponse	= (new JSONObject(response)).getJSONObject("data");
+					
 					String lowest	= jsonResponse.getString("lowest");
 					String highest	= jsonResponse.getString("highest");
 					String url		= jsonResponse.getString("apkUrl");

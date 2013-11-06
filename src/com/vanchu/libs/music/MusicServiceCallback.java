@@ -1,8 +1,8 @@
 package com.vanchu.libs.music;
 
 import android.media.MediaPlayer;
-
 import com.vanchu.libs.common.util.SwitchLogger;
+
 
 public class MusicServiceCallback {
 

@@ -67,7 +67,12 @@ public class ActivityUtil {
 		return true;
 	}
 	
-	public static boolean isAppRuning(Context context) {
+	/**
+	 * 判断app是否在运行（包括后台运行和前台运行）
+	 * @param context
+	 * @return 
+	 */
+	public static boolean isAppRunning(Context context) {
 		boolean isRunning = false;
 		
 		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -88,6 +93,26 @@ public class ActivityUtil {
 	}
 	
 	/**
+	 * 判断app是否在前台运行
+	 * @param context
+	 * @return
+	 */
+	public static boolean isAppRunningTop(Context context) {
+		
+		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> list = am.getRunningTasks(1);
+		if (list.size() > 0) {
+			String packageName = context.getPackageName();
+			RunningTaskInfo topRunningTaskinfo	= list.get(0);
+			if (topRunningTaskinfo.topActivity.getPackageName().equals(packageName)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	/**
 	 * 用于启动自身app
 	 * @param context
 	 * @param launcherActivityClass
@@ -97,7 +122,7 @@ public class ActivityUtil {
 		try {
 			Intent	intent;
 			
-			if(isAppRuning(context)){
+			if(isAppRunning(context)){
 				intent = new Intent(context, launcherActivityClass);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 				context.startActivity(intent);

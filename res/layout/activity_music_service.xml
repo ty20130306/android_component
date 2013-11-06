@@ -1,61 +1,62 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    tools:context=".MusicServiceActivity" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	    xmlns:tools="http://schemas.android.com/tools"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    tools:context=".MusicServiceActivity" >
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="暂停"
-        android:onClick="pause"
-        />
-    
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="播放"
-        android:onClick="play"
-        />
-     
-     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="下一首"
-        android:onClick="next"
-        />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="在线播放"
-        android:onClick="onlinePlay"
-        />
-     
-     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="在线下一首"
-        android:onClick="onlineNext"
-        />
-     
-     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="离线播放"
-        android:onClick="offlinePlay"
-        />
-     
-     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="离线下一首"
-        android:onClick="offlineNext"
-        />
-
-</LinearLayout>
+	    <Button
+	        android:layout_marginTop="30dp"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="暂停"
+	        android:onClick="pause"
+	        />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="播放"
+	        android:onClick="play"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="下一首"
+	        android:onClick="next"
+	        />
+	
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="在线播放"
+	        android:onClick="onlinePlay"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="在线下一首"
+	        android:onClick="onlineNext"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="离线播放"
+	        android:onClick="offlinePlay"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="离线下一首"
+	        android:onClick="offlineNext"
+	        />
+	     
+	</LinearLayout>
+</ScrollView>

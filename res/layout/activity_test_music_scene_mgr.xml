@@ -1,0 +1,94 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	    xmlns:tools="http://schemas.android.com/tools"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    tools:context=".MusicServiceActivity" >
+
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="初始化音乐场景管理器"
+	        android:onClick="initMusicSceneMgr"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取当前场景类型"
+	        android:onClick="getCurrSceneType"
+	        />
+		
+		<EditText 
+		    android:id="@+id/scene_type_input"
+		    android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="输入你要设置的场景类型数值"
+		    />
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="设置当前场景类型"
+	        android:onClick="setCurrSceneType"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="下一首离线音乐数据"
+	        android:onClick="nextOfflineMusicData"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="下一首在线音乐数据"
+	        android:onClick="nextOnlineMusicData"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="预加载默认音乐"
+	        android:onClick="preloadDefaultMusic"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="预加载2音乐"
+	        android:onClick="preload2Music"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="预加载3音乐"
+	        android:onClick="preload2Music"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="预加载4音乐"
+	        android:onClick="preload4Music"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="暂停预加载音乐"
+	        android:onClick="pausePreloadingMusic"
+	        />
+		
+		<Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取场景数据"
+	        android:onClick="getSceneInfo"
+	        />
+	</LinearLayout>
+</ScrollView>

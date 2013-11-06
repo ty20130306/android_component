@@ -30,7 +30,6 @@ public class DbHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		SwitchLogger.d(LOG_TAG, "onCreate() called");
 		
-		// 创建playlist
 		String	sql = "CREATE TABLE IF NOT EXISTS "
 						+ TABLE_PLUGIN_VERSION
 						+ "(id TEXT PRIMARY KEY NOT NULL UNIQUE, version TEXT)";

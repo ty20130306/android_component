@@ -22,15 +22,17 @@ public class DbManager {
 		_db			= _dbHelper.getWritableDatabase();
 	}
 	
-	public void setPluginVersion(String pluginId, String version) {
+	public boolean setPluginVersion(String pluginId, String version) {
 		SwitchLogger.d(LOG_TAG, "call setPluginVersion with pluginId=" + pluginId + ", version=" + version);
 		
 		try {
 			_db.execSQL("REPLACE INTO " + DbHelper.TABLE_PLUGIN_VERSION + " VALUES (?, ?)", 
 						new Object[] {pluginId, version});
 			
+			return true;
 		} catch (SQLException e) {
 			SwitchLogger.e(e);
+			return false;
 		}
 	}
 	
@@ -55,6 +57,18 @@ public class DbManager {
 		}
 		
 		return version;
+	}
+	
+	public boolean deletePluginVersion(String pluginId) {
+		SwitchLogger.d(LOG_TAG, "call deletePluginVersion with pluginId=" + pluginId);
+		int result =	_db.delete(DbHelper.TABLE_PLUGIN_VERSION, 
+									DbHelper.TABLE_PLUGIN_VERSION_COLUMN_ID + " = ?", new String[] {pluginId});
+		
+		if(1 == result) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public Map<String, String> getAllPluginVersion() {

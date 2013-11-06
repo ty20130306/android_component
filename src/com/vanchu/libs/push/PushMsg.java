@@ -16,6 +16,7 @@ public class PushMsg {
 	public static final int MSG_TYPE_NONE		= 0;
 	
 	private boolean	_show;
+	private boolean _force;
 	private	int		_type;
 	private	String	_title;
 	private	String	_text;
@@ -26,6 +27,7 @@ public class PushMsg {
 	
 	public PushMsg(JSONObject msg){
 		_show	= false;
+		_force	= false;
 		_extra	= new Bundle();
 		_cfg	= new HashMap<String, String>();
 		
@@ -41,6 +43,7 @@ public class PushMsg {
 			SwitchLogger.e(e);
 			
 			_show	= false;
+			_force	= false;
 			_type	= MSG_TYPE_NONE;
 			_title	= "";
 			_text	= "";
@@ -51,6 +54,10 @@ public class PushMsg {
 	
 	public boolean isShow(){
 		return _show;
+	}
+	
+	public boolean isForce() {
+		return _force;
 	}
 	
 	public int getType(){
@@ -99,6 +106,17 @@ public class PushMsg {
 		}
 	}
 	
+	private void parseForce(JSONObject data) throws JSONException {
+		if(data.has("force")){
+			int f	= Integer.parseInt(data.getString("force"));
+			if(f == 0){
+				_force	= false;
+			} else {
+				_force	= true;
+			}
+		}
+	}
+	
 	private void parseTicker(JSONObject data) throws JSONException {
 		if(data.has("ticker")){
 			_ticker	= data.getString("ticker");
@@ -126,6 +144,7 @@ public class PushMsg {
 			_text	= data.getString("text");
 			
 			parseShow(data);
+			parseForce(data);
 			parseTicker(data);
 			parseExtra(data);
 		} else {

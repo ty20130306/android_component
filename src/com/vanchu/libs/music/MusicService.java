@@ -119,6 +119,11 @@ public class MusicService extends Service {
 						_callback.onMusicPrepared(mp);
 					}
 					
+					/**
+					 * 有可能在准备的过程中，用户按了暂停按钮，
+					 * 如果按了暂停，则不能做播放了
+					 * 所以这里加了对状态的判断，只有在准备状态才继续播放
+					 */
 					if(PLAYER_STATE_PREPARING == _playerState) {
 						_playerState	= PLAYER_STATE_PLAYING;
 						mp.start();

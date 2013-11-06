@@ -17,11 +17,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 
 abstract public class PushService extends Service {
 	private static final String LOG_TAG				= PushService.class.getSimpleName();
+	
+	private static final String PREFS_PUSH_SERVICE		= "push_service";
 	
 	private static final int NO_EXIT_TIME			= -1;
 	private static final int NO_POP_UP_TIME			= -1;
@@ -38,6 +41,7 @@ abstract public class PushService extends Service {
 	private AlarmManager	_alarmManager	= null;
 	private PendingIntent	_alarmIntent	= null;
 	
+	private SharedPreferences	_prefs	= null;
 	private long 		_lastExitTime	= NO_EXIT_TIME;
 	private long		_lastPopUpTime	= NO_POP_UP_TIME;
 	
@@ -58,8 +62,9 @@ abstract public class PushService extends Service {
 	protected void putMsgUrlParam(String key, String value) {
 		Map<String, String> msgUrlParam	= _pushParam.getMsgUrlParam();
 		msgUrlParam.put(key, value);
-		
-		_pushParam.setMsgUrlParam(msgUrlParam);
+		synchronized (PushService.this) {
+			_pushParam.setMsgUrlParam(msgUrlParam);
+		}
 		setPushParam();
 	}
 	
@@ -78,7 +83,6 @@ abstract public class PushService extends Service {
 		notification.tickerText = pushMsg.getTicker();
 		notification.flags = Notification.FLAG_AUTO_CANCEL;
 		notification.setLatestEventInfo(this, pushMsg.getTitle(), pushMsg.getText(), pIntent);
-		getPushParam();
 		notification.defaults = _pushParam.getDefaults();
 		
 		NotificationManager	notificationManager	= (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -111,8 +115,16 @@ abstract public class PushService extends Service {
 		// update should come first
 		updateExitTimeIfNeed();
 		
-		// check whehter should pop up
+		// if force, force to pop up no matter what other conditons
 		long currTime	= System.currentTimeMillis();
+		if(pushMsg.isForce()) {
+			SwitchLogger.d(LOG_TAG, "force set, force to pop up " );
+			_lastPopUpTime	= currTime;
+			_prefs.edit().putLong("last_pop_up_time", _lastPopUpTime).commit();
+			return true;
+		}
+		
+		// check whehter should pop up
 		if(currTime - _lastExitTime < _pushParam.getDelay()) {
 			SwitchLogger.d(LOG_TAG, "do not reach delay, delay = " + _pushParam.getDelay() + ", passed = " + (currTime - _lastExitTime));
 			return false;
@@ -127,7 +139,7 @@ abstract public class PushService extends Service {
 		}
 		
 		boolean notifyWhenRunning	= _pushParam.getNotifyWhenRunning();
-		if( ! notifyWhenRunning && ActivityUtil.isAppRuning(this)){
+		if( ! notifyWhenRunning && ActivityUtil.isAppRunningTop(this)){
 			SwitchLogger.d(LOG_TAG, "do not notify when running");
 			return false;
 		}
@@ -142,67 +154,79 @@ abstract public class PushService extends Service {
 			return false;
 		}
 		
+		SwitchLogger.d(LOG_TAG, "condition satisfied, pop up,  _lastPopUpTime="
+								+_lastPopUpTime+",_lastExitTime="+_lastExitTime
+								+",current time="+currTime);
+		
 		_lastPopUpTime	= currTime;
+		_prefs.edit().putLong("last_pop_up_time", _lastPopUpTime).commit();
 		
 		return true;
 	}
 
 	private void updatePushCfgIfNeed(PushMsg pushMsg) {
+		synchronized (PushService.this) {
 
-		synchronized (_pushParam) {
 			boolean		needRegisterAlarm	= false;
 			boolean		needSetPushParam	= false;
-			
+
 			HashMap<String, String> cfg	= pushMsg.getCfg();
-			getPushParam();
-			
 			if(cfg.containsKey("interval")){
 				int interval	= Integer.parseInt(cfg.get("interval"));
 				SwitchLogger.d(LOG_TAG, "received interval="+interval);
 				if(interval != _pushParam.getMsgInterval()){
+					SwitchLogger.d(LOG_TAG, "old interval="+_pushParam.getMsgInterval());
 					_pushParam.setMsgInterval(interval);
 					needSetPushParam	= true;
 					needRegisterAlarm	= true;
 				}
 			}
-			
+
 			if(cfg.containsKey("delay")) {
 				int delay	= Integer.parseInt(cfg.get("delay"));
 				SwitchLogger.d(LOG_TAG, "received delay="+delay);
 				if(delay != _pushParam.getDelay()){
+					SwitchLogger.d(LOG_TAG, "old delay="+_pushParam.getDelay());
 					_pushParam.setDelay(delay);
 					needSetPushParam	= true;
 				}
 			}
-			
+
 			if(cfg.containsKey("avaiStartTime") && cfg.containsKey("avaiEndTime")) {
 				int avaiStartTime	= Integer.parseInt(cfg.get("avaiStartTime"));
 				int avaiEndTime		= Integer.parseInt(cfg.get("avaiEndTime"));
 				SwitchLogger.d(LOG_TAG, "received avaiStartTime=" + avaiStartTime + ",avaiEndTime=" + avaiEndTime);
-				
-				_pushParam.setAvaiTime(avaiStartTime, avaiEndTime);
-				needSetPushParam	= true;
+
+				if(avaiStartTime != _pushParam.getAvaiStartTime() || avaiEndTime != _pushParam.getAvaiEndTime()) {
+					SwitchLogger.d(LOG_TAG, "old avai time,start="+_pushParam.getAvaiStartTime()
+							+",end="+_pushParam.getAvaiEndTime());
+					_pushParam.setAvaiTime(avaiStartTime, avaiEndTime);
+					needSetPushParam	= true;
+				}
 			}
-			
+
 			if(cfg.containsKey("after")) {
 				int after	= Integer.parseInt(cfg.get("after"));
 				SwitchLogger.d(LOG_TAG, "received after="+after);
 				if(after != _pushParam.getAfter()){
+					SwitchLogger.d(LOG_TAG, "old after ,after="+_pushParam.getAfter());
 					_pushParam.setAfter(after);
 					needSetPushParam	= true;
 				}
 			}
-			
+
 			if(needSetPushParam) {
 				SwitchLogger.d(LOG_TAG, "***************cfg change, need update push param");
 				setPushParam();
 			}
-			
+
 			if(needRegisterAlarm) {
 				SwitchLogger.d(LOG_TAG, "***************cfg change, need register alarm");
 				cancelAlarm();
 				setAlarm();
 			}
+
+			SwitchLogger.d(LOG_TAG, "_lastPopUpTime="+_lastPopUpTime+",_lastExitTime="+_lastExitTime);
 		}
 	}
 	
@@ -215,6 +239,11 @@ abstract public class PushService extends Service {
 	@Override
 	public void onCreate(){
 		SwitchLogger.d(LOG_TAG, "onCreate()");
+		_prefs	= getSharedPreferences(PREFS_PUSH_SERVICE, Context.MODE_PRIVATE);
+		
+		getPushParam();
+		getPushStatus();
+		
 		super.onCreate();
 	}
 	
@@ -261,15 +290,26 @@ abstract public class PushService extends Service {
 	public void onDestroy(){
 		SwitchLogger.d(LOG_TAG, "onDestroy()");
 		cancelAlarm();
+		setPushParam();
 		super.onDestroy();
 	}
 	
+	private void getPushStatus() {
+		long currTime	= System.currentTimeMillis();
+		_lastPopUpTime	= _prefs.getLong("last_pop_up_time", currTime);
+		_lastExitTime	= _prefs.getLong("last_exit_time", currTime);
+	}
+	
 	private void getPushParam(){
-		_pushParam	= PushRobot.getPushParam(this);
+		synchronized (PushService.this) {
+			_pushParam	= PushRobot.getPushParam(this);
+		}
 	}
 	
 	private void setPushParam(){
-		PushRobot.setPushParam(this, _pushParam);
+		synchronized (PushService.this) {
+			PushRobot.setPushParam(this, _pushParam);
+		}
 	}
 	
 	private void setAlarm() {
@@ -282,7 +322,7 @@ abstract public class PushService extends Service {
 			int interval	= _pushParam.getMsgInterval();
 			SwitchLogger.d(LOG_TAG, "get msg interval is " + interval);
 			_alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 
-										System.currentTimeMillis() + interval, 
+										System.currentTimeMillis() + 10 * 1000, 
 										interval, _alarmIntent);
 		} else {
 			SwitchLogger.d(LOG_TAG, "alarm has been registered");
@@ -298,13 +338,15 @@ abstract public class PushService extends Service {
 	}
 	
 	private void updateExitTimeIfNeed() {
-		if(ActivityUtil.isAppRuning(this)) {
+		if(ActivityUtil.isAppRunningTop(this)) {
 			_lastExitTime	= NO_EXIT_TIME;
 		} else {
 			if(_lastExitTime == NO_EXIT_TIME) {
 				_lastExitTime	= System.currentTimeMillis();
 			}
 		}
+		
+		_prefs.edit().putLong("last_exit_time", _lastExitTime).commit();
 	}
 	
 	private int getCurrHourAndMinute() {
@@ -316,24 +358,20 @@ abstract public class PushService extends Service {
 	}
 	
 	private void getPushMsg() {
-		synchronized (_pushParam) {
-			getPushParam();
-			
-			new Thread() {
-				public void run() {
-					if(_pushParam.isMsgUrlValid()){
-						String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
-						if(response == null){
-							SwitchLogger.e(LOG_TAG, "request push msg fail");
-							return ;
-						}
-						SwitchLogger.d(LOG_TAG, "response = " + response);
-						onPushMsgResponse(response);
-					} else {
-						SwitchLogger.e(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
+		new Thread() {
+			public void run() {
+				if(_pushParam.isMsgUrlValid()){
+					String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
+					if(response == null){
+						SwitchLogger.e(LOG_TAG, "request push msg fail");
+						return ;
 					}
+					SwitchLogger.d(LOG_TAG, "response = " + response);
+					onPushMsgResponse(response);
+				} else {
+					SwitchLogger.e(LOG_TAG, "msg url not valid, url=" + _pushParam.getMsgUrl());
 				}
-			}.start();
-		}
+			}
+		}.start();
 	}
 }

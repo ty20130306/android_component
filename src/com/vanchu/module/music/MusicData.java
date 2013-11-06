@@ -5,6 +5,7 @@ public class MusicData {
 	private String	_id;
 	private String	_name;
 	private String	_artist;
+	private String	_album;
 	private int		_playerMode;
 	private String	_audioUrl;
 	private String	_audioPath;
@@ -12,12 +13,13 @@ public class MusicData {
 	private String	_lyricPath;
 	private String	_imgUrl;
 	
-	public MusicData(String id, String name, String artist, int playerMode, String audioUrl, String audioPath, 
+	public MusicData(String id, String name, String artist, String album, int playerMode, String audioUrl, String audioPath, 
 					String lyricUrl, String lyricPath, String imgUrl) 
 	{
 		_id			= id;
 		_name		= name;
 		_artist		= artist;
+		_album		= album;
 		_playerMode	= playerMode;
 		_audioUrl	= audioUrl;
 		_audioPath	= audioPath;
@@ -36,6 +38,10 @@ public class MusicData {
 	
 	public String getArtist() {
 		return _artist;
+	}
+	
+	public String getAlbum() {
+		return _album;
 	}
 	
 	public int getPlayerMode() {

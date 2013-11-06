@@ -49,4 +49,26 @@ public class MusicInfo {
 	public String getLyric() {
 		return _lyric;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) {
+			return true;
+		}
+		
+		if(o == null) {
+			return false;
+		}
+		
+		if(this.getClass() != o.getClass()){
+			return false;
+		}
+		
+		MusicInfo another	= (MusicInfo)o;
+		if(_id.equals(another.getId())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

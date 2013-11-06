@@ -31,6 +31,8 @@ public class Storage {
         public String id;
     }
 
+    private final static String LOG_TAG	= Storage.class.getSimpleName();
+    
     private final static String DIR_NAME = "webcache";
     private final static String FILE_ENTRIES = "entries.idx";
     private Map<String, ItemMeta> _entries;
@@ -96,6 +98,7 @@ public class Storage {
                 try {
                     file.createNewFile();
                 } catch (Exception e){
+                	SwitchLogger.e(LOG_TAG, "url="+url+",id="+meta.id+",file path="+this._external+"/"+meta.id+".dat");
                 	SwitchLogger.e(e);
                     file = null;
                 }
@@ -108,6 +111,7 @@ public class Storage {
                 try {
                     file.createNewFile();
                 } catch (Exception e){
+                	SwitchLogger.e(LOG_TAG, "url="+url+",id="+meta.id+",file path="+this._external+"/"+meta.id+".dat");
                 	SwitchLogger.e(e);
                     file = null;
                 }

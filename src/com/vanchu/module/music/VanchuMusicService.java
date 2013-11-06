@@ -176,10 +176,11 @@ public class VanchuMusicService extends MusicService {
 			String id		= mi.getId();
 			String name		= mi.getName();
 			String artist	= mi.getArtist();
+			String album	= mi.getAlbum();
 			String audioUrl	= mi.getAudio();
 			String lyricUrl	= mi.getLyric();
 			String imgUrl	= mi.getImg();
-			return new MusicData(id, name, artist, playerMode, audioUrl, "", lyricUrl, "", imgUrl);
+			return new MusicData(id, name, artist, album, playerMode, audioUrl, "", lyricUrl, "", imgUrl);
 		} else if(PLAYER_MODE_OFFLINE == playerMode) {
 			MusicSolidQueueElement msqe	= getCurrentMusicSolidQueueElement();
 			if(null == msqe) {
@@ -189,10 +190,11 @@ public class VanchuMusicService extends MusicService {
 			String id			= msqe.getId();
 			String name			= msqe.getName();
 			String artist		= msqe.getArtist();
+			String album		= msqe.getAlbum();
 			String audioPath	= msqe.getAudioPath();
 			String lyricPath	= msqe.getLyricPath();
 			String imgUrl		= msqe.getImg();
-			return new MusicData(id, name, artist, playerMode, "", audioPath, "", lyricPath, imgUrl);
+			return new MusicData(id, name, artist, album, playerMode, "", audioPath, "", lyricPath, imgUrl);
 		} else {
 			return null;
 		}

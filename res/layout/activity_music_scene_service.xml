@@ -1,0 +1,128 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	    xmlns:tools="http://schemas.android.com/tools"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical"
+	    tools:context=".MusicServiceActivity" >
+
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="暂停"
+	        android:onClick="pause"
+	        />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="播放"
+	        android:onClick="play"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="下一首"
+	        android:onClick="next"
+	        />
+	
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="在线播放"
+	        android:onClick="onlinePlay"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="在线下一首"
+	        android:onClick="onlineNext"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="离线播放"
+	        android:onClick="offlinePlay"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="离线下一首"
+	        android:onClick="offlineNext"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="喜欢当前歌曲"
+	        android:onClick="likeIt"
+	        />
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="取消喜欢当前歌曲"
+	        android:onClick="dislikeIt"
+	        />
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取所有喜欢歌曲"
+	        android:onClick="getFavoriteList"
+	        />
+	     
+	     <EditText
+	         android:id="@+id/scene_type_input"
+	         android:layout_width="match_parent"
+	         android:layout_height="wrap_content"
+	         android:hint="输入sceneType"
+	         />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="设置场景类型"
+	        android:onClick="setCurrentSceneType"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取场景最大缓存数量"
+	        android:onClick="getMaxQueueSize"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取场景已缓存数量"
+	        android:onClick="getQueueSize"
+	        />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取场景类型"
+	        android:onClick="getCurrentSceneType"
+	        />
+	     
+	     <EditText
+	         android:id="@+id/preload_num_input"
+	         android:layout_width="match_parent"
+	         android:layout_height="wrap_content"
+	         android:hint="输入预加载数量"
+	         />
+	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="预加载"
+	        android:onClick="preload"
+	        />
+	</LinearLayout>
+</ScrollView>
