@@ -59,6 +59,10 @@ abstract public class PushService extends Service {
 	 */
 	abstract protected void onNotificationClick(int msgType, Bundle msgExtra);
 	
+	protected void onPopUp() {
+		SwitchLogger.d(LOG_TAG, "notification pop up" );
+	}
+	
 	protected void putMsgUrlParam(String key, String value) {
 		Map<String, String> msgUrlParam	= _pushParam.getMsgUrlParam();
 		msgUrlParam.put(key, value);
@@ -103,6 +107,7 @@ abstract public class PushService extends Service {
 			PushMsg pushMsg	= new PushMsg(msg);
 			if(needPopUp(pushMsg)){
 				showNotification(pushMsg);
+				onPopUp();
 			}
 			
 			updatePushCfgIfNeed(pushMsg);

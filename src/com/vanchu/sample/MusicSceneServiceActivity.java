@@ -358,4 +358,8 @@ public class MusicSceneServiceActivity extends Activity {
 		_service.preload(sceneType, num);
 	}
 	
+	public void getMusicSceneList(View v) {
+		List<MusicSceneInfo> list	= _service.getMusicSceneList();
+		printSceneInfo(list);
+	}
 }

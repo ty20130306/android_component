@@ -133,6 +133,10 @@
             android:name="com.vanchu.test.TestMusicSceneMgrActivity"
             android:label="@string/title_activity_test_music_scene_mgr" >
         </activity>
+        <activity
+            android:name="com.vanchu.test.TestKvDbActivity"
+            android:label="@string/title_activity_test_kv_db" >
+        </activity>
     </application>
 
 </manifest>

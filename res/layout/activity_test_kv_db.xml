@@ -1,0 +1,121 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context=".TestKvDbActivity" >
+    
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".TestKvDbActivity" > 
+    
+    <EditText
+        android:id="@+id/db_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入db" />
+    
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="selectDb"
+    	android:onClick="selectDb"
+        />
+    
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="getDbSize"
+    	android:onClick="getDbSize"
+        />
+    
+    <EditText
+        android:id="@+id/capacity_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入db容量" />
+    
+    <EditText
+        android:id="@+id/threshold_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入db LRU淘汰门槛" />
+    
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="setCfg"
+    	android:onClick="setCfg"
+        />
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="getCfg"
+    	android:onClick="getCfg"
+        />
+    
+    <EditText
+        android:id="@+id/key_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入key" />
+    
+    <EditText
+        android:id="@+id/value_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入value" />
+
+    <EditText
+        android:id="@+id/expire_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入存活时间（-1表不过期，单位秒）" />
+    
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="expire"
+    	android:onClick="expire"
+        />
+    
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="ttl"
+    	android:onClick="ttl"
+        />
+    
+    <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="set"
+    	android:onClick="set"
+        />
+   <Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="setValueNull"
+    	android:onClick="setValueNull"
+        />
+	<Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="get"
+    	android:onClick="get"
+        />
+	
+	<Button 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:text="delete"
+    	android:onClick="delete"
+        />
+	</LinearLayout>
+</ScrollView>

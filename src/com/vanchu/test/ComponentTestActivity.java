@@ -2,6 +2,9 @@ package com.vanchu.test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -20,6 +23,7 @@ import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SharedPrefsUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
+import com.vanchu.libs.common.util.TimeUtil;
 import com.vanchu.libs.push.PushParam;
 import com.vanchu.libs.push.PushRobot;
 import com.vanchu.libs.upgrade.UpgradeCallback;
@@ -81,6 +85,47 @@ public class ComponentTestActivity extends Activity {
 		//testSqlLite(null);
 	}
 	
+	public void testTime(View v) {
+		long time	= System.currentTimeMillis();
+		SwitchLogger.d(LOG_TAG, "System.currentTimeMillis()="+time);
+		
+		Calendar calendar	= Calendar.getInstance();
+		calendar.setTimeInMillis(time);
+		int year	= calendar.get(Calendar.YEAR);
+		int month	= calendar.get(Calendar.MONTH);
+		int day		= calendar.get(Calendar.DAY_OF_MONTH);
+		int hour	= calendar.get(Calendar.HOUR_OF_DAY);
+		int minute	= calendar.get(Calendar.MINUTE);
+		int second	= calendar.get(Calendar.SECOND);
+		SwitchLogger.d(LOG_TAG, "get from calendar,"+year+"-"+(month+1)+"-"+day+" "+hour+":"+minute+":"+second);
+		GregorianCalendar gcalenar = new GregorianCalendar(year, month, day, hour, minute, second);
+		
+		SwitchLogger.d(LOG_TAG, "gcalenar.getTimeInMillis()="+gcalenar.getTimeInMillis());
+		
+		SwitchLogger.d(LOG_TAG, "tomorrow morning=============================");
+		GregorianCalendar gcalenar2 = new GregorianCalendar(year, month, day+1, 0, 0, 0);
+		SwitchLogger.d(LOG_TAG, "gcalenar2.getTimeInMillis()="+gcalenar2.getTimeInMillis());
+		
+		calendar.setTimeInMillis(gcalenar2.getTimeInMillis());
+		int year2	= calendar.get(Calendar.YEAR);
+		int month2	= calendar.get(Calendar.MONTH);
+		int day2	= calendar.get(Calendar.DAY_OF_MONTH);
+		int hour2	= calendar.get(Calendar.HOUR_OF_DAY);
+		int minute2	= calendar.get(Calendar.MINUTE);
+		int second2	= calendar.get(Calendar.SECOND);
+		SwitchLogger.d(LOG_TAG, "get from calendar2,"+year2+"-"+(month2+1)+"-"+day2+" "+hour2+":"+minute2+":"+second2);
+		
+		SwitchLogger.d(LOG_TAG, "TimeUtil====================================");
+		long ndts	= TimeUtil.nextDayTimestamp();
+		SwitchLogger.d(LOG_TAG, "nextDayTimestamp="+ndts);
+		SwitchLogger.d(LOG_TAG, "next date="+TimeUtil.timestampToDateStr(ndts) );
+	}
+	
+	public void testKvDb(View v) {
+		Intent intent	= new Intent(this, TestKvDbActivity.class);
+		startActivity(intent);
+	}
+	
 	public void testListRemove(View v) {
 		ArrayList<String> list	= new ArrayList<String>();
 		list.add("a");
@@ -97,6 +142,8 @@ public class ComponentTestActivity extends Activity {
 		
 		r	= list.remove(0);
 		SwitchLogger.d(LOG_TAG, r + " is be removed");
+		
+		
 	}
 
 	class Father {

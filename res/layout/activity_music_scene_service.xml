@@ -111,6 +111,13 @@
 	        android:onClick="getCurrentSceneType"
 	        />
 	     
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取所有场景信息"
+	        android:onClick="getMusicSceneList"
+	        />
+	     
 	     <EditText
 	         android:id="@+id/preload_num_input"
 	         android:layout_width="match_parent"

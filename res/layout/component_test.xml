@@ -16,6 +16,20 @@
 	    <Button
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:text="测试时间"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testTime" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试KvDb"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testKvDb" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
 	        android:text="测试删除list元素"
 	        android:layout_marginBottom="10dp"
 	        android:onClick="testListRemove" />

@@ -92,8 +92,13 @@ public class MusicScene {
 		editor.remove(getOfflineListenedNumKey());
 		editor.commit();
 		
+		int oldQueueSize	= getQueueSize();
 		_musicSolidQueue.setMaxSize(0);
 		_musicSolidQueue.solidify();
+		int newQueueSize	= getQueueSize();
+		if(oldQueueSize != newQueueSize && null != _callback) {
+			_callback.onQueueSizeChanged(this, newQueueSize);
+		}
 	}
 	
 	private String getOfflineListenedNumKey() {
@@ -142,9 +147,14 @@ public class MusicScene {
 	}
 	
 	public void setMaxQueueSize(int maxSize) {
+		int oldQueueSize	= getQueueSize();
 		_maxQueueSize	= maxSize;
 		_musicSolidQueue.setMaxSize(_maxQueueSize);
 		_musicSolidQueue.solidify();
+		int newQueueSize	= getQueueSize();
+		if(oldQueueSize != newQueueSize && null != _callback) {
+			_callback.onQueueSizeChanged(this, newQueueSize);
+		}
 	}
 	
 	public int getMaxQueueSize() {
@@ -625,28 +635,6 @@ public class MusicScene {
 	
 	public String getRequestUrl() {
 		return _requestUrl;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if(this == o) {
-			return true;
-		}
-		
-		if(o == null) {
-			return false;
-		}
-		
-		if(this.getClass() != o.getClass()){
-			return false;
-		}
-		
-		MusicScene another	= (MusicScene)o;
-		if(_sceneType == another.getSceneType()) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 	
 	public interface OnlineCallback {

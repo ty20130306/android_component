@@ -48,6 +48,10 @@ public class SceneMusicService extends MusicService {
 		return _musicSceneMgr.getCurrentSceneType();
 	}
 	
+	public int getCurrentPreloadingType() {
+		return _musicSceneMgr.getCurrentPreloadingType();
+	}
+	
 	public interface InitMusicSceneMgrCallback {
 		public void onMusicSceneInit(boolean succ, List<MusicSceneInfo> list);
 		public void onPreloadStatusChanged(MusicScene ms, int currentStatus);
@@ -55,7 +59,10 @@ public class SceneMusicService extends MusicService {
 	}
 	
 	public void initMusicSceneMgr(String sceneCfgUrl, final InitMusicSceneMgrCallback initSceneMgrCallback) {
-		_musicSceneMgr	= new MusicSceneMgr(this, _requestUrl);
+		if(null == _musicSceneMgr) {
+			_musicSceneMgr	= new MusicSceneMgr(this, _requestUrl);
+		}
+		
 		_musicSceneMgr.init(sceneCfgUrl, new MusicSceneMgr.InitCallback() {
 			
 			@Override

@@ -25,6 +25,8 @@ public class MusicSceneMgr {
 	
 	private static final String LOG_TAG	= MusicSceneMgr.class.getSimpleName();
 	
+	public static final int SCENE_TYPE_NONE			= -1;
+	public static final int SCENE_TYPE_NEWEST		= 1;
 	public static final int SCENE_TYPE_DEFAULT		= 2;
 	public static final int SCENE_TYPE_FAVORITE		= 3;
 	
@@ -147,6 +149,16 @@ public class MusicSceneMgr {
 		});
 	}
 	
+	private boolean inDownloadMusicSceneList(MusicScene ms) {
+		for(int i = 0; i < _downloadMusicSceneList.size(); ++i) {
+			if(ms.getSceneType() == _downloadMusicSceneList.get(i).getSceneType()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public List<MusicSceneInfo> getMusicSceneInfoList() {
 		List<MusicSceneInfo> list	= new ArrayList<MusicSceneInfo>();
 		Iterator<Entry<Integer, MusicSceneCfg>>	iter	= _typeCfgMap.entrySet().iterator();
@@ -164,10 +176,10 @@ public class MusicSceneMgr {
 			int maxQueueSize	= musicScene.getMaxQueueSize();
 			
 			boolean isPreloading	= false;
-			if(_downloadMusicSceneList.contains(musicScene)) {
+			if(inDownloadMusicSceneList(musicScene)) {
 				isPreloading	= true;
 			}
-			
+			SwitchLogger.d(LOG_TAG, "type " + musicScene.getSceneType() + ", isPreloading="+isPreloading);
 			MusicSceneCfg cfg	= entry.getValue();
 			int type	= cfg.getType();
 			String name	= cfg.getName();
@@ -192,6 +204,11 @@ public class MusicSceneMgr {
 			if(null == typeObj) {
 				continue;
 			}
+			
+			if(_typeSceneMap.containsKey(typeObj)) {
+				continue;
+			}
+			
 			int sceneType	= typeObj.intValue();
 			
 			Integer maxSizeObj	= _typeMaxQueueSizeMap.get(typeObj);
@@ -299,6 +316,14 @@ public class MusicSceneMgr {
 		saveTypeMaxQueueSizeMap();
 		
 		SwitchLogger.d(LOG_TAG, "set type " + sceneType + " max queue size to " + maxSize);
+	}
+	
+	public int getCurrentPreloadingType() {
+		if(_downloadMusicSceneList.size() <= 0) {
+			return MusicSceneMgr.SCENE_TYPE_NONE;
+		}
+	
+		return _downloadMusicSceneList.getLast().getSceneType();
 	}
 	
 	public int getMaxQueueSize(int sceneType) {
