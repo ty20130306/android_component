@@ -28,5 +28,6 @@
     <string name="title_activity_music_scene_service">MusicSceneServiceActivity</string>
     <string name="title_activity_test_music_scene_mgr">TestMusicSceneMgrActivity</string>
     <string name="title_activity_test_kv_db">TestKvDbActivity</string>
+    <string name="title_activity_test_event_center">TestEventCenterActivity</string>
 
 </resources>

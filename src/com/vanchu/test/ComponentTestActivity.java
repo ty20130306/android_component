@@ -85,6 +85,28 @@ public class ComponentTestActivity extends Activity {
 		//testSqlLite(null);
 	}
 	
+	public void testEventCenter(View v) {
+		Intent intent	= new Intent(this, TestEventCenterActivity.class);
+		startActivity(intent);
+	}
+	
+	public void testObjCmp(View v) {
+		Father f	= new Father(1);
+		Father ff	= new Father(2);
+		Father f2	= new Father(2);
+		
+		Father fr	= f;
+		
+		SwitchLogger.d(LOG_TAG, "f == f is " + cmp(f, f));
+		SwitchLogger.d(LOG_TAG, "f == f2 is " + cmp(f, f2));
+		SwitchLogger.d(LOG_TAG, "f == fr is " + cmp(f, fr));
+		SwitchLogger.d(LOG_TAG, "f == ff is " + cmp(f, ff));
+	}
+	
+	private boolean cmp(Object a, Object b) {
+		return (a == b);
+	}
+	
 	public void testTime(View v) {
 		long time	= System.currentTimeMillis();
 		SwitchLogger.d(LOG_TAG, "System.currentTimeMillis()="+time);
@@ -164,6 +186,11 @@ public class ComponentTestActivity extends Activity {
 		public void preload() {
 			SwitchLogger.d(LOG_TAG, "father.preload");
 		}
+		
+//		@Override
+//		public boolean equals(Object obj) {
+//			return false;
+//		}
 	}
 	
 	class Son extends Father {

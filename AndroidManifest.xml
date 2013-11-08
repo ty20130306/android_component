@@ -137,6 +137,10 @@
             android:name="com.vanchu.test.TestKvDbActivity"
             android:label="@string/title_activity_test_kv_db" >
         </activity>
+        <activity
+            android:name="com.vanchu.test.TestEventCenterActivity"
+            android:label="@string/title_activity_test_event_center" >
+        </activity>
     </application>
 
 </manifest>

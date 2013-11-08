@@ -16,6 +16,20 @@
 	    <Button
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:text="测试事件中心"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testEventCenter" />
+	    
+	     <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="测试对象比较"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="testObjCmp" />
+	    
+	    <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
 	        android:text="测试时间"
 	        android:layout_marginBottom="10dp"
 	        android:onClick="testTime" />
