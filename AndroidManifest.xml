@@ -6,7 +6,7 @@
     android:versionName="1.0.5" >
 
     <uses-sdk
-        android:minSdkVersion="7"
+        android:minSdkVersion="8"
         android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,6 +17,18 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="aandroid.permission.WRITE_SETTINGS" />
+    
+    
 
     <!-- 支持多种分辨率，得到正确的物理尺寸 -->
     <supports-screens
@@ -25,9 +37,11 @@
         android:normalScreens="true"
         android:resizeable="true"
         android:smallScreens="true" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
+        android:name=".TestApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -41,12 +55,33 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent100645243" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.vanchu.libs.upgrade.UpgradeActivity"
             android:label="@string/title_activity_upgrade" >
         </activity>
         <activity
             android:name="com.vanchu.test.SecondActivity"
             android:label="@string/title_activity_second" >
+        </activity>
+        <activity android:name="com.vanchu.sample.GestureLockSampleActivity" >
+        </activity>
+        <activity android:name="com.vanchu.sample.SmileSampleActivity" >
+        </activity>
+        <activity android:name="com.vanchu.sample.ScrollListViewSampleActivity" >
+        </activity>
+        <activity android:name="com.vanchu.sample.ImageLoadSampleActivity" >
         </activity>
 
         <!-- 插件系统 -->
@@ -68,6 +103,17 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
+        <!-- 百度定位sdk service -->
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" >
+            <intent-filter>
+                <action android:name="com.baidu.location.service_v2.2" >
+                </action>
+            </intent-filter>
+        </service>
+        
 
         <activity
             android:name="com.vanchu.test.WebCacheActivity"
@@ -122,7 +168,7 @@
             android:label="@string/title_activity_db" >
         </activity>
         <activity
-            android:name="com.vanchu.test.TestCfgCenterActivity"
+            android:name="com.vanchu.test.TestCfgMgrActivity"
             android:label="@string/title_activity_test_cfg_center" >
         </activity>
         <activity
@@ -140,6 +186,58 @@
         <activity
             android:name="com.vanchu.test.TestEventCenterActivity"
             android:label="@string/title_activity_test_event_center" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.VanchuTabSampleActivity"
+            android:label="@string/title_activity_vanchu_tab_sample" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.QqSdkSampleActivity"
+            android:label="@string/title_activity_qq_sdk_sample" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.SinaSdkSampleActivity"
+            android:label="@string/title_activity_sina_sdk_sample" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.AccountSystemActivity"
+            android:label="@string/title_activity_account_system" >
+        </activity>
+        <activity android:name="com.vanchu.sample.PictureBrowserSampleActivity" >
+        </activity>
+        <activity android:name="com.vanchu.sample.slipping.GuimiSlippingActivity" >
+        </activity>
+        <activity
+            android:name="com.vanchu.test.wxapi.WXEntryActivity"
+            android:exported="true"
+            android:label="@string/title_activity_wxentry" >
+        </activity>
+        <activity android:name="com.vanchu.sample.AddressActivity" >
+        </activity>
+        <activity
+            android:name="com.vanchu.test.TestCachedImageLoaderActivity"
+            android:label="@string/title_activity_test_cached_image_loader" >
+        </activity>
+        <activity
+            android:name="com.vanchu.test.AnotherTestActivity"
+            android:label="@string/title_activity_another_test" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.LocationActivity"
+            android:label="@string/title_activity_location" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.SocketClientSampleActivity"
+            android:label="@string/title_activity_socket_channel_sample"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.VasClientSampleActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.vanchu.sample.TalkClientSampleActivity"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

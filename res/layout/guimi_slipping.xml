@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <RadioGroup android:id="@+id/radiogroup_slipping"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        
+        <RadioButton android:id="@+id/radio_random_look"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+             android:padding="5dp"
+             android:layout_weight="1.0"
+            android:text="随便看看"/>
+        
+        <RadioButton android:id="@+id/radio_newest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_weight="1.0"
+            android:text="新鲜出炉"/>
+        
+        <RadioButton 
+            android:id="@+id/radio_newest_talk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:text="热门说说"/>
+    </RadioGroup>
+
+     <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager_slipping"
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent" />   
+</LinearLayout>

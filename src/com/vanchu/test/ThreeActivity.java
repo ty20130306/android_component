@@ -20,17 +20,37 @@ import android.view.Menu;
 import android.view.View;
 
 public class ThreeActivity extends Activity {
-	private static final String LOG_TAG	= SecondActivity.class.getSimpleName();
+	private static final String LOG_TAG	= ThreeActivity.class.getSimpleName();
 	
 	private ProgressDialog	_progressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_three);
 		SwitchLogger.setPrintLog(true);
+		
+		Intent intent	= new Intent(this, TestKvDbActivity.class);
+		startActivityForResult(intent, 0);
+		//setContentView(R.layout.activity_three);
+		
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		SwitchLogger.d(LOG_TAG, "onDestroy");
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == 0 && resultCode == RESULT_OK) {
+			//finish();
+			return ;
+		}
+		
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

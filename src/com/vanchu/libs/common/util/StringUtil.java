@@ -9,6 +9,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtil {
 	public static final int BUFFER_SIZE	= 8192;
@@ -48,4 +50,27 @@ public class StringUtil {
         
         return hex.toString();
     }
+	
+	public static boolean isLegalEmail(String email) {
+		String strPattern = "^[a-zA-Z0-9][a-zA-Z0-9\\.\\-_]*[a-zA-Z0-9]"
+							+ "@[a-zA-Z0-9][a-zA-Z0-9\\-_]*[a-zA-Z0-9]\\."
+							+ "([a-zA-Z0-9][a-zA-Z0-9\\-_]*[a-zA-Z0-9]\\.)*[a-zA-Z0-9]*$";
+
+		Pattern p = Pattern.compile(strPattern);
+		Matcher m = p.matcher(email);
+		return m.matches();
+	}
+	
+	public static String getNameFromEmail(String email) {
+		String nameAddr[]	= email.split("@");
+		return nameAddr[0];
+	}
+	
+	public static boolean isLegalPhoneNumber(String phoneNumber) {
+		String strPattern = "^((13[0-9])|(14[5,7])|(15[0-9])|(18[0-9]))[0-9]{8}$";
+
+		Pattern p = Pattern.compile(strPattern);
+		Matcher m = p.matcher(phoneNumber);
+		return m.matches();
+	}
 }

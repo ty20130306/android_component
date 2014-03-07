@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/btn_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="本地图片" />
+
+            <Button
+                android:id="@+id/btn_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="本地裁剪" />
+
+            <Button
+                android:id="@+id/btn_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="拍照图片" />
+
+            <Button
+                android:id="@+id/btn_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="拍照裁剪" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_0"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/iv_1"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_2"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_3"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_4"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/iv_5"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_6"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_7"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_8"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/iv_9"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_10"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_11"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/iv_12"
+            android:layout_width="70dip"
+            android:layout_height="70dip"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
+
+</LinearLayout>

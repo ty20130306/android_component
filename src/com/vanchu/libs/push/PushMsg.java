@@ -12,7 +12,8 @@ import com.vanchu.libs.common.util.SwitchLogger;
 import android.os.Bundle;
 
 public class PushMsg {
-	
+	private static final String LOG_TAG	= PushMsg.class.getSimpleName();
+			
 	public static final int MSG_TYPE_NONE		= 0;
 	
 	private boolean	_show;
@@ -92,6 +93,8 @@ public class PushMsg {
 				String key	= (String)iterator.next();
 				_extra.putString(key, extra.getString(key));
 			}
+		} else {
+			SwitchLogger.d(LOG_TAG, "extra not found" );
 		}
 	}
 	
@@ -103,6 +106,8 @@ public class PushMsg {
 			} else {
 				_show	= true;
 			}
+		} else {
+			SwitchLogger.e(LOG_TAG, "show not found" );
 		}
 	}
 	
@@ -114,6 +119,8 @@ public class PushMsg {
 			} else {
 				_force	= true;
 			}
+		} else {
+			SwitchLogger.e(LOG_TAG, "force not found" );
 		}
 	}
 	
@@ -122,6 +129,7 @@ public class PushMsg {
 			_ticker	= data.getString("ticker");
 		} else {
 			_ticker	= _text;
+			SwitchLogger.e(LOG_TAG, "ticker not found, set text to ticker" );
 		}
 	}
 	
@@ -133,6 +141,8 @@ public class PushMsg {
 				String key	= (String)iterator.next();
 				_cfg.put(key, extra.getString(key));
 			}
+		} else {
+			SwitchLogger.e(LOG_TAG, "cfg not found" );
 		}
 	}
 	
@@ -148,6 +158,7 @@ public class PushMsg {
 			parseTicker(data);
 			parseExtra(data);
 		} else {
+			SwitchLogger.e(LOG_TAG, "data not found" );
 			_show	= false;
 			_type	= MSG_TYPE_NONE;
 			_title	= "";

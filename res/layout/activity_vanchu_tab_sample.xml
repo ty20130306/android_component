@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 导航界面 -->
+<TabHost
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@android:color/darker_gray"
+	android:id="@android:id/tabhost">
+	<RelativeLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+		<!-- 隐藏的TabWidget,visibility="gone" -->
+		<TabWidget 
+			android:id="@android:id/tabs"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"	
+			android:visibility="gone"	/>
+		<!-- 标签内容 -->
+		<FrameLayout 
+			android:id="@android:id/tabcontent"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1.0"
+			android:layout_above="@+id/navigation_tab_group"/>
+		<!-- 用户可见的“tabs”实际上是一组按钮 -->
+		<!-- 注意：checkedButton=“@+id/tab1“，这使得默认选中第一个按钮 -->
+		<RadioGroup 
+			android:id="@+id/navigation_tab_group"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:gravity="center_vertical"				
+			android:orientation="horizontal"
+			android:background="@android:color/background_dark"
+			android:checkedButton="@+id/navigation_tab1">
+			<!-- 第一个标签，注意button属性设置成null，以此去掉自带的radio button -->
+			<!-- 注意：id="@id/tab1"-->
+			<RadioButton 
+				android:id="@id/navigation_tab1"
+				android:tag="tab1"
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:textStyle="bold"
+				android:textColor="@android:color/white"
+				android:button="@null"
+				android:background="@drawable/tab_bg_selector"
+				android:paddingTop="5dp"
+				android:drawableTop="@android:drawable/ic_menu_camera"
+				android:text="照相1"/>	
+			<ImageView 
+				android:layout_width="1dp"
+				android:layout_height="fill_parent"		
+				android:background="@android:color/white"/>
+			<RadioButton 
+				android:id="@+id/navigation_tab2"
+				android:tag="tab2"
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:textStyle="bold"
+				android:textColor="@android:color/white"
+				android:button="@null"
+				android:background="@drawable/tab_bg_selector"
+				android:paddingTop="5dp"
+				android:drawableTop="@android:drawable/ic_menu_call"
+				android:text="电话2"/>	
+			<ImageView 
+				android:layout_width="1dp"
+				android:layout_height="fill_parent"		
+				android:background="@android:color/white"/>
+			<RadioButton 
+				android:id="@+id/navigation_tab3"
+				android:tag="tab3"
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:textStyle="bold"
+				android:textColor="@android:color/white"
+				android:button="@null"
+				android:background="@drawable/tab_bg_selector"
+				android:paddingTop="5dp"
+				android:drawableTop="@android:drawable/ic_menu_search"
+				android:text="tab3"/>	
+			<ImageView 
+				android:layout_width="1dp"
+				android:layout_height="fill_parent"		
+				android:background="@android:color/white"/>
+			<RadioButton 
+				android:id="@+id/navigation_tab4"
+				android:tag="tab4"
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:textStyle="bold"
+				android:textColor="@android:color/white"
+				android:button="@null"
+				android:background="@drawable/tab_bg_selector"
+				android:paddingTop="5dp"
+				android:drawableTop="@android:drawable/ic_menu_edit"
+				android:text="tab4"/>	
+			<ImageView 
+				android:layout_width="1dp"
+				android:layout_height="fill_parent"		
+				android:background="@android:color/white"/>
+			<RadioButton 
+				android:id="@+id/navigation_tab5"
+				android:tag="tab5"
+				android:layout_width="fill_parent"	
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:textStyle="bold"
+				android:textColor="@android:color/white"
+				android:button="@null"
+				android:background="@drawable/tab_bg_selector"
+				android:paddingTop="5dp"
+				android:drawableTop="@android:drawable/ic_menu_save"
+				android:text="tab5"/>	
+		</RadioGroup>	
+	</RelativeLayout> 
+</TabHost>

@@ -1,0 +1,101 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical" >
+	    
+	   <EditText
+	        android:id="@+id/email"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:maxLines="8"
+	        android:inputType="textEmailAddress"
+	        android:hint="输入邮箱" />
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="验证邮箱是否正确书写"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="validateEmail" />
+	   
+	   <EditText
+	        android:id="@+id/phone_number"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:maxLines="8"
+	        android:hint="输入手机号码" />
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="验证手机号码是否正确书写"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="validatePhoneNumber" />
+	   
+	   <EditText
+	        android:id="@+id/password"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:maxLines="8"
+	        android:hint="输入密码" />
+	   
+	   
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件注册"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="registerLib" />
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件登录"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="loginLib" />
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件退出"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="logoutLib" />
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件验证登陆"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="validateLib" />
+	   
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件获取用户信息"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="getInfoLib" />
+	   
+
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="登录"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="login" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="注册"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="register" />
+	    
+	    
+	</LinearLayout>
+</ScrollView>	    

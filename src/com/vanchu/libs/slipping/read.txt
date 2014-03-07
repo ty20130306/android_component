@@ -1,0 +1,23 @@
+使用说明：
+一)初始化：
+SlippingFragment slippingFragment = new SlippingFragment(FragmentActivity activity,ArrayList<Fragment> fragments);
+				
+参数说明：
+activity  
+fragments  滑动页面加载的Fragment
+
+二)调用方式
+
+第一种：
+若RadioGroup中包含除了RadioButton 之外的组件元素，必须调用此方法；
+若RadioGroup中只有RadioButton组件也可以使用此方法
+slippingFragment.initFragment(SlippingViewEntity entity);
+参数说明：
+entity ：ViewPager ，RadioGroup，List<RadioButton>
+
+
+第二种：只针对如果RadioGroup中值包含RadioButton 没有其他组件可以调用此方法
+slippingFragment.initFragment(ViewPager viewPager,RadioGroup radioGroup);
+参数说明：
+viewPager   --对象
+radioGroup  --对象

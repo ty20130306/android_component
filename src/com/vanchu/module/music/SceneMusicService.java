@@ -154,6 +154,14 @@ public class SceneMusicService extends MusicService {
 		return list;
 	}
 	
+	public int getFavoriteMusicNum() {
+		MusicDbManager dbManager	= new MusicDbManager(this);
+		int size	= dbManager.getDbSize();
+		dbManager.close();
+		
+		return size;
+	}
+	
 	public void likeMusic() {
 		if(null == _currentMusicData) {
 			SwitchLogger.e(LOG_TAG, "current music data is null");
@@ -233,6 +241,7 @@ public class SceneMusicService extends MusicService {
 			public void onDone(MusicData data) {
 				if(null == data) {
 					if(null != _callback) {
+						setCurrentSceneType(MusicSceneMgr.SCENE_TYPE_DEFAULT);
 						_callback.onError(ERR_FETCH_ONLINE_MUSIC_DATA_FAIL);
 					}
 					SwitchLogger.e(LOG_TAG, "nextOnlineMusicData fetch fail, data is null" );

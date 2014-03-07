@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ActivityNotFoundException;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * @author wolf
@@ -262,4 +264,11 @@ public class ActivityUtil {
         
         return metaValue;
     }
+	
+	public static void hideInputPanel(Activity activity) {
+		InputMethodManager	imm	= (InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+		if(imm.isActive()) {
+			imm.hideSoftInputFromWindow(activity.getCurrentFocus().getApplicationWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS );
+		}
+	}
 }

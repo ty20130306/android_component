@@ -1,29 +1,29 @@
 package com.vanchu.module.music;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Handler;
-
 import com.vanchu.libs.common.container.SolidQueue;
 import com.vanchu.libs.common.task.Downloader;
 import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
+import com.vanchu.libs.webCache.WebCache;
 
 public class MusicScene {
 	
 	private static final String LOG_TAG	= MusicScene.class.getSimpleName();
 	
+	public static final int DOWNLOAD_STATUS_NONE		= 0;
 	public static final int DOWNLOAD_STATUS_STOPPED		= 1;
 	public static final int DOWNLOAD_STATUS_RUNNING		= 2;
 	public static final int DOWNLOAD_STATUS_PAUSED		= 3;
@@ -47,7 +47,7 @@ public class MusicScene {
 	
 	protected int	_eachFetchNum		= DEFAULT_EACH_FETCH_NUM;
 	
-	private int	_downloadStatus			= DOWNLOAD_STATUS_STOPPED;
+	private int	_downloadStatus			= DOWNLOAD_STATUS_NONE;
 	private Downloader	_audioDownloader	= null;
 	protected List<MusicInfo> _downloadList	= new ArrayList<MusicInfo>();
 	
@@ -219,8 +219,13 @@ public class MusicScene {
 	}
 	
 	private void changeDownloadStatus(int newStatus) {
+		if(_downloadStatus == newStatus) {
+			return ;
+		}
+		
 		SwitchLogger.d(LOG_TAG, "download status change from " + downloadStatusStr(_downloadStatus) 
 								+ " to " + downloadStatusStr(newStatus) );
+		
 		_downloadStatus	= newStatus;
 		if(null != _callback) {
 			_callback.onPreloadStatusChanged(this, _downloadStatus);
@@ -297,6 +302,33 @@ public class MusicScene {
 					_prefs.edit().putInt(getOfflineListenedNumKey(), _offlineListenedNum).commit();
 				}
 			}
+			WebCache webCache = WebCache.getInstance(_context,"music_index");
+			WebCache.Settings settings = new WebCache.Settings();
+			settings.capacity = 100;
+			settings.timeout = 10000; // millisecond
+			webCache.setup(settings);
+			WebCache.GetCallback webcacheCallback = new WebCache.GetCallback() {
+
+				@Override
+				public void onDone(String url, File file, Object param) {
+					// TODO Auto-generated method stub
+					SwitchLogger.d(LOG_TAG, "download cd_picture suc:"+mi.getImg());
+				}
+
+				@Override
+				public void onFail(String url, int reason, Object param) {
+					// TODO Auto-generated method stub
+					SwitchLogger.d(LOG_TAG, "download cd_picture fail:"+mi.getImg());
+				}
+
+				@Override
+				public void onProgress(String url, int progress, Object param) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			};
+			webCache.get( mi.getImg(), webcacheCallback, null, false);
 			
 			if(null != _callback) {
 				_callback.onQueueSizeChanged(ms, ms.getQueueSize());
@@ -429,7 +461,7 @@ public class MusicScene {
 				params.put("num", String.valueOf(fetchNum));
 				params.put("type", String.valueOf(_sceneType));
 				
-				String response	= NetUtil.httpPostRequest(_requestUrl, params, 3);
+				String response	= NetUtil.httpPostRequest(_requestUrl, params, 1);
 				SwitchLogger.d(LOG_TAG, "response=" + response);
 
 				if(null == response){
@@ -515,6 +547,11 @@ public class MusicScene {
 				return ;
 			}
 			
+			if(NetUtil.NETWORK_TYPE_WIFI != NetUtil.getNetworkType(_context)) {
+				changeDownloadStatus(DOWNLOAD_STATUS_STOPPED);
+				return ;
+			}
+			
 			changeDownloadStatus(DOWNLOAD_STATUS_RUNNING);
 		}
 
@@ -592,9 +629,9 @@ public class MusicScene {
 				HashMap<String, String> params	= new HashMap<String, String>();
 				params.put("newbie", getAndUpdateNewbieFlag());
 				params.put("num", String.valueOf(_eachFetchNum));
-				params.put("sceneType", String.valueOf(_sceneType));
+				params.put("type", String.valueOf(_sceneType));
 				
-				String response	= NetUtil.httpPostRequest(_requestUrl, params, 3);
+				String response	= NetUtil.httpPostRequest(_requestUrl, params, 1);
 				SwitchLogger.d(LOG_TAG, "response=" + response);
 
 				if(response == null){

@@ -362,4 +362,12 @@ public class MusicSceneServiceActivity extends Activity {
 		List<MusicSceneInfo> list	= _service.getMusicSceneList();
 		printSceneInfo(list);
 	}
+	
+	public void getFavoriteMusicNum(View v) {
+		int num 	= _service.getFavoriteMusicNum();
+		String msg	= "favorite music num = " + num;
+		
+		SwitchLogger.d(LOG_TAG, msg);
+		Tip.show(this, msg);
+	}
 }

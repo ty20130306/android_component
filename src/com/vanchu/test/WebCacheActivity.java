@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WebCacheActivity extends Activity {
+	
+	private static final String LOG_TAG	= WebCacheActivity.class.getSimpleName();
+	
     private ButtonTestTcpOnClickListener _btnTestTcpOnClickListener;
     private ButtonTestLruOnClickListener _btnTestLruOnClickListener;
     private ButtonTestSoundOnClickListener _btnTestSoundOnClickListener;
@@ -148,7 +151,7 @@ public class WebCacheActivity extends Activity {
                 
                 @Override
                 public void onProgress(String url, int progress, Object param) {
-                	SwitchLogger.d("onProgress", "--------------progress="+progress);
+                	//SwitchLogger.d("onProgress", "--------------progress="+progress);
                 }
             };
             
@@ -158,8 +161,15 @@ public class WebCacheActivity extends Activity {
             
             
             Log.d("", "begin request ,list.size="+list.size());
+            
             for(int i = 0; i < list.size(); ++i) {
             	Log.d("", "request " + list.get(i));
+            	if(cache.inCache(list.get(i))) {
+            		SwitchLogger.d(LOG_TAG, "url "+i+" is in cache" );
+            	} else {
+            		SwitchLogger.d(LOG_TAG, "url "+i+" is not in cache" );
+            	}
+            	
                 cache.get(list.get(i), listener, i, false);
             }
         }

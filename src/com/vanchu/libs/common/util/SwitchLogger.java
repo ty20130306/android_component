@@ -8,24 +8,36 @@ public class SwitchLogger {
 	
 	public static void d(String tag, String msg){
 		if(isPrintLog()){
-			Log.d(tag, msg);
+			if(null == msg) {
+				Log.d(tag, "null");
+			} else {
+				Log.d(tag, msg);
+			}
 		}
 	}
 	
 	public static void w(String tag, String msg){
 		if(isPrintLog()){
-			Log.w(tag, msg);
+			if(null == msg) {
+				Log.w(tag, "null");
+			} else {
+				Log.w(tag, msg);
+			}
 		}
 	}
 	
 	public static void e(String tag, String msg){
 		if(isPrintLog()){
-			Log.e(tag, msg);
+			if(null == msg) {
+				Log.e(tag, "null");
+			} else {
+				Log.e(tag, msg);
+			}
 		}
 	}
 	
 	public static void e(Exception e){
-		if(isPrintLog()){
+		if(isPrintLog() && null != e){
 			e.printStackTrace();
 		}
 	}

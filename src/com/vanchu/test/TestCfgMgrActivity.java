@@ -3,7 +3,7 @@ package com.vanchu.test;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.vanchu.libs.cfgCenter.CfgCenter;
+import com.vanchu.libs.common.task.CfgMgr;
 import com.vanchu.libs.common.util.SwitchLogger;
 
 import android.os.Bundle;
@@ -11,18 +11,18 @@ import android.app.Activity;
 import android.view.Menu;
 import android.view.View;
 
-public class TestCfgCenterActivity extends Activity {
+public class TestCfgMgrActivity extends Activity {
 
-	private static final String LOG_TAG	= TestCfgCenterActivity.class.getSimpleName();
+	private static final String LOG_TAG	= TestCfgMgrActivity.class.getSimpleName();
 	
-	private CfgCenter	_cfgCenter	= null;
+	private CfgMgr	_cfgMgr	= null;
 	private static final String TEST_CFG_URL	= "http://pesiwang.devel.rabbit.oa.com/test_cfg_center.php";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_test_cfg_center);
-		_cfgCenter	= new CfgCenter(this);
+		_cfgMgr	= CfgMgr.getInstance(getApplicationContext());
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class TestCfgCenterActivity extends Activity {
 	
 	public void testGet(View v) {
 		SwitchLogger.d(LOG_TAG, "CfgCenter testGet");
-		_cfgCenter.get(TEST_CFG_URL, new CfgCenter.GetCallback() {
+		_cfgMgr.get(TEST_CFG_URL, new CfgMgr.GetCallback() {
 			
 			@Override
 			public JSONObject onResponse(String url, String response) {
@@ -79,7 +79,7 @@ public class TestCfgCenterActivity extends Activity {
 
 	public void testGetLocal(View v) {
 		SwitchLogger.d(LOG_TAG, "CfgCenter testGetLocal");
-		JSONObject localCfg	= _cfgCenter.getLocal(TEST_CFG_URL);
+		JSONObject localCfg	= _cfgMgr.getLocal(TEST_CFG_URL);
 		if(null == localCfg) {
 			SwitchLogger.d(LOG_TAG, "CfgCenter.getLocal return null");
 			return ;
@@ -90,6 +90,6 @@ public class TestCfgCenterActivity extends Activity {
 	
 	public void testRemoveLocal(View v) {
 		SwitchLogger.d(LOG_TAG, "CfgCenter testRemoveLocal");
-		_cfgCenter.removeLocal(TEST_CFG_URL);
+		_cfgMgr.removeLocal(TEST_CFG_URL);
 	}
 }

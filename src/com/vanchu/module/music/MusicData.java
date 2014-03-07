@@ -27,7 +27,7 @@ public class MusicData {
 		_lyricPath	= lyricPath;
 		_imgUrl		= imgUrl;
 	}
-	
+//	
 	public String getId() {
 		return _id;
 	}

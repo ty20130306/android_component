@@ -29,5 +29,14 @@
     <string name="title_activity_test_music_scene_mgr">TestMusicSceneMgrActivity</string>
     <string name="title_activity_test_kv_db">TestKvDbActivity</string>
     <string name="title_activity_test_event_center">TestEventCenterActivity</string>
+    <string name="title_activity_vanchu_tab_sample">VanchuTabSampleActivity</string>
+    <string name="title_activity_qq_sdk_sample">QqSdkSampleActivity</string>
+    <string name="title_activity_sina_sdk_sample">SinaSdkSampleActivity</string>
+    <string name="title_activity_account_system">AccountSystemActivity</string>
+    <string name="title_activity_wxentry">WXEntryActivity</string>
+    <string name="title_activity_test_cached_image_loader">TestCachedImageLoaderActivity</string>
+    <string name="title_activity_another_test">AnotherTestActivity</string>
+    <string name="title_activity_location">LocationActivity</string>
+    <string name="title_activity_socket_channel_sample">SocketChannelSampleActivity</string>
 
 </resources>

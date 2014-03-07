@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 
 public class MusicDbManager {
@@ -116,7 +117,7 @@ public class MusicDbManager {
 		
 		try {
 			Cursor c	= _db.rawQuery("SELECT * FROM " + MusicDbHelper.TABLE_FAVORITE + " order by " 
-										+ MusicDbHelper.TABLE_FAVORITE_COLUMN_UPDATE_TIME + " DESC "
+										+ MusicDbHelper.TABLE_FAVORITE_COLUMN_UPDATE_TIME + " ASC "
 										+ "LIMIT " + limit + " OFFSET " + offset, null);
 			if(c.moveToFirst()){
 				do {
@@ -133,6 +134,18 @@ public class MusicDbManager {
 		}
 		
 		return list;
+	}
+	
+	public int getDbSize() {
+		try {
+			String sql	= "SELECT COUNT(*) FROM " + MusicDbHelper.TABLE_FAVORITE;
+			SQLiteStatement statement	= _db.compileStatement(sql);
+			long dbSize	= statement.simpleQueryForLong();
+			return (int)(dbSize);
+		} catch (Exception e) {
+			SwitchLogger.e(e);
+			return 0;
+		}
 	}
 	
 	public List<MusicData> getAllMusicData() {

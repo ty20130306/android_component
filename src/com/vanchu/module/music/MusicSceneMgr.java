@@ -16,8 +16,8 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.vanchu.libs.cfgCenter.CfgCenter;
 import com.vanchu.libs.common.container.SolidQueue;
+import com.vanchu.libs.common.task.CfgMgr;
 import com.vanchu.libs.common.util.SwitchLogger;
 import com.vanchu.libs.music.MusicService;
 
@@ -42,7 +42,7 @@ public class MusicSceneMgr {
 	private Context	_context;
 	private String	_requestUrl;
 	
-	private CfgCenter	_cfgCenter;
+	private CfgMgr	_cfgMgr;
 	private Map<Integer, MusicSceneCfg>	_typeCfgMap;
 	private Map<Integer, MusicScene>	_typeSceneMap;
 	private Map<Integer, Integer>		_typeMaxQueueSizeMap;
@@ -54,7 +54,7 @@ public class MusicSceneMgr {
 		_context		= context;
 		_requestUrl		= requestUrl;
 		
-		_cfgCenter		= new CfgCenter(_context);
+		_cfgMgr		= CfgMgr.getInstance(_context.getApplicationContext());
 		_typeCfgMap		= new HashMap<Integer, MusicSceneCfg>();
 		_typeSceneMap	= new LinkedHashMap<Integer, MusicScene>();
 		_typeMaxQueueSizeMap	= new HashMap<Integer, Integer>();
@@ -101,7 +101,7 @@ public class MusicSceneMgr {
 	}
  	
 	public void init(String sceneCfgUrl, final InitCallback initCallback) {
-		_cfgCenter.get(sceneCfgUrl, new CfgCenter.GetCallback() {
+		_cfgMgr.get(sceneCfgUrl, new CfgMgr.GetCallback() {
 			
 			@Override
 			public JSONObject onResponse(String url, String response) {
@@ -160,36 +160,38 @@ public class MusicSceneMgr {
 	}
 	
 	public List<MusicSceneInfo> getMusicSceneInfoList() {
-		List<MusicSceneInfo> list	= new ArrayList<MusicSceneInfo>();
-		Iterator<Entry<Integer, MusicSceneCfg>>	iter	= _typeCfgMap.entrySet().iterator();
-		while(iter.hasNext()) {
-			Entry<Integer, MusicSceneCfg> entry	= iter.next();
-			Integer typeObj	= entry.getKey();
-			if(null == typeObj) {
-				continue;
+		synchronized (_downloadMusicSceneList) {
+			List<MusicSceneInfo> list	= new ArrayList<MusicSceneInfo>();
+			Iterator<Entry<Integer, MusicSceneCfg>>	iter	= _typeCfgMap.entrySet().iterator();
+			while(iter.hasNext()) {
+				Entry<Integer, MusicSceneCfg> entry	= iter.next();
+				Integer typeObj	= entry.getKey();
+				if(null == typeObj) {
+					continue;
+				}
+
+				MusicScene	musicScene	= _typeSceneMap.get(typeObj);
+				if(null == musicScene) {
+					continue;
+				}
+				int maxQueueSize	= musicScene.getMaxQueueSize();
+
+				boolean isPreloading	= false;
+				if(inDownloadMusicSceneList(musicScene)) {
+					isPreloading	= true;
+				}
+				SwitchLogger.d(LOG_TAG, "type " + musicScene.getSceneType() + ", isPreloading="+isPreloading);
+				MusicSceneCfg cfg	= entry.getValue();
+				int type	= cfg.getType();
+				String name	= cfg.getName();
+
+				int queueSize	= musicScene.getQueueSize();
+				MusicSceneInfo	info	= new MusicSceneInfo(type, name, queueSize, maxQueueSize, isPreloading);
+				list.add(info);
 			}
-			
-			MusicScene	musicScene	= _typeSceneMap.get(typeObj);
-			if(null == musicScene) {
-				continue;
-			}
-			int maxQueueSize	= musicScene.getMaxQueueSize();
-			
-			boolean isPreloading	= false;
-			if(inDownloadMusicSceneList(musicScene)) {
-				isPreloading	= true;
-			}
-			SwitchLogger.d(LOG_TAG, "type " + musicScene.getSceneType() + ", isPreloading="+isPreloading);
-			MusicSceneCfg cfg	= entry.getValue();
-			int type	= cfg.getType();
-			String name	= cfg.getName();
-			
-			int queueSize	= musicScene.getQueueSize();
-			MusicSceneInfo	info	= new MusicSceneInfo(type, name, queueSize, maxQueueSize, isPreloading);
-			list.add(info);
+
+			return list;
 		}
-		
-		return list;
 	}
 	
 	public void setMusicSceneMgrCallback(MusicSceneMgrCallback callback) {
@@ -231,12 +233,19 @@ public class MusicSceneMgr {
 				public void onPreloadStatusChanged(MusicScene ms, int currentStatus) {
 					synchronized (_downloadMusicSceneList) {
 						if(MusicScene.DOWNLOAD_STATUS_STOPPED == currentStatus) {
-							_downloadMusicSceneList.remove(ms);
+							if(_downloadMusicSceneList.size() > 0) {
+								MusicScene lastMusicScene	= _downloadMusicSceneList.getLast();
+								if(lastMusicScene.getSceneType() == ms.getSceneType()) {
+									_downloadMusicSceneList.removeLast();
+								}
+							}
 							
 							if(_downloadMusicSceneList.size() > 0) {
-								SwitchLogger.d(LOG_TAG, "current music scene download finished, start next one");
-								MusicScene nextMusicScene	= _downloadMusicSceneList.removeLast();
+								MusicScene nextMusicScene	= _downloadMusicSceneList.getLast();
 								nextMusicScene.preload();
+								SwitchLogger.d(LOG_TAG, "musicScene of type " + ms.getSceneType()
+										+ " download finished, start next one, next type="
+										+ nextMusicScene.getSceneType());
 							} else {
 								SwitchLogger.d(LOG_TAG, "all music scene download finished");
 							}
@@ -456,7 +465,6 @@ public class MusicSceneMgr {
 			
 			// stop preloading
 			if(num <= 0) {
-				_downloadMusicSceneList.remove(ms);
 				setMaxQueueSize(sceneType, 0);
 				ms.stopPreloading();
 				SwitchLogger.e(LOG_TAG, "num <= 0, clear preloading music, scene type="+sceneType+",num="+num);
@@ -464,17 +472,14 @@ public class MusicSceneMgr {
 			}
 			
 			setMaxQueueSize(sceneType, num);
-			if(-1 == _downloadMusicSceneList.indexOf(ms)) {
+			if( ! inDownloadMusicSceneList(ms) ) {
 				_downloadMusicSceneList.addFirst(ms);
 			}
 
-			if(_downloadMusicSceneList.size() > 1) {
-				MusicScene s	= _downloadMusicSceneList.getLast();
-				SwitchLogger.e(LOG_TAG, "scene type " + s.getSceneType() + " is preloading, wait for it");
-				return ;
-			}
-			
-			if(_downloadMusicSceneList.size() <= 1) {
+			if(_downloadMusicSceneList.size() >= 2) {
+				MusicScene lastMusicScene	= _downloadMusicSceneList.getLast();
+				SwitchLogger.e(LOG_TAG, "scene type " + lastMusicScene.getSceneType() + " is preloading, wait for it");
+			} else {
 				ms.preload();
 			}
 		}

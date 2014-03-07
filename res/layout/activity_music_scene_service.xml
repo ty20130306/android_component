@@ -131,5 +131,11 @@
 	        android:text="预加载"
 	        android:onClick="preload"
 	        />
+	     <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="获取红心歌单数量"
+	        android:onClick="getFavoriteMusicNum"
+	        />
 	</LinearLayout>
 </ScrollView>

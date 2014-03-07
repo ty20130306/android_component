@@ -12,10 +12,10 @@ public class KvDb {
 	private SqlDbManager	_sqlDbManager;
 	private KvDbCfg			_kvDbCfg;
 	
-	public KvDb(Context context, String dbName) {
+	public KvDb(Context context, String dbName, KvDbCfg kvDbCfg) {
 		_dbName			= dbName;	
 		_sqlDbManager	= new SqlDbManager(context, dbName);
-		_kvDbCfg		= new KvDbCfg();
+		_kvDbCfg		= kvDbCfg;
 	}
 	
 	private void lru() {
@@ -92,8 +92,7 @@ public class KvDb {
 		}
 		
 		// update touch time & get ttl
-		md.setTouchTime(System.currentTimeMillis());
-		_sqlDbManager.set(md);
+		_sqlDbManager.updateTouchTime(key);
 		if(MetaData.NEVER_EXPIRE == md.getExpire()) {
 			return MetaData.NEVER_EXPIRE;
 		} else {
@@ -104,7 +103,7 @@ public class KvDb {
 	/**
 	 * 设置key的过期时间
 	 * @param key
-	 * @param millis
+	 * @param millis 存活时间，单位毫秒，永不过期使用宏MetaData.NEVER_EXPIRE
 	 * @return 成功返回true，失败返回false
 	 */
 	public boolean expire(String key, long millis) {
@@ -120,22 +119,24 @@ public class KvDb {
 		}
 		
 		long currentTime	= System.currentTimeMillis();
-		if(MetaData.NEVER_EXPIRE == millis) {
-			md.setExpire(MetaData.NEVER_EXPIRE);
-		} else {
-			md.setExpire(currentTime + millis);
+		if(MetaData.NEVER_EXPIRE != md.getExpire() && md.getExpire() < currentTime) {
+			_sqlDbManager.delete(key);
+			return false;
 		}
 		
-		md.setTouchTime(currentTime);
+		long expire		= currentTime + millis;
+		if(MetaData.NEVER_EXPIRE == millis){
+			expire	= MetaData.NEVER_EXPIRE;
+		}
 		
-		return _sqlDbManager.set(md);
+		return _sqlDbManager.updateExpireAndTouchTime(key, expire);
 	}
 	
 	/**
 	 * 保存数据
 	 * @param key
 	 * @param value
-	 * @param expire
+	 * @param expire 存活时间，单位毫秒，永不过期使用宏MetaData.NEVER_EXPIRE
 	 * @return 成功返回true，失败返回false
 	 */
 	public boolean set(String key, String value, long expire) {
@@ -149,9 +150,9 @@ public class KvDb {
 		long currentTime	= System.currentTimeMillis();
 		MetaData md	= null;
 		if(MetaData.NEVER_EXPIRE == expire) {
-			md	= new MetaData(key, value, expire, currentTime);
+			md	= new MetaData(key, value, expire);
 		} else {
-			md	= new MetaData(key, value, currentTime + expire, currentTime);
+			md	= new MetaData(key, value, currentTime + expire);
 		}
 		
 		lru();
@@ -192,8 +193,7 @@ public class KvDb {
 			_sqlDbManager.delete(key);
 			return null;
 		} else {
-			md.setTouchTime(currentTime);
-			_sqlDbManager.set(md);
+			_sqlDbManager.updateTouchTime(key);
 			return md.getValue();
 		}
 	}

@@ -8,26 +8,22 @@ public class MetaData {
 	private String	_value		= null;
 	private long	_expire		= NEVER_EXPIRE;
 	private long	_touchTime	= System.currentTimeMillis();
+	private long	_updateTime	= System.currentTimeMillis();
+	private long	_createTime	= System.currentTimeMillis();
 	private boolean	_exist		= false;
 	
 	public MetaData(String key) {
 		_key	= key;
-		_exist	= false;
 	}
 	
-	public MetaData(String key, String value, long expire, long touchTime) {
+	public MetaData(String key, String value, long expire) {
 		_key	= key;
 		_value	= value;
 		_expire	= expire;
-		_touchTime	= touchTime;
 		_exist		= true;
 	}
 	
 	/**************getter*******************/
-	public boolean exist() {
-		return _exist;
-	}
-	
 	public String getKey() {
 		return _key;
 	}
@@ -42,6 +38,18 @@ public class MetaData {
 
 	public long getTouchTime() {
 		return _touchTime;
+	}
+	
+	public long getUpdateTime() {
+		return _updateTime;
+	}
+	
+	public long getCreateTime() {
+		return _createTime;
+	}
+	
+	public boolean exist() {
+		return _exist;
 	}
 
 	/**************setter*********************/
@@ -59,6 +67,14 @@ public class MetaData {
 	
 	public void setExpire(long expire) {
 		_expire	= expire;
+	}
+	
+	public void setUpdateTime(long updateTime) {
+		_updateTime	= updateTime;
+	}
+	
+	public void setCreateTime(long createTime) {
+		_createTime	= createTime;
 	}
 	
 	public void setTouchTime(long touchTime) {

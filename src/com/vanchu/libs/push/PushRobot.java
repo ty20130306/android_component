@@ -12,8 +12,8 @@ import android.content.SharedPreferences;
 
 public class PushRobot {
 	private static final String LOG_TAG		= PushRobot.class.getSimpleName();
-	private static final String PREFS_PUSH_PARAM		= "push_param";
-	private static final String PREFS_PUSH_SERVICE_MSG_URL_PARAM	= "push_service_msg_url_param";
+	private static final String PREFS_PUSH_PARAM		= "com_vanchu_libs_push_param";
+	private static final String PREFS_PUSH_SERVICE_MSG_URL_PARAM	= "com_vanchu_libs_push_service_msg_url_param";
 	
 	public static void run(Context context, Class<?> pushServiceClass, PushParam pushParam){
 		setPushParam(context, pushParam);
@@ -56,7 +56,7 @@ public class PushRobot {
 		pushParam.setAfter(after);
 		
 		SwitchLogger.d(LOG_TAG, "prefs get push param,url="+msgUrl+",delay="+delay
-								+",after="+after+",msgInterval="+msgInterval
+								+",after="+after+",msgInterval="+msgInterval+",defaults="+defaults
 								+",avaiStartTime="+avaiStartTime
 								+",avaiEndTime="+avaiEndTime);
 		
@@ -78,7 +78,7 @@ public class PushRobot {
 		boolean succ	= editor.commit();
 		if(succ) {
 			SwitchLogger.d(LOG_TAG, "prefs commit push param succ,url="+pushParam.getMsgUrl()
-									+",delay="+pushParam.getDelay()
+									+",delay="+pushParam.getDelay()+",defaults="+pushParam.getDefaults()
 									+",after="+pushParam.getAfter()+",msgInterval="+pushParam.getMsgInterval()
 									+",avaiStartTime="+pushParam.getAvaiStartTime()
 									+",avaiEndTime="+pushParam.getAvaiEndTime());

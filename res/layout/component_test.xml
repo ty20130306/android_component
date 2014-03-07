@@ -1,241 +1,354 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent" >
 
-	<LinearLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:paddingBottom="@dimen/activity_vertical_margin"
-	    android:paddingLeft="@dimen/activity_horizontal_margin"
-	    android:paddingRight="@dimen/activity_horizontal_margin"
-	    android:paddingTop="@dimen/activity_vertical_margin"
-	    android:orientation="vertical" >
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试事件中心"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testEventCenter" />
-	    
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试对象比较"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testObjCmp" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试时间"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testTime" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试KvDb"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testKvDb" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试删除list元素"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testListRemove" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试父子类转换"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testExtend" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试MusicSceneMgr"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testMusicSceneMgr" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试MusicSceneService"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testMusicSceneService" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试HashMap的containsValue"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testHashMap" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试配置中心"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testCfgCenter" />
-	    
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试json序列化"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testSerializeJson" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试sqlLite"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testSqlLite" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试MusicService"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testMusicService" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试MediaPlayer"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testMediaPlayer" />
-	    
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试动画"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testAnimation" />
-	     
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试WebView"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testWebView" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试WebCache"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testWebCache" />
-	    
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试比例切图"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testScaleCrop" />
-	    
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试SolidQueue"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testSolidQueue" />
-	     
-	     <ProgressBar 
-	        android:id="@+id/downloader_progress_bar"
-	        android:layout_width="match_parent" 
-	        android:layout_height="wrap_content"
-	        style="?android:attr/progressBarStyleHorizontal"
-	        android:max="100"
-	        android:progress="0" />
-	        
-	      <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试下载器--开始下载"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testDownloaderRun" />
-	    
-	      <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试下载器--暂停下载"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testDownloaderPause" />
-	      
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试插件系统"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testPluginSystem" />
-	     
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试启动（packageName）"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="startApp" />
-	     
-	      <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试启动（packageName, className）"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="startApp2" />
-	      
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试自定义升级组件"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="checkUpgradeUIManager" />
-	     
-	      <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试自定义升级代理"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="upgradeUIProxy" />
-	      
-	    <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试升级组件"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="checkUpgradeManager" />
-	    
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试升级代理"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="upgradeProxy" />
-	     
-	     <Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="测试推送服务"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="testPushService" />
-	     
-		<Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="跳               转"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="goToSecond" />
-		
-		<Button
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="反               馈"
-	        android:layout_marginBottom="10dp"
-	        android:onClick="feedback" />
-	</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="another"
+            android:text="AnotherTest" />
+        
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testByteBuffer"
+            android:text="测试ByteBuffer" />
+        
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testGestureLock"
+            android:text="手势解锁" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testCachedImageLoader"
+            android:text="测试图片二级内存缓存" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="getPhoneInfo"
+            android:text="获取机型和版本" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testImageLoad"
+            android:text="测试拍照裁剪组件" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testScrollListView"
+            android:text="测试listview组件" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testSmile"
+            android:text="测试表情组件" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testSlipping"
+            android:text="测试滑动导航组件" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testPictureBrowser"
+            android:text="测试图片浏览器" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testAccountSystem"
+            android:text="测试自有账号系统" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testSinaSdk"
+            android:text="测试sina SDK" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testQqSdk"
+            android:text="测试QQ SDK" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testVanchuTab"
+            android:text="测试底部导航栏" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testEventCenter"
+            android:text="测试事件中心" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testObjCmp"
+            android:text="测试对象比较" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testTime"
+            android:text="测试时间" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testKvDb"
+            android:text="测试KvDb" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testListRemove"
+            android:text="测试删除list元素" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testExtend"
+            android:text="测试父子类转换" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testMusicSceneMgr"
+            android:text="测试MusicSceneMgr" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testMusicSceneService"
+            android:text="测试MusicSceneService" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testHashMap"
+            android:text="测试HashMap的containsValue" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testCfgCenter"
+            android:text="测试配置中心" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testSerializeJson"
+            android:text="测试json序列化" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testSqlLite"
+            android:text="测试sqlLite" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testMusicService"
+            android:text="测试MusicService" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testMediaPlayer"
+            android:text="测试MediaPlayer" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testAnimation"
+            android:text="测试动画" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testWebView"
+            android:text="测试WebView" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testWebCache"
+            android:text="测试WebCache" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testScaleCrop"
+            android:text="测试比例切图" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testSolidQueue"
+            android:text="测试SolidQueue" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testDeadList"
+            android:text="测试DeadList" />
+
+        <ProgressBar
+            android:id="@+id/downloader_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="0" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testDownloaderRun"
+            android:text="测试下载器--开始下载" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testDownloaderPause"
+            android:text="测试下载器--暂停下载" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testPluginSystem"
+            android:text="测试插件系统" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="startApp"
+            android:text="测试启动（packageName）" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="startApp2"
+            android:text="测试启动（packageName, className）" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="checkUpgradeUIManager"
+            android:text="测试自定义升级组件" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="upgradeUIProxy"
+            android:text="测试自定义升级代理" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="checkUpgradeManager"
+            android:text="测试升级组件" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="upgradeProxy"
+            android:text="测试升级代理" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="testPushService"
+            android:text="测试推送服务" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="goToSecond"
+            android:text="跳               转" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="feedback"
+            android:text="反               馈" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="addressBookClick"
+            android:text="通讯录" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:onClick="locationClick"
+            android:text="获取位置" />
+    </LinearLayout>
+
 </ScrollView>

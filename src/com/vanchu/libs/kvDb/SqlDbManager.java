@@ -2,6 +2,8 @@ package com.vanchu.libs.kvDb;
 
 
 import com.vanchu.libs.common.util.SwitchLogger;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -17,10 +19,41 @@ public class SqlDbManager {
 		_db			= _dbHelper.getWritableDatabase();
 	}
 	
+	public boolean updateTouchTime(String key) {
+		ContentValues cv	= new ContentValues();
+		cv.put(SqlDbHelper.COLUMN_TOUCH_TIME, new Long(System.currentTimeMillis()));
+		int num	= _db.update(SqlDbHelper.TABLE_NAME, cv, SqlDbHelper.COLUMN_KEY+"=?", new String[]{key});
+		if(1 == num) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean updateExpireAndTouchTime(String key, long expire) {
+		ContentValues cv	= new ContentValues();
+		cv.put(SqlDbHelper.COLUMN_EXPIRE, new Long(expire));
+		cv.put(SqlDbHelper.COLUMN_TOUCH_TIME, new Long(System.currentTimeMillis()));
+		
+		int num	= _db.update(SqlDbHelper.TABLE_NAME, cv, SqlDbHelper.COLUMN_KEY+"=?", new String[]{key});
+		if(1 == num) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean set(MetaData md) {
 		try {
-			_db.execSQL("REPLACE INTO " + SqlDbHelper.TABLE_NAME + " VALUES (?, ?, ?, ?)", 
-						new Object[] {md.getKey(), md.getValue(), md.getExpire(), md.getTouchTime()});
+			long currentTime	= System.currentTimeMillis();
+			MetaData oldMd		= get(md.getKey());
+			long createTime		= currentTime;
+			if(oldMd.exist()) {
+				createTime	= oldMd.getCreateTime();
+			}
+			_db.execSQL("REPLACE INTO " + SqlDbHelper.TABLE_NAME + " VALUES (?, ?, ?, ?, ?, ?)", 
+						new Object[] {md.getKey(), md.getValue(), md.getExpire(), currentTime,
+										currentTime, createTime});
 			
 			return true;
 		} catch (SQLException e) {
@@ -46,6 +79,12 @@ public class SqlDbManager {
 				
 				long touchTime	= c.getLong(c.getColumnIndex(SqlDbHelper.COLUMN_TOUCH_TIME));
 				md.setTouchTime(touchTime);
+				
+				long updateTime	= c.getLong(c.getColumnIndex(SqlDbHelper.COLUMN_UPDATE_TIME));
+				md.setUpdateTime(updateTime);
+				
+				long createTime	= c.getLong(c.getColumnIndex(SqlDbHelper.COLUMN_CREATE_TIME));
+				md.setCreateTime(createTime);
 				
 				md.setExist(true);
 			}

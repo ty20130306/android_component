@@ -1,0 +1,55 @@
+
+使用方法：
+一)继承AddressBookActivity
+二)调用initResId方法
+		initResId(R.layout.item_minefriend, R.id.minefriend_item_image, R.id.minefriend_item_name,
+				R.layout.dialog_minefriend_text, R.id.minefriend_item_alphabar, 
+				R.drawable.headicon_default , mListView, mlinearLayout);
+	
+三)调用initData方法
+参数说明：
+item布局文件ID，头像布局文件id，名字布局文件id，触摸指示器时中间显示text的布局文件id,分类标签id，悄悄话资源id,内容listview，指示器linearLaout,头像默认图片
+context             上下文对象
+LETTERS       		通讯录右边指示器的标识（例如：， 。 # A B C  D）
+personDataList  	PersonInfoEntity对象集合（参数有：头像url地址，用户名字，对应指示器标签）
+webCache			头像缓存webcache
+
+四)点击事件：
+	1、悄悄话点击事件
+	@Override
+	public void privateClickListener(int position) {
+		super.privateClickListener(position);
+		Log.d("tag", "click the private conversation ,position:"+position);
+	}
+	2、item点击事件
+	@Override
+	public void itemClick(int position) {
+		super.itemClick(position);
+		Log.d("tag", "itemClick");
+	}
+	3、item长按事件
+	@Override
+	public void itemLongClick(int position) {
+		super.itemLongClick(position);
+		Log.d("tag", "itemLongClick");
+	}
+五)删除一项item
+	deletePerson(position);
+六）选用继承方法
+	1、设置指示器字母和背景颜色
+	setColor(getResources().getColor(R.color.mine_friend_indicator),
+				getResources().getColor(R.color.mine_friend_layout));
+	2、在刷新adapter之前会调用此方法，isSetAdapter返回true时此方法会在设置adapter之前调用，在这个时候可以设置footview或者headview
+	 beforeRefreshAdapter(List<AddressBookData> data , ListView listView ,boolean  isSetAdapter)
+	3、handleNewView(View view , int position)
+		此方法会在getview里调用，如果要在item里添加某个控件，可在此方法中添加
+	4、
+	
+
+AndriodManifest.xml需要加入的权限：
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+注意：LETTERS中的字符必须和PersonInfoEntity中的指示器标签对应，如果指示器标签中有些字符在LETTERS中没有，手指滑动时listview就不会跳到那一项
+

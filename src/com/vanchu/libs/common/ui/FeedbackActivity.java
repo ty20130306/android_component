@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.vanchu.libs.common.util.ActivityUtil;
 import com.vanchu.libs.common.util.NetUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 
@@ -13,8 +14,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -23,6 +22,8 @@ import android.widget.ImageButton;
 
 
 abstract public class FeedbackActivity extends Activity implements OnClickListener {
+	
+	private static final String LOG_TAG		= FeedbackActivity.class.getSimpleName();
 	
 	private static final int DEFAULT_MAX_MSG_LEN		= 200;
 	private static final int DEFAULT_MAX_CONTACT_LEN	= 50;
@@ -47,7 +48,9 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	private EditText	_contactText	= null;
 	private EditText	_msgText		= null;
 	
+	private String	_contactKey	= "contact";
 	private String	_contact	= "";
+	private String	_msgKey		= "msg";
 	private String	_msg		= "";
 	
 	private int _layoutResId;
@@ -125,8 +128,30 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 		_contactText	= (EditText)findViewById(_contactTextResId);
 		_msgText		= (EditText)findViewById(_msgTextResId);
 		
-		_msgText.addTextChangedListener(new MsgTextWatcher());
-		_contactText.addTextChangedListener(new ContactTextWatcher());
+		_msgText.addTextChangedListener(new MaxInputTextWatcher(_msgText, _maxMsgLen, new MaxInputTextWatcher.Callback() {
+			
+			@Override
+			public void onMaxInputReached(int maxLen) {
+				Tip.show(FeedbackActivity.this, "你只能输入"+maxLen+"个字");
+			}
+			
+			@Override
+			public void onTextChanged(String currentStr, int maxLen) {
+				SwitchLogger.d(LOG_TAG, "current str="+currentStr+",len="+currentStr.length()+",maxLen="+maxLen);
+			}
+		}));
+		_contactText.addTextChangedListener(new MaxInputTextWatcher(_contactText, _maxContactLen, new MaxInputTextWatcher.Callback() {
+			
+			@Override
+			public void onMaxInputReached(int maxLen) {
+				Tip.show(FeedbackActivity.this, "你只能输入"+maxLen+"个字");
+			}
+			
+			@Override
+			public void onTextChanged(String currentStr, int maxLen) {
+				SwitchLogger.d(LOG_TAG, "current str="+currentStr+",len="+currentStr.length()+",maxLen="+maxLen);
+			}
+		}));
 	}
 	
 	@Override
@@ -151,9 +176,9 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 		beforeSendRequest();		
 		new Thread(){
 			public void run(){
-				_submitUrlParams.put("contact", _contact);
-				_submitUrlParams.put("msg", _msg);
-				String response	= NetUtil.httpPostRequest(_submitUrl, _submitUrlParams, 3);
+				_submitUrlParams.put(_contactKey, _contact);
+				_submitUrlParams.put(_msgKey, _msg);
+				String response	= NetUtil.httpPostRequest(_submitUrl, _submitUrlParams, 1);
 				if(null != response && onSubmitResponse(response)){
 					_handler.sendEmptyMessage(SUBMIT_SUCC);
 				} else {
@@ -164,55 +189,10 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	}
 
 	private void cancel() {
+		ActivityUtil.hideInputPanel(this);
 		quit();
 	}
 
-	private class MsgTextWatcher implements TextWatcher{
-		private CharSequence temp;
-		
-		@Override
-		public void afterTextChanged(Editable s) {
-			if(temp.length() > _maxMsgLen){
-				s.delete(_maxMsgLen, temp.length());
-				_msgText.setText(s);
-				_msgText.setSelection(_msgText.getText().toString().length()); 
-			}
-		}
-
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
-			// nothing to do
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			temp	= s;
-		}
-	}
-	
-	private class ContactTextWatcher implements TextWatcher{
-		private CharSequence temp;
-		
-		@Override
-		public void afterTextChanged(Editable s) {
-			if(temp.length() > _maxContactLen){
-				s.delete(_maxContactLen, temp.length());
-				_contactText.setText(s);
-				_contactText.setSelection(_contactText.getText().toString().length()); 
-			}
-		}
-
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
-			// nothing to do
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			temp	= s;
-		}
-	}
-	
 	protected void initResId(int layoutResId, int contactTextResId, int msgTextResId, 
 			int cancelBtnResId, int submitBtnResId) 
 	{
@@ -256,6 +236,7 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	}
 	
 	protected void onSubmitSucc() {
+		ActivityUtil.hideInputPanel(this);
 		Tip.show(this, "反馈成功, 我们会尽快处理您的反馈");
 	}
 	
@@ -279,6 +260,14 @@ abstract public class FeedbackActivity extends Activity implements OnClickListen
 	
 	protected void setIsSubmitImageBtn(boolean isSubmitImageBtn) {
 		_isSubmitImageBtn	= isSubmitImageBtn;
+	}
+	
+	protected void setContactKey(String contactKey) {
+		_contactKey	= contactKey;
+	}
+	
+	protected void setMsgKey(String msgKey) {
+		_msgKey		= msgKey;
 	}
 	
 	/**

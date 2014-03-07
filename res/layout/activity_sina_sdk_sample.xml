@@ -1,0 +1,89 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical" >
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件登录"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libLogin" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件注销"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libLogout" />
+	    
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件验证token"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libValidate" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="登录"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="login" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="注销"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="logout" />
+	    
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="验证token"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="validate" />
+	   
+	   <EditText
+        android:id="@+id/msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="8"
+        android:hint="输入微博内容" />
+	   
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="发文字微博"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="update" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="发图文微博"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="upload" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件发文字微博"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libUpdate" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件发图文微博"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libUpload" />
+	    
+	</LinearLayout>
+</ScrollView>	    

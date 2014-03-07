@@ -1,0 +1,109 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical" >
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件登录"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libLogin" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件验证token"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libValidate" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件退出"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libLogout" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件shareToQq"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libShareToQq" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件sendStory"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libSendStory" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件分享到微信好友"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libShareToWxFriend" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="组件分享到微信朋友圈"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="libShareToWxCircle" />
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="登录"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="login" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="注销"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="logout" />
+	    
+	   <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="验证token"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="validate" />
+	   
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="分享到qq"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="shareToQq" />
+	   
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="应用邀请"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="invite" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="sendStory"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="sendStory" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="分享到微信好友"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="shareToWxFriend" />
+	    
+	    <Button
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="分享到微信朋友圈"
+	        android:layout_marginBottom="10dp"
+	        android:onClick="shareToWxCircle" />
+	</LinearLayout>
+</ScrollView>	    

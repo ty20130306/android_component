@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" > 
+    <TextView
+        android:id="@+id/item_talk_client_sender_id" 
+        android:layout_height="wrap_content" 
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:text="发送人的id" >
+    </TextView> 
+    
+    <TextView
+        android:id="@+id/item_talk_client_send_time" 
+        android:layout_height="wrap_content" 
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/item_talk_client_sender_id"
+        android:text="时间" >
+    </TextView>
+    
+    <TextView
+        android:id="@+id/item_talk_client_send_state" 
+        android:layout_height="wrap_content" 
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/item_talk_client_send_time"
+        android:text="发送状态" >
+    </TextView>
+    
+    <Button
+        android:id="@+id/item_talk_client_resend" 
+        android:layout_height="40dp" 
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:textSize="12sp"
+        android:layout_toRightOf="@id/item_talk_client_send_state"
+        android:visibility="gone"
+        android:text="重发" >
+    </Button>
+    
+    <TextView
+        android:id="@+id/item_talk_client_msg" 
+        android:layout_height="wrap_content" 
+        android:layout_width="wrap_content"
+        android:layout_below="@id/item_talk_client_sender_id"
+        android:text="发送的消息" >
+    </TextView>
+</RelativeLayout>

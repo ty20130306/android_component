@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".TestActivity" >
+
+    <LinearLayout
+        android:id="@+id/function"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/inputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/function"
+        android:layout_gravity="bottom" >
+
+        <ImageButton
+            android:id="@+id/smile"
+            android:layout_width="40dip"
+            android:layout_height="match_parent" />
+
+        <com.vanchu.libs.smile.SmileEditText
+            android:id="@+id/editText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:maxLines="2"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/input"
+            android:layout_width="40dip"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/inputLayout"
+        android:layout_alignParentTop="true" >
+
+        <com.vanchu.libs.smile.SmileTextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+
+</RelativeLayout>

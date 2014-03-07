@@ -49,7 +49,7 @@ public class Storage {
 
         this._external = "";
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            dir = new File(Environment.getExternalStorageDirectory(), context.getPackageName() + "/" + DIR_NAME + "/" + type);
+            dir = new File(Environment.getExternalStorageDirectory(), "data/"+context.getPackageName() + "/" + DIR_NAME + "/" + type);
             dir.mkdirs();
             this._external = dir.getAbsolutePath();
         }

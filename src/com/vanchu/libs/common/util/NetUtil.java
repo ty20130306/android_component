@@ -1,8 +1,10 @@
 package com.vanchu.libs.common.util;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,11 +17,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +48,9 @@ public class NetUtil {
 	private static final int HTTP_RETRY_MAX				= 3;
 	
 	public static boolean isConnected(Context context){
+		if (null == context ) {
+			return false;
+		}
 		ConnectivityManager connMgr	= (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if(null != connMgr){
 			NetworkInfo networkInfo	= connMgr.getActiveNetworkInfo();
@@ -124,6 +133,59 @@ public class NetUtil {
 			return HTTP_RETRY_MAX;
 		} else {
 			return retry;
+		}
+	}
+
+	public interface PostTextAndImgCallback {
+		public void onProgress(long uploaded, long total);
+		public void onSucc(String response);
+		public void onFail();
+	}
+	
+	public static void postTextAndImg(String url, Map<String, String> textParams, 
+			Map<String, String> imgParams, final PostTextAndImgCallback callback) 
+	{
+		try {
+			DefaultHttpClient httpClient	= createHttpClient();
+			HttpPost httpPost	= new HttpPost(url);
+			CustomMultipartEntity	entity	= new CustomMultipartEntity();
+			String paramStr	= "?";
+			if(null != textParams) {
+				Iterator<Entry<String, String>> iterator	= textParams.entrySet().iterator();
+				while(iterator.hasNext()){
+					Entry<String, String> entry	= iterator.next();
+					entity.addPart(entry.getKey(), new StringBody(entry.getValue(), Charset.forName("UTF-8")));
+					paramStr += entry.getKey() + "=" + entry.getValue()+"&";
+				}
+			}
+
+			if(null != imgParams) {
+				Iterator<Entry<String, String>> iterator	= imgParams.entrySet().iterator();
+				while(iterator.hasNext()){
+					Entry<String, String> entry	= iterator.next();
+					entity.addPart(entry.getKey(), new FileBody(new File(entry.getValue())));
+					paramStr += entry.getKey() + "=" + entry.getValue()+"&";
+				}
+			}
+			
+			final long totalSize	= entity.getContentLength();  
+			SwitchLogger.d(LOG_TAG, "postTextAndImg, url="+url+paramStr+",total size="+totalSize);
+			
+			entity.setProgressListener(new CustomMultipartEntity.ProgressListener() {
+				
+				@Override
+				public void transferred(long num) {
+					callback.onProgress(num, totalSize);
+				}
+			});
+			
+			httpPost.setEntity(entity);
+			HttpResponse httpResponse	= httpClient.execute(httpPost);
+			String response	= EntityUtils.toString(httpResponse.getEntity());
+			callback.onSucc(response);
+		} catch (Exception e) {
+			SwitchLogger.e(e);
+			callback.onFail();
 		}
 	}
 	

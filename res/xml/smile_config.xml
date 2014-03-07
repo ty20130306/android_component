@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+	<item key="[微笑]" pic="e000" />
+	<item key="[难过]" pic="e001" />
+	<item key="[大笑]" pic="e002" />
+	<item key="[大哭]" pic="e003" />
+	<item key="[发怒]" pic="e004" />
+	<item key="[惊讶]" pic="e005" />
+	<item key="[调皮]" pic="e006" />
+	<item key="[害羞]" pic="e007" />
+	<item key="[偷笑]" pic="e008" />
+	<item key="[流汗]" pic="e009" />
+	<item key="[抓狂]" pic="e010" />
+	<item key="[呲牙]" pic="e011" />
+	<item key="[可爱]" pic="e012" />
+	<item key="[惊恐]" pic="e013" />
+	<item key="[咒骂]" pic="e014" />
+	<item key="[折磨]" pic="e015" />
+	<item key="[闭嘴]" pic="e016" />
+	<item key="[睡觉]" pic="e017" />
+	<item key="[抱抱]" pic="e018" />
+	<item key="[胜利]" pic="e019" />
+	<item key="[月亮]" pic="e020" />
+	<item key="[亲亲]" pic="e021" />
+	<item key="[握手]" pic="e022" />
+	<item key="[咖啡]" pic="e023" />
+	<item key="[尴尬]" pic="e024" />
+	<item key="[耍酷]" pic="e025" />
+	<item key="[可怜]" pic="e026" />
+	<item key="[白眼]" pic="e027" />
+	<item key="[傲慢]" pic="e028" />
+	<item key="[困了]" pic="e029" />
+	<item key="[色眼]" pic="e030" />
+	<item key="[大兵]" pic="e031" />
+	<item key="[奋斗]" pic="e032" />
+	<item key="[晕了]" pic="e033" />
+	<item key="[悲剧]" pic="e034" />
+	<item key="[骷髅]" pic="e035" />
+	<item key="[再见]" pic="e036" />
+	<item key="[抠鼻]" pic="e037" />
+	<item key="[坏笑]" pic="e038" />
+	<item key="[右哼]" pic="e039" />
+	<item key="[鄙视]" pic="e040" />
+	<item key="[委屈]" pic="e041" />
+	<item key="[墨镜]" pic="e042" />
+	<item key="[要哭]" pic="e043" />
+	<item key="[阴险]" pic="e044" />
+	<item key="[很棒]" pic="e045" />
+	<item key="[药丸]" pic="e046" />
+	<item key="[菜刀]" pic="e047" />
+	<item key="[西瓜]" pic="e048" />
+	<item key="[啤酒]" pic="e049" />
+	<item key="[米饭]" pic="e050" />
+	<item key="[玫瑰]" pic="e051" />
+	<item key="[爱心]" pic="e052" />
+	<item key="[蛋糕]" pic="e053" />
+	<item key="[炸弹]" pic="e054" />
+	<item key="[礼物]" pic="e055" />
+	<item key="[爱你]" pic="e056" />
+	<item key="[好的]" pic="e057" />
+
+</resources>

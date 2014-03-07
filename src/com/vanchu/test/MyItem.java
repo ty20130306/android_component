@@ -38,4 +38,26 @@ class MyItem implements Serializable {
 	public void set_name(String _name) {
 		this._name = _name;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) {
+			return true;
+		}
+		
+		if(o == null) {
+			return false;
+		}
+		
+		if(this.getClass() != o.getClass()){
+			return false;
+		}
+		
+		MyItem another	= (MyItem)o;
+		if(null != _id && _id.equals(another.get_id())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

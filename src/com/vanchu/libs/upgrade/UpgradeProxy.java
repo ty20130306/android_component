@@ -66,7 +66,7 @@ public class UpgradeProxy {
 			return ;
 		}
 		
-		String response = NetUtil.httpGetRequest(_upgradeInfoUrl, null, 3);
+		String response = NetUtil.httpGetRequest(_upgradeInfoUrl, null, 1);
 		if(response == null){
 			_handler.obtainMessage(ERR_HTTP_REQUEST_FAILED).sendToTarget();
 			return ;

@@ -80,8 +80,7 @@ public class MusicFavoriteScene extends MusicScene {
 	@Override
 	protected void getInfoListFromSource(final OnlineCallback callback) {
 		MusicDbManager dbManager	= new MusicDbManager(_context);
-		//int limit	= _eachFetchNum;
-		int limit	= 2;
+		int limit	= _eachFetchNum;
 		int offset	= _currentInfoIndex;
 		if(offset < 0) {
 			offset	= 0;

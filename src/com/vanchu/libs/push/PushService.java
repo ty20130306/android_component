@@ -89,6 +89,7 @@ abstract public class PushService extends Service {
 		notification.setLatestEventInfo(this, pushMsg.getTitle(), pushMsg.getText(), pIntent);
 		notification.defaults = _pushParam.getDefaults();
 		
+		SwitchLogger.d(LOG_TAG, "notification.defaults = " + notification.defaults);
 		NotificationManager	notificationManager	= (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(pushMsg.getType(), notification);
 	}
@@ -363,10 +364,11 @@ abstract public class PushService extends Service {
 	}
 	
 	private void getPushMsg() {
+		getPushParam();
 		new Thread() {
 			public void run() {
 				if(_pushParam.isMsgUrlValid()){
-					String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 3);
+					String response	= NetUtil.httpPostRequest(_pushParam.getMsgUrl(), _pushParam.getMsgUrlParam(), 1);
 					if(response == null){
 						SwitchLogger.e(LOG_TAG, "request push msg fail");
 						return ;

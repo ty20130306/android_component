@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- 按下 -->
+	<item android:state_pressed="true" android:drawable="@android:color/darker_gray" />
+	<!-- 聚焦 -->
+	<item android:state_focused="true" android:drawable="@android:color/darker_gray" />
+	<!-- 选中 -->
+	<item android:state_checked="true" android:drawable="@android:color/darker_gray" />
+	<!-- 默认 -->
+	<item android:drawable="@android:color/transparent" />
+</selector>

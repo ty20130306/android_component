@@ -279,7 +279,7 @@ public class VanchuMusicService extends MusicService {
 				params.put("newbie", getAndUpdateNewbieFlag());
 				params.put("num", _eachFetchNum);
 				
-				String response	= NetUtil.httpPostRequest(_requestUrl, params, 3);
+				String response	= NetUtil.httpPostRequest(_requestUrl, params, 1);
 				SwitchLogger.d(LOG_TAG, "response="+response);
 
 				if(response == null){

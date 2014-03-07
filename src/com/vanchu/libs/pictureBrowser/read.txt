@@ -1,0 +1,43 @@
+
+使用方法：
+一)初始化对象
+PictureBrowser browser = new  PictureBrowser(Context context, PictureBrowserViewEntity browserEntity,
+			List<PictureBrowserDataEntity> lists, int currentIndex,
+			PictureBrowserItemViewEntity browserItemEntity) {
+			
+参数说明：
+context             上下文对象
+browserEntity       承装的对象（ViewPager，LinearLayout[点个数,子标签必须是Imageview 不能包含其他的标签] ）
+lists               加载数据           （默认图片，加载的大图URL）
+currentIndex        当前选择展示的下标 从0开始
+browserItemEntity   viewPager需要承装的对象 （布局文件的ID，imageview的id，progressbar的id，textview的id）
+
+browser.setItemClickListener(PictureBrowserItemClickLinstener itemClickLinstener)  ViewPager Item ImageView onClick Listener 
+点击ViewPager Item ImageView onClick 时间
+
+二)  browser.initpager();  调用这个展示数据
+
+
+补充：PictureBrowserDataEntity 有两种方式
+
+第一种：PictureBrowserDataEntity(Drawable defDrawable, String detailUrl)  
+参数说明：
+defDrawable：默认图片
+     
+detailUrl：详细图片的地址
+
+第二种：PictureBrowserDataEntity(String defImgUrl, String detailUrl,WebCache webCache)
+
+参数说明： 
+defImgUrl：默认图片的地址
+detailUrl：详细图片的地址
+webCache： 缓存图片的webcache
+
+
+AndriodManifest.xml需要加入的权限：
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+如果需要用到放大缩小图片，需要使用com.vanchu.apps.guimiquan.imgzoom.GestureImageView这个自定义的Imageview
+特别注意：需要在view的父控件上加上xmlns:gesture-image="http://schemas.polites.com/android"这个域名（非常重要）

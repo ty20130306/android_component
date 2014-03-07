@@ -18,6 +18,19 @@ public class WebCache {
     static public class Settings{
         public int capacity = 100; /* items to hold */
         public int timeout = 10000; /* timeout in milliseconds */
+        
+        public Settings() {
+
+        }
+        
+        public Settings(int capacity) {
+        	this.capacity	= capacity;
+        }
+        
+        public Settings(int capacity, int timeout) {
+        	this.capacity	= capacity;
+        	this.timeout	= timeout;
+        }
     }
 
     public interface GetCallback{
@@ -50,10 +63,20 @@ public class WebCache {
             WebCache cache = _instances.get(type);
             if(cache == null){
                 cache = new WebCache(context, type);
+                cache.setup(new Settings());
                 _instances.put(type, cache);
             }
             return cache;
         }
+    }
+    
+    public boolean inCache(String url) {
+    	File file = WebCache.this._storage.get(url);
+		if(null != file){
+			return true;
+		} else {
+			return false;
+		}
     }
 
     public void get(final String url, final GetCallback getCallback, final Object param, final boolean skipCache){

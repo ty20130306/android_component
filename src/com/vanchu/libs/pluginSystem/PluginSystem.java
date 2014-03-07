@@ -112,7 +112,7 @@ public class PluginSystem {
 			return ;
 		}
 		
-		String response = NetUtil.httpGetRequest(_pluginCfgUrl, null, 3);
+		String response = NetUtil.httpGetRequest(_pluginCfgUrl, null, 1);
 		if(response == null){
 			_handler.obtainMessage(ERR_HTTP_REQUEST_FAILED).sendToTarget();
 			return ;

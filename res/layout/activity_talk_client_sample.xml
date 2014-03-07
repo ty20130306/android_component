@@ -1,0 +1,128 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".TalkClientSampleActivity" >
+
+    <ListView
+        android:id="@+id/talk_client_content"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/talk_client_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="输入你要发送的消息"
+            android:text="" />
+
+        <Button
+            android:id="@+id/talk_client_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:onClick="send"
+            android:text="发 送" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/talk_client_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/talk_client_host"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="host"
+            android:singleLine="true"
+            android:text="test.gmq.apps.vanchu.cn" />
+
+        <EditText
+            android:id="@+id/talk_client_port"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:hint="port"
+            android:singleLine="true"
+            android:text="5000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/talk_client_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/talk_client_uid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="uid"
+            android:singleLine="true"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/talk_client_to_uid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="to uid"
+            android:singleLine="true"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/talk_client_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/talk_client_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="start"
+            android:text="连接" />
+
+        <Button
+            android:id="@+id/talk_client_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="stop"
+            android:text="断开" />
+
+        <Button
+            android:id="@+id/talk_client_restart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="restart"
+            android:text="重连" />
+        
+        <Button
+            android:id="@+id/talk_client_check_connect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="checkConnect"
+            android:text="检查" />
+    </LinearLayout>
+
+</LinearLayout>

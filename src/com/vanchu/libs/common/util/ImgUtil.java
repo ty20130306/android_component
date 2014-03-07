@@ -7,8 +7,6 @@ import com.vanchu.libs.common.task.AsyncImageLoader;
 import com.vanchu.libs.common.task.AsyncImageLoader.ImageCallback;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
@@ -33,51 +31,6 @@ public class ImgUtil {
 		
 		_path = _context.getDir(LOADED_IMG_DIR, Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE) + "/";
 		_asyncImageLoader = new AsyncImageLoader(_path);
-	}
-	
-	public static Bitmap getSuitableBitmap(File file) {
-		Bitmap bitmap = null;
-		try {
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			FileInputStream fis	= new FileInputStream(file);
-			bitmap	= BitmapFactory.decodeStream(fis, null, options);
-			
-			int sum = options.outWidth * options.outHeight;
-			SwitchLogger.d(LOG_TAG, "=============before, width="+options.outWidth+",height="+options.outHeight);
-			if (sum > 640000 || options.outWidth > 2048 || options.outHeight > 2048) { // 图片太大
-				float scale = (float) Math.sqrt(sum / 500000.0f);
-				float extScale	= 0.0f;	
-				if(options.outWidth > 2048) {
-					extScale	= (float)((float)(options.outWidth) / (float)(1024+256));
-				}
-				if(options.outHeight > 2048) {
-					float tmpScale	= (float)((float)(options.outHeight) / (float)(1024+256));
-					if(tmpScale > extScale) {
-						extScale = tmpScale;
-					}
-				}
-				float totalScale	= scale + extScale;
-				options.outWidth /= totalScale;
-				options.outHeight /= totalScale;
-				options.inSampleSize		= (int)(Math.ceil(totalScale));
-				//options.inPreferredConfig	= Bitmap.Config.ARGB_4444;
-				//options.inPreferredConfig	= Bitmap.Config.RGB_565;
-				options.inDither			= false;	//Disable Dithering mode
-				options.inPurgeable			= true;		//Tell to gc that whether it needs free memory, the Bitmap can be cleared
-				options.inInputShareable	= true;		//Which kind of reference will be used to recover the Bitmap data after being clear, when it will be used in the future
-				SwitchLogger.d(LOG_TAG, "=============scale="+scale+", extScale="+extScale+",totalScale="+totalScale+",inSampleSize="+options.inSampleSize);
-			}
-			SwitchLogger.d(LOG_TAG, "=============after, width="+options.outWidth+",height="+options.outHeight);
-			options.inJustDecodeBounds	= false;
-
-			fis	= new FileInputStream(file);
-			bitmap = BitmapFactory.decodeStream(fis, null, options);
-		} catch (Exception e) {
-			SwitchLogger.e(e);
-			return null;
-		}
-		return bitmap;
 	}
 
 	public static String getImgTypeFromFile(File file) {

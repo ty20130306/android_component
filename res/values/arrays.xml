@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string-array name="default_smiley_texts">
+        <item>[爱你]</item>
+        <item>[机器人]</item>
+        <item>[拜拜]</item>
+        <item>[抱抱]</item>
+        <item>[悲剧]</item>
+        <item>[悲伤]</item>
+        <item>[便便]</item>
+        <item>[鄙视]</item>
+        <item>[闭嘴]</item>
+        <item>[不要]</item>
+        <item>[馋嘴]</item>
+    </string-array>
+
+</resources>

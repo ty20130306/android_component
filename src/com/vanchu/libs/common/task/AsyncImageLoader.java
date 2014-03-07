@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.vanchu.libs.common.util.ImgUtil;
+import com.vanchu.libs.common.util.BitmapUtil;
 import com.vanchu.libs.common.util.StringUtil;
 import com.vanchu.libs.common.util.SwitchLogger;
 
@@ -31,6 +31,12 @@ public class AsyncImageLoader {
 		_path = path;
 	}
 
+	public String getFilePathByUrl(String imageUrl) {
+		String imgName = getImgName(imageUrl);
+		
+		return _path + "/" + imgName;
+	}
+	
 	/**
 	 * 从缓存获取图片
 	 * 
@@ -45,7 +51,7 @@ public class AsyncImageLoader {
 		
 		// 1、从本地加载图片
 		String imgName = getImgName(imageUrl);
-		Bitmap bitmap = ImgUtil.getSuitableBitmap(new File(_path + imgName));
+		Bitmap bitmap = BitmapUtil.getSuitableBitmap(new File(_path + imgName));
 		if (bitmap != null) {
 			Drawable drawable = new BitmapDrawable(bitmap);
 			SwitchLogger.d(LOG_TAG, "get from storage");

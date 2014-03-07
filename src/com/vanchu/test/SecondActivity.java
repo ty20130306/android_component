@@ -18,12 +18,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class SecondActivity extends Activity {
 
@@ -60,6 +63,22 @@ public class SecondActivity extends Activity {
 		String uniqueId	= IdUtil.getDeviceUniqueId(this);
 		
 		SwitchLogger.d(LOG_TAG, "device id="+deviceId+",uuid="+uuid+",uniqueId="+uniqueId);
+		
+		TextView tView = (TextView) findViewById(R.id.text_and_img);
+	    final String sText1 = "测试图片信息：<img src=" + R.drawable.ic_launcher + " />";
+
+	    final Html.ImageGetter imageGetter = new Html.ImageGetter() {
+
+	        public Drawable getDrawable(String source) {
+	            Drawable drawable = null;
+	            int rId = Integer.parseInt(source);
+	            drawable = getResources().getDrawable(rId);
+	            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
+	                    drawable.getIntrinsicHeight());
+	            return drawable;
+	        };
+	    };
+	    tView.setText(Html.fromHtml(sText1, imageGetter, null));
 	}
 
 	@Override

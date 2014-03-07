@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -146,16 +147,92 @@ public class SolidQueue <T>{
 		}
 	}
 	
+	public void clear() {
+		synchronized (_lock) {
+			int oldMaxSize	= _maxSize;
+			setMaxSize(0);
+			solidify();
+			setMaxSize(oldMaxSize);
+		}
+	}
+	
+	public boolean destroy() {
+		synchronized (_lock) {
+			try {
+				clear();
+				
+				File queueFile	= new File(_path);
+				if(queueFile.exists()) {
+					boolean succ	= queueFile.delete();
+					if(succ) {
+						SwitchLogger.d(LOG_TAG, "queue file delete succ, path=" + _path);
+					} else {
+						SwitchLogger.e(LOG_TAG, "queue file delete fail, path=" + _path);
+					}
+					
+					return succ;
+				} else {
+					SwitchLogger.d(LOG_TAG, "queue file not exist, delete fail, path=" + _path);
+					return false;
+				}
+
+			} catch(Exception e) {
+				SwitchLogger.e(e);
+				return false;
+			}
+		}
+	}
+	
+	public void addAll(List<T> elementList, boolean smallIndexFirst) {
+		synchronized (_lock) {
+			if(smallIndexFirst) {
+				for(int i = 0; i < elementList.size(); ++i) {
+					T element	= elementList.get(i);
+					_linkedList.addFirst(element);
+					if(null != _callback) {
+						_callback.onAdd(element);
+					}
+				}
+			} else {
+				for(int i = elementList.size() - 1; i >= 0; --i) {
+					T element	= elementList.get(i);
+					_linkedList.addFirst(element);
+					if(null != _callback) {
+						_callback.onAdd(element);
+					}
+				}
+			}
+			
+			solidify();
+		}
+	}
+	
 	public void setMaxSize(int maxSize) {
-		_maxSize	= maxSize;
+		synchronized (_lock) {
+			_maxSize	= maxSize;
+		}
 	}
 	
 	public int size() {
-		return _linkedList.size();
+		synchronized (_lock) {
+			return _linkedList.size();
+		}
 	}
 	
 	public LinkedList<T> getQueue() {
-		return _linkedList;
+		synchronized (_lock) {
+			return _linkedList;
+		}
+	}
+	
+	public LinkedList<T> getReverseQueue() {
+		synchronized (_lock) {
+			LinkedList<T> reverseQueue	= new LinkedList<T>();
+			for(int i = 0; i < _linkedList.size(); ++i) {
+				reverseQueue.addFirst(_linkedList.get(i));
+			}
+			return reverseQueue;
+		}
 	}
 	
 	public static interface SolidQueueCallback<E> {
